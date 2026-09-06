@@ -1262,7 +1262,7 @@ function Workspace() {
 
                             {message.basis && message.basis.length > 0 && (
                               <div className="border-t border-[var(--line)] pt-3 flex flex-wrap items-center gap-1.5">
-                                <span className="font-utility text-[9px] text-[var(--subtle)] mr-1">BASIS:</span>
+                                <span className="font-utility text-[9px] text-[var(--subtle)] mr-1">Sources:</span>
                                 {message.basis.map((b) => (
                                   <span key={b.id} className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-0.5 text-[var(--muted)]">
                                     {b.display}
