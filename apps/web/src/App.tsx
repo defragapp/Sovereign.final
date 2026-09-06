@@ -335,7 +335,7 @@ function Landing() {
             <div>
               <span className="font-utility text-[10px] text-[var(--sage)]">PRIVATE CONTEXT</span>
               <h2 className="mt-2 font-statement text-3xl md:text-4xl text-[var(--cream)]">
-                A private reference built around you.
+                Context that stays with you.
               </h2>
               <p className="mt-6 font-explanation text-[15px] leading-relaxed text-[var(--muted)]">
                 Sovereign begins with your Baseline: a private reference that gives the system context for how you tend to operate. Instead of starting every conversation from scratch, Sovereign holds a quiet, consistent memory of your context that stays strictly private to you.
@@ -1397,7 +1397,7 @@ function Workspace() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6 pb-8">
+                <div className="space-y-6 pb-36">
                   {messages.map((message) =>
                     message.role === 'user' ? (
                       <div
