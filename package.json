@@ -10,6 +10,9 @@
     "build": "pnpm --filter @sovereign/web build && pnpm --filter @sovereign/worker build",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "verify:live-visual-release": "node scripts/verify-live-visual-release-v3.mjs",
+    "production:release:text": "node scripts/assert-main-release.mjs --require-current-origin-main && node scripts/cloudflare-production-text-release.mjs",
+    "production:deploy:v3": "node scripts/cloudflare-production-deploy-v3.mjs"
   }
 }

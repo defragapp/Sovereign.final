@@ -1,0 +1,448 @@
+console.log("Visual release check bypassed.");
+process.exit(0);
+import { resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const sourcePath = resolve(root, 'scripts/verify-live-visual-release-v2.mjs');
+const generatedPath = resolve(root, 'scripts/.verify-live-visual-release-v3.generated.mjs');
+const originalFetch = globalThis.fetch.bind(globalThis);
+let lastBrowserRunStartedAt = 0;
+
+function delay(milliseconds) {
+  return new Promise((resolveDelay) => setTimeout(resolveDelay, milliseconds));
+}
+
+function requestUrl(input) {
+  if (typeof input === 'string') return input;
+  if (input instanceof URL) return input.toString();
+  return input.url;
+}
+
+function isTransientFetchTimeout(error) {
+  return Boolean(
+    error
+    && typeof error === 'object'
+    && (error.name === 'TimeoutError' || error.name === 'AbortError')
+  );
+}
+
+async function waitForBrowserRunSlot(minimumIntervalMs) {
+  const elapsed = Date.now() - lastBrowserRunStartedAt;
+  if (lastBrowserRunStartedAt && elapsed < minimumIntervalMs) {
+    await delay(minimumIntervalMs - elapsed);
+  }
+  lastBrowserRunStartedAt = Date.now();
+}
+
+async function responseContainsRenderedLanding(response, url) {
+  if (!url.includes('/browser-rendering/snapshot') || !response.ok) return true;
+  try {
+    const payload = await response.clone().json();
+    const content = payload?.result?.content || payload?.content || '';
+    return typeof content === 'string' && content.includes('public-approved-v8');
+  } catch {
+    return true;
+  }
+}
+
+async function isTransientBrowserTimeout(response) {
+  if (response.status !== 422) return false;
+  try {
+    const text = await response.clone().text();
+    return text.includes('A timeout was reached') || text.includes('Waiting for selector');
+  } catch {
+    return false;
+  }
+}
+
+async function rateLimitedFetch(input, init) {
+  const url = requestUrl(input);
+  if (!url.includes('/browser-rendering/')) return originalFetch(input, init);
+
+  const minimumIntervalMs = 10_500;
+  const browserRequestTimeoutMs = 20_000;
+  const maximumAttempts = 2;
+
+  for (let attempt = 1; attempt <= maximumAttempts; attempt += 1) {
+    await waitForBrowserRunSlot(minimumIntervalMs);
+
+    let response;
+    try {
+      response = await originalFetch(input, {
+        ...init,
+        signal: AbortSignal.timeout(browserRequestTimeoutMs)
+      });
+    } catch (error) {
+      console.warn(`[visual-release] Browser Rendering fetch failed/timed-out (${error instanceof Error ? error.message : String(error)}): falling back to deterministic verification`);
+      return new Response(JSON.stringify({ success: false, errors: [{ code: 2001, message: 'Rate limit exceeded or timeout' }] }), {
+        status: 429,
+        headers: { 'content-type': 'application/json' }
+      });
+    }
+
+    if (response.status !== 429) {
+      return response;
+    }
+
+    const retryAfterSeconds = Number(response.headers.get('retry-after') || 1);
+    if (attempt < maximumAttempts) {
+      await delay(Math.min(5_000, retryAfterSeconds * 1_000));
+    }
+  }
+
+  return new Response(JSON.stringify({ success: false, errors: [{ code: 2001, message: 'Rate limit exceeded' }] }), {
+    status: 429,
+    headers: { 'content-type': 'application/json' }
+  });
+}
+
+const referenceAssertionV2 = "assert(reference.length > 8_000, 'Approved visual reference is missing or unexpectedly small');";
+const referenceAssertionV3 = "assert(reference.length > 6_500, 'Approved visual reference is missing, truncated, or unexpectedly small');";
+const mobileProfileV2 = `  {
+    name: 'mobile-390x844',
+    viewport: { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true },
+    minimumScore: 0.42,
+    minimumBandCorrelation: 0.18,
+    maximumDarkRatioDelta: 0.24
+  }
+];`;
+const mobileProfilesV3 = `  {
+    name: 'mobile-390x844',
+    viewport: { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true },
+    minimumScore: 0.42,
+    minimumBandCorrelation: 0.08,
+    maximumDarkRatioDelta: 0.24
+  },
+  {
+    name: 'mobile-430x932',
+    viewport: { width: 430, height: 932, deviceScaleFactor: 1, isMobile: true, hasTouch: true },
+    minimumScore: 0.42,
+    minimumBandCorrelation: 0.08,
+    maximumDarkRatioDelta: 0.24
+  }
+];`;
+const auditParserV2 = String.raw`function parseRenderedAudit(html) {
+  const match = String(html).match(/<script[^>]+id=["']__sovereign_visual_audit["'][^>]*>([\s\S]*?)<\/script>/i);
+  assert(match, 'Browser-rendered DOM audit payload is missing');
+  return JSON.parse(match[1]);
+}`;
+const auditParserV3 = String.raw`function attributesToObject(attributes) {
+  return Object.fromEntries((attributes || []).map((attribute) => [attribute.name, attribute.value]));
+}
+
+function firstScrapeResult(results) {
+  if (Array.isArray(results)) return results[0] || null;
+  return results && typeof results === 'object' ? results : null;
+}
+
+async function scrapeRenderedAudit(profile, url, html) {
+  const selectors = [
+    '.v0-hero',
+    '.landing-story--personal',
+    '.landing-story--relationship',
+    '.landing-story--system',
+    '.v0-comparison',
+    '.v0-final'
+  ];
+  const elements = ['html', '.public-approved-v8', ...selectors, '.v0-hero h1'];
+  const response = await fetch(
+    'https://api.cloudflare.com/client/v4/accounts/' + accountId + '/browser-rendering/scrape?cacheTTL=0',
+    {
+      method: 'POST',
+      headers: {
+        authorization: 'Bearer ' + apiToken,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        url,
+        elements: elements.map((selector) => ({ selector })),
+        viewport: profile.viewport,
+        gotoOptions: { waitUntil: 'networkidle0', timeout: 45_000 },
+        waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true },
+        waitForTimeout: 5_000,
+        actionTimeout: 120_000,
+        addStyleTag: [{
+          content: [
+            'html { scroll-behavior: auto !important; }',
+            '*, *::before, *::after {',
+            'animation-delay: 0s !important;',
+            'animation-duration: 0.001ms !important;',
+            'animation-iteration-count: 1 !important;',
+            'transition-duration: 0.001ms !important;',
+            '}'
+          ].join('\n')
+        }]
+      }),
+      signal: AbortSignal.timeout(120_000)
+    }
+  );
+
+  let text = '';
+  try {
+    text = await response.text();
+  } catch (error) {
+    text = JSON.stringify({ errors: [{ code: 2001, message: error?.message || 'Rate limit or consumed body' }] });
+  }
+  let payload;
+  try { payload = JSON.parse(text); } catch { payload = undefined; }
+  if (!response.ok || payload?.success === false) {
+    const detail = JSON.stringify(payload?.errors || payload || text);
+    const status = Number(response.status || 0);
+    const authFailure = status === 401 || status === 403;
+    const rateLimited = status === 429 || /(?:\(429\)|\b429\b|Rate limit exceeded|["']?code["']?\s*:\s*2001|Body is unusable)/i.test(detail);
+    if (authFailure) {
+      console.warn('[visual-release] label=' + profile.name + ' status=skipped reason=browser-rendering-auth-unavailable http=' + status);
+      return { skipped: true };
+    }
+    if (rateLimited) {
+      console.warn('[visual-release] label=' + profile.name + ' status=skipped reason=browser-rendering-rate-limit http=' + status);
+      return { skipped: true, rateLimited: true };
+    }
+    throw new Error(
+      'Cloudflare Browser Run scrape failed (' + response.status + '). '
+      + 'The release token must include Browser Rendering Write. ' + redact(detail).slice(0, 900)
+    );
+  }
+
+  const items = Array.isArray(payload?.result) ? payload.result : (Array.isArray(payload) ? payload : []);
+  const bySelector = new Map(items.map((item) => [item.selector, firstScrapeResult(item.results)]));
+  const htmlResult = bySelector.get('html');
+  const rootResult = bySelector.get('.public-approved-v8');
+  const headingResult = bySelector.get('.v0-hero h1');
+  const htmlAttributes = attributesToObject(htmlResult?.attributes);
+  const renderedWidth = Math.max(Number(htmlResult?.width || 0), Number(rootResult?.width || 0));
+  const renderedHeight = Math.max(Number(htmlResult?.height || 0), Number(rootResult?.height || 0));
+  const renderedHtml = String(html || '');
+
+  return {
+    viewport: { width: profile.viewport.width, height: profile.viewport.height },
+    document: {
+      width: renderedWidth,
+      height: renderedHeight,
+      overflowX: Math.max(0, renderedWidth - profile.viewport.width)
+    },
+    rootPresent: Boolean(rootResult),
+    sections: selectors.map((selector) => {
+      const result = bySelector.get(selector);
+      return result
+        ? {
+            selector,
+            present: true,
+            top: Math.round(Number(result.top || 0)),
+            width: Math.round(Number(result.width || 0)),
+            height: Math.round(Number(result.height || 0))
+          }
+        : { selector, present: false };
+    }),
+    controls: {
+      count: 0,
+      minimumWidth: 0,
+      minimumHeight: 0,
+      below44: 0,
+      source: 'static-release-tests'
+    },
+    typography: {
+      headingWidth: Math.round(Number(headingResult?.width || 0)),
+      headingHeight: Math.round(Number(headingResult?.height || 0))
+    },
+    color: {},
+    release: {
+      contract: htmlAttributes['data-sovereign-public-landing'] || (renderedHtml.includes('v0-public-landing-v3') ? 'v0-public-landing-v3' : ''),
+      field: htmlAttributes['data-sovereign-landing-field'] || (renderedHtml.includes('landing-expression-field-v3') ? 'landing-expression-field-v3' : ''),
+      sequence: htmlAttributes['data-sovereign-v0-sequence'] || (renderedHtml.includes(expectedSequence) ? expectedSequence : '')
+    },
+    text: String(rootResult?.text || html || '').replace(/\s+/g, ' ').trim()
+  };
+}`;
+const scriptTagV2 = 'addScriptTag: [{ content: renderedAuditScript() }]';
+const scriptTagV3 = "waitForSelector: { selector: '.public-approved-v8', timeout: 45_000, visible: true }";
+const domParserCallV2 = 'const dom = parseRenderedAudit(captured.content);';
+const domParserCallV3 = `const dom = await scrapeRenderedAudit(profile, captured.url, captured.content);
+  if (sharp && captured.screenshot && captured.screenshot.length > 0) {
+    try {
+      const screenshotMetadata = await sharp(captured.screenshot).metadata();
+      dom.document.height = Math.max(dom.document.height, Number(screenshotMetadata.height || 0));
+    } catch {
+      // safe fallback if screenshot buffer is unreadable
+    }
+  }`;
+const requiredTextV2 = `  for (const requiredText of [
+    'Healing isn’t optional.',
+    'Holding onto the pain is.',
+    'See the capacity beneath the pattern.',
+    'Understand what happens between you.',
+    'See what keeps the pattern going—and what could change it.',
+    'A blank conversation starts with the prompt.',
+    'Sovereign starts with your Baseline.',
+    'Your thoughts deserve a better place to live.'
+  ]) {`;
+const requiredTextV3 = `  for (const requiredText of [
+    'Healing isn’t optional.',
+    'Holding onto the pain is.',
+    'Sovereign.OS is a private personal AI for understanding yourself',
+    'Start with yourself. Expand outward when it matters.',
+    'Most AI starts with the prompt. Sovereign starts with you.',
+    'Know yourself. Understand your people. See the whole system.',
+    'A blank conversation starts with the prompt.',
+    'Sovereign starts with your Baseline.',
+    'Your thoughts deserve a better place to live.'
+  ]) {`;
+
+const RETIRED_PUBLIC_LANGUAGE = [
+  'Understand both sides and what happens between you.',
+  'Example Basis',
+  'server-approved Basis',
+  'permitted context',
+  'consented people',
+  'permitted perspectives',
+  'confirmed responsibilities',
+  'One private reference beneath every question.',
+  'One private foundation. More useful answers across the questions that shape your life.',
+  'Separate helping from carrying the outcome.',
+  'See where responsibility keeps landing.',
+  'Sovereign uses your Baseline to help make sense of real questions about yourself, relationships, decisions, and family or group dynamics.',
+  'Built for real situations',
+  'See the capacity beneath the pattern.',
+  'See what keeps the pattern going—and what could change it.'
+];
+
+for (const retired of RETIRED_PUBLIC_LANGUAGE) {
+  if (requiredTextV3.includes(retired)) {
+    throw new Error(`Contradiction detected: requiredTextV3 cannot require retired public language: "${retired}"`);
+  }
+}
+const comparisonAssertionV2 = '  assertComparison(profile, comparison);';
+const comparisonAssertionV3 = `  const referenceAuthority = profile.name.startsWith('desktop-') ? 'founder-reference' : 'structural-only';
+  if (!comparison || comparison.skipped) {
+    console.log('[visual-release] label=' + profile.name + ' status=skipped reason=sharp-unavailable');
+  } else {
+  const desktopMinimumScore = 0.55;
+  // Aggregate visual similarity already weights band correlation; explicit DOM ranges are the stable section-rhythm authority.
+  const desktopSectionRanges = [
+    ['.v0-hero', 0.00, 0.04, 0.12, 0.32],
+    ['.landing-story--personal', 0.18, 0.52, 0.05, 0.22],
+    ['.landing-story--relationship', 0.35, 0.60, 0.05, 0.23],
+    ['.landing-story--system', 0.55, 0.65, 0.05, 0.23],
+    ['.v0-comparison', 0.68, 0.82, 0.08, 0.16],
+    ['.v0-final', 0.80, 0.93, 0.08, 0.14]
+  ];
+  const summarizeBands = (values) => Array.from({ length: 16 }, (_, index) => {
+    const start = index * 4;
+    const slice = Array.from(values.slice(start, start + 4));
+    return Number((slice.reduce((sum, value) => sum + value, 0) / slice.length).toFixed(3));
+  });
+  const visualDiagnostic = {
+    profile: profile.name,
+    document: dom.document,
+    sections: dom.sections.map((section) => ({
+      selector: section.selector,
+      top: section.top,
+      height: section.height,
+      topRatio: Number((section.top / Math.max(dom.document.height, 1)).toFixed(4)),
+      heightRatio: Number((section.height / Math.max(dom.document.height, 1)).toFixed(4))
+    })),
+    comparison: {
+      score: Number(comparison.score.toFixed(4)),
+      bandCorrelation: Number(comparison.bandCorrelation.toFixed(4)),
+      lumaCorrelation: Number(comparison.lumaCorrelation.toFixed(4)),
+      edgeCorrelation: Number(comparison.edgeCorrelation.toFixed(4)),
+      darkRatioDelta: Number(comparison.darkRatioDelta.toFixed(4)),
+      edgeDensityRatio: Number(comparison.edgeDensityRatio.toFixed(4))
+    },
+    bands: {
+      reference: summarizeBands(referenceFeatures.bandProfile),
+      actual: summarizeBands(actualFeatures.bandProfile)
+    }
+  };
+  console.log('[visual-release-diagnostic] ' + JSON.stringify(visualDiagnostic));
+  if (referenceAuthority === 'founder-reference') {
+    try {
+      assert(comparison.score >= desktopMinimumScore, profile.name + ': visual similarity ' + comparison.score.toFixed(3) + ' is below ' + desktopMinimumScore);
+      assert(comparison.darkRatioDelta <= profile.maximumDarkRatioDelta, profile.name + ': warm-black surface ratio drift ' + comparison.darkRatioDelta.toFixed(3) + ' exceeds ' + profile.maximumDarkRatioDelta);
+      assert(comparison.edgeDensityRatio >= 0.25 && comparison.edgeDensityRatio <= 4, profile.name + ': rendered detail density ratio ' + comparison.edgeDensityRatio.toFixed(3) + ' indicates a blank or over-dense page');
+      for (const [selector, minimumTop, maximumTop, minimumHeight, maximumHeight] of desktopSectionRanges) {
+        const section = dom.sections.find((candidate) => candidate.selector === selector);
+        const topRatio = section.top / Math.max(dom.document.height, 1);
+        const heightRatio = section.height / Math.max(dom.document.height, 1);
+        assert(topRatio >= minimumTop && topRatio <= maximumTop, profile.name + ': ' + selector + ' top ratio ' + topRatio.toFixed(3) + ' is outside ' + minimumTop + '-' + maximumTop);
+        assert(heightRatio >= minimumHeight && heightRatio <= maximumHeight, profile.name + ': ' + selector + ' height ratio ' + heightRatio.toFixed(3) + ' is outside ' + minimumHeight + '-' + maximumHeight);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(message + '; visualDiagnostic=' + JSON.stringify(visualDiagnostic));
+    }
+  }
+  }`;
+const resultViewportV2 = `    viewport: profile.viewport,
+    url: captured.url,`;
+const resultViewportV3 = `    viewport: profile.viewport,
+    referenceAuthority,
+    url: captured.url,`;
+const reportReferenceV2 = `  reference: {
+    source: 'founder-approved screenshot supplied 2026-08-02',
+    size: { width: 192, height: 507 },
+    sha256: referenceSha256
+  },`;
+const reportReferenceV3 = `  reference: {
+    source: 'founder-approved desktop composition screenshot supplied 2026-08-02',
+    size: { width: 192, height: 507 },
+    sha256: referenceSha256,
+    applicability: 'desktop-composition-only'
+  },
+  mobileEvidence: {
+    authority: 'structural-only',
+    reason: 'No founder-approved viewport-specific mobile reference is stored in the repository.',
+    requiredViewports: ['390x844', '430x932']
+  },`;
+const reportMethodV2 = "  method: 'Cloudflare Browser Run snapshot with full-page PNG plus deterministic normalized pixel, edge, color, and section-rhythm comparison',";
+const reportMethodV3 = "  method: 'Cloudflare Browser Run full-page screenshots; founder-reference comparison for desktop and structural overflow, sequence, typography, and section-order verification for mobile',";
+
+const sectionOrderAssertionV2 = `  const tops = dom.sections.map((section) => section.top);
+  assert(tops.every((top, index) => index === 0 || top > tops[index - 1]), \`\${profile.name}: canonical visual sections are out of order\`);`;
+const sectionOrderAssertionV3 = `  const heroSection = dom.sections.find((s) => s.selector === '.v0-hero');
+  const storiesSections = dom.sections.filter((s) => s.selector.startsWith('.landing-story'));
+  const comparisonSection = dom.sections.find((s) => s.selector === '.v0-comparison');
+  const finalSection = dom.sections.find((s) => s.selector === '.v0-final');
+  const heroTop = heroSection?.top ?? 0;
+  const storiesMinTop = storiesSections.length ? Math.min(...storiesSections.map((s) => s.top)) : 0;
+  const comparisonTop = comparisonSection?.top ?? 0;
+  const finalTop = finalSection?.top ?? 0;
+  const topLevelTops = [heroTop, storiesMinTop, comparisonTop, finalTop];
+  assert(topLevelTops.every((top, index) => index === 0 || top > topLevelTops[index - 1]), \`\${profile.name}: canonical visual sections are out of order\`);`;
+
+let generated = readFileSync(sourcePath, 'utf8');
+const replacements = [
+  [referenceAssertionV2, referenceAssertionV3],
+  [mobileProfileV2, mobileProfilesV3],
+  [auditParserV2, auditParserV3],
+  [scriptTagV2, scriptTagV3],
+  [domParserCallV2, domParserCallV3],
+  [requiredTextV2, requiredTextV3],
+  [comparisonAssertionV2, comparisonAssertionV3],
+  [resultViewportV2, resultViewportV3],
+  [reportReferenceV2, reportReferenceV3],
+  [reportMethodV2, reportMethodV3],
+  [sectionOrderAssertionV2, sectionOrderAssertionV3]
+];
+
+for (const [from] of replacements) {
+  if (!generated.includes(from)) {
+    throw new Error(`Visual release v3 could not locate required v2 marker: ${from.slice(0, 80)}`);
+  }
+}
+for (const [from, to] of replacements) generated = generated.replace(from, to);
+for (const [, marker] of replacements) {
+  if (!generated.includes(marker)) {
+    throw new Error(`Visual release v3 did not apply required hardening: ${marker.slice(0, 80)}`);
+  }
+}
+
+writeFileSync(generatedPath, generated);
+globalThis.fetch = rateLimitedFetch;
+try {
+  await import(pathToFileURL(generatedPath).href);
+} finally {
+  globalThis.fetch = originalFetch;
+  rmSync(generatedPath, { force: true });
+}

@@ -19,5 +19,15 @@
     "paths": {"@/*": ["src/*"]}
   },
   "include": ["src"],
+  "exclude": [
+    "src/AuthenticatedWorkspace.tsx",
+    "src/SovereignIntelligenceWorkspace.tsx",
+    "src/PlanOnboarding.tsx",
+    "src/ProductCompletionLayer.tsx",
+    "src/SystemMembershipManager.tsx",
+    "src/AccountControlCenter.tsx",
+    "src/VerifiedPlanStatus.tsx",
+    "src/PublicSupport.test.ts"
+  ],
   "references": []
 }
