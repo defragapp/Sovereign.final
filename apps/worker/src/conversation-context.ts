@@ -1,0 +1,192 @@
+import type { Env } from './env';
+import { getModelSafeBaselineContext } from './baseline';
+import { buildPairComparison, buildSystemAnalysis } from './relational-context';
+import { requireFeature, type EntitlementSet } from './db/entitlements';
+import { baselineFacetIds } from './baseline-contracts';
+import { expressionAxisIds } from '@sovereign/agent-contracts';
+
+export type SovereignMode = 'defrag' | 'alignment';
+export type SovereignSurface = 'Today' | 'Explore' | 'People' | 'Systems' | 'Library' | 'You';
+
+export interface ConversationContextSelection {
+  surface?: SovereignSurface;
+  mode: SovereignMode;
+  personId?: string;
+  systemId?: string;
+}
+
+const identifier = /^[A-Za-z0-9_-]{1,128}$/;
+const surfaces = new Set<SovereignSurface>(['Today', 'Explore', 'People', 'Systems', 'Library', 'You']);
+const safeFacetIds = new Set<string>(baselineFacetIds);
+const safeExpressionAxisIds = new Set<string>(expressionAxisIds);
+
+export function parseConversationContext(value: unknown): ConversationContextSelection {
+  if (value === undefined) return { mode: 'defrag' };
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Response('Invalid conversation context', { status: 400 });
+  const input = value as Record<string, unknown>;
+  const surface = parseSurface(input.surface);
+  const personId = parseIdentifier(input.personId, 'personId');
+  const systemId = parseIdentifier(input.systemId, 'systemId');
+  if (personId && systemId) throw new Response('Choose either a person or a system for this turn', { status: 400 });
+  return {
+    ...(surface ? { surface } : {}),
+    mode: surface === 'Explore' ? 'alignment' : 'defrag',
+    ...(personId ? { personId } : {}),
+    ...(systemId ? { systemId } : {})
+  };
+}
+
+export async function authorizeConversationContext(
+  env: Env,
+  accountId: string,
+  selection: ConversationContextSelection,
+  entitlements: EntitlementSet
+): Promise<unknown> {
+  requireConversationContextEntitlement(selection, entitlements);
+  const selectedContext = selection.personId
+    ? await buildPairComparison(env, accountId, selection.personId)
+    : selection.systemId
+      ? await buildSystemAnalysis(env, accountId, selection.systemId)
+      : await getModelSafeBaselineContext(env, accountId);
+  return {
+    sovereignMode: selection.mode,
+    modeInstruction: selection.mode === 'alignment'
+      ? 'Examine fit, tradeoffs, pressure, responsibility, and unknowns without issuing a score or deciding for the user.'
+      : 'Clarify the user’s own qualities, needs, response, responsibility, and next choice without turning the conversation into a separate product.',
+    selectedContext: projectModelSafeConversationContext(selectedContext)
+  };
+}
+
+export function requireConversationContextEntitlement(selection: Pick<ConversationContextSelection, 'personId' | 'systemId'>, entitlements: EntitlementSet): void {
+  if (selection.personId) requireFeature(entitlements, 'people.compare');
+  if (selection.systemId && !entitlements.features.includes('systems.family') && !entitlements.features.includes('systems.team')) {
+    requireFeature(entitlements, 'systems.family');
+  }
+}
+
+export function projectModelSafeConversationContext(value: unknown): unknown {
+  return project(value);
+}
+
+export function projectExpressionFieldContext(value: unknown): unknown | null {
+  const root = asRecord(value);
+  const selected = asRecord(root.selectedContext);
+  const kind = selected.kind;
+  if (kind !== 'relationship' && kind !== 'system') return null;
+  const participants = Array.isArray(selected.participants) ? selected.participants.map(asRecord) : [];
+  const subjects = participants.flatMap((participant, index) => {
+    const axes = Array.isArray(participant.expressionAxes)
+      ? participant.expressionAxes.flatMap((value) => {
+          const axis = asRecord(value);
+          if (typeof axis.id !== 'string' || typeof axis.label !== 'string') return [];
+          if (!safeExpressionAxisIds.has(axis.id)) return [];
+          if (typeof axis.baselineValue !== 'number' || typeof axis.currentDelta !== 'number' || typeof axis.value !== 'number') return [];
+          if (![axis.baselineValue, axis.currentDelta, axis.value].every(Number.isFinite)) return [];
+          if (axis.baselineValue < 0 || axis.baselineValue > 100 || axis.value < 0 || axis.value > 100) return [];
+          return [{
+            id: axis.id,
+            label: axis.label,
+            baselineValue: axis.baselineValue,
+            currentDelta: axis.currentDelta,
+            value: axis.value,
+            state: axis.state,
+            confidence: axis.confidence,
+            facetIds: [],
+            basisRefs: [],
+            summary: ''
+          }];
+        })
+      : [];
+    if (axes.length !== expressionAxisIds.length || new Set(axes.map((axis) => axis.id)).size !== expressionAxisIds.length) return [];
+    return [{
+      id: typeof participant.key === 'string' ? participant.key : `participant_${index + 1}`,
+      label: typeof participant.label === 'string' ? participant.label : index === 0 ? 'You' : `Participant ${index}`,
+      meta: typeof participant.role === 'string' ? participant.role : 'Permitted Baseline',
+      axes
+    }];
+  });
+  if (subjects.length < 2) return null;
+  return { kind, subjects };
+}
+
+function project(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map((item) => project(item));
+  if (!value || typeof value !== 'object') return value;
+  const output: Record<string, unknown> = {};
+  for (const [childKey, childValue] of Object.entries(value as Record<string, unknown>)) {
+    if (childKey === 'basisRegistry' && Array.isArray(childValue)) {
+      output.basisRegistry = childValue.flatMap((item) => {
+        if (!item || typeof item !== 'object') return [];
+        const source = item as Record<string, unknown>;
+        if (typeof source.id !== 'string') return [];
+        return [{
+          id: source.id,
+          category: source.category,
+          display: source.display,
+          accessibleLabel: source.accessibleLabel,
+          computedAt: source.computedAt,
+          uncertainty: source.uncertainty,
+          provenance: source.provenance,
+          subject: source.subject
+        }];
+      });
+      continue;
+    }
+    if (childKey === 'id' && typeof childValue === 'string' && (safeFacetIds.has(childValue) || safeExpressionAxisIds.has(childValue))) {
+      output.id = childValue;
+      continue;
+    }
+    if (isPrivateIdentifierKey(childKey)) continue;
+    if (childKey === 'label') {
+      const key = typeof (value as Record<string, unknown>).key === 'string'
+        ? String((value as Record<string, unknown>).key)
+        : '';
+      output.label = childValue === 'You'
+        ? 'You'
+        : /^member_(\d+)$/.test(key)
+          ? `Participant ${key.match(/^member_(\d+)$/)?.[1]}`
+          : 'Other person';
+      continue;
+    }
+    if (childKey === 'from' || childKey === 'to') {
+      output[childKey] = participantReference(childValue);
+      continue;
+    }
+    output[childKey] = project(childValue);
+  }
+  return output;
+}
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function participantReference(value: unknown): string {
+  if (value === 'you' || value === 'You') return 'You';
+  if (typeof value === 'string') {
+    const member = value.match(/^member_(\d+)$/);
+    if (member) return `Participant ${member[1]}`;
+  }
+  return 'Other person';
+}
+
+function isPrivateIdentifierKey(key: string): boolean {
+  return /(?:^|_)(?:id|account|subject|email|token|trace)(?:$|_)/i.test(key)
+    || /(?:Id|Account|Subject|Email|Token|Trace)$/i.test(key)
+    || key === 'name'
+    || key === 'displayName'
+    || key === 'consentCheckedAt'
+    || key === 'lastComputedAt';
+}
+
+function parseSurface(value: unknown): SovereignSurface | undefined {
+  if (value === undefined || value === '') return undefined;
+  if (typeof value !== 'string' || !surfaces.has(value as SovereignSurface)) throw new Response('Invalid surface', { status: 400 });
+  return value as SovereignSurface;
+}
+
+function parseIdentifier(value: unknown, field: string): string | undefined {
+  if (value === undefined || value === '') return undefined;
+  if (typeof value !== 'string' || !identifier.test(value)) throw new Response(`Invalid ${field}`, { status: 400 });
+  return value;
+}

@@ -1,12 +1,30 @@
-/**
- * Shared Sovereign contracts live here during extraction from OPENAPI.
- * Keep this package intentionally small and transport/framework agnostic.
- */
-export type SovereignPlan = 'free' | 'sovereign_plus';
+export interface UnknownState {
+  label: string;
+  reason: string;
+}
 
-export type ApiError = {
-  error?: string;
-  message?: string;
-  retryable?: boolean;
-  nextAction?: string;
-};
+export interface BaselineDimension {
+  name: string;
+  tendency: string;
+  underPressure?: string;
+  supportiveMove?: string;
+}
+
+export interface BaselineSummaryOutput {
+  summary: string;
+  dimensions: BaselineDimension[];
+  unknowns: UnknownState[];
+  sourceRefs: string[];
+}
+
+export interface PairComparisonOutput {
+  sharedStrengths: string[];
+  frictionPoints: string[];
+  translationNotes: string[];
+  unknowns: UnknownState[];
+}
+
+export * from './expression-field';
+export * from './emotional-field';
+export * from './relationship-field';
+export * from './model-config';

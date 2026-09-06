@@ -1,0 +1,213 @@
+import { describe, expect, it } from 'vitest';
+import type { BasisRegistryItem } from '../baseline-contracts';
+import {
+  attachBasisValues,
+  composeSovereignAnswerText,
+  deriveAuthorizedBasisRegistry,
+  parseSovereignAnswer,
+  sovereignAnswerSchema
+} from './recognition';
+
+const registry: BasisRegistryItem[] = [{
+  id: 'natal.sun',
+  category: 'natal',
+  display: '☉ CAN 04.2°',
+  accessibleLabel: 'Sun in Cancer at 4.2 degrees',
+  computedAt: '2026-07-28T12:00:00.000Z',
+  uncertainty: 'low',
+  provenance: 'NASA/JPL Horizons',
+  subject: 'self'
+}];
+
+function answer(overrides: Record<string, unknown> = {}) {
+  return JSON.stringify({
+    version: 'sovereign-answer.v2',
+    mode: 'baseline',
+    depth: 'standard',
+    headline: 'Direction becomes responsibility quickly.',
+    direct_answer: 'You may be quick to create direction when a situation has no clear owner, which can be useful until the consequences become yours without matching authority.',
+    sections: [
+      { id: 'shadow', label: 'Shadow', body: 'You may end uncertainty by taking over a decision before responsibility is shared.' },
+      { id: 'gift', label: 'Gift', body: 'You can turn ambiguity into structure without becoming responsible for everyone inside it.' }
+    ],
+    basis_refs: ['natal.sun'],
+    correction_prompt: 'Does this fit your experience?',
+    actions: [{ type: 'explore_facet', label: 'Explore this quality' }],
+    confidence: 'supported',
+    safety_mode: 'standard',
+    ...overrides
+  });
+}
+
+function section(id: 'steady' | 'shadow' | 'interaction' | 'responsibility' | 'unknowns', label: string) {
+  return { id, label, body: `${label} remains a supported, correctable interpretation rather than a fixed verdict.` };
+}
+
+describe('sovereign-answer.v2', () => {
+  it('validates a useful answer and attaches exact server-owned Basis values', () => {
+    const parsed = parseSovereignAnswer(answer(), registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+    expect(parsed.sections).toHaveLength(2);
+    expect(attachBasisValues(parsed, registry)).toEqual(registry);
+    expect(composeSovereignAnswerText(parsed)).toContain('Direction becomes responsibility quickly.');
+    expect(composeSovereignAnswerText(parsed)).not.toContain('☉ CAN 04.2°');
+  });
+
+  it('preserves server-owned expiry provenance for current Basis values', () => {
+    const current: BasisRegistryItem = {
+      ...registry[0]!,
+      id: 'live.pluto',
+      category: 'live',
+      display: 'LIVE ♇ AQU 04.0°R',
+      accessibleLabel: 'Current Pluto in Aquarius at 4.0 degrees, retrograde',
+      expiresAt: '2026-07-28T18:00:00.000Z'
+    };
+    const parsed = parseSovereignAnswer(answer({ basis_refs: ['live.pluto'] }), [current]);
+    expect(attachBasisValues(parsed, [current])).toEqual([current]);
+    expect(attachBasisValues(parsed, [current])[0]?.expiresAt).toBe(current.expiresAt);
+  });
+
+  it('rejects an invented Basis reference', () => {
+    expect(() => parseSovereignAnswer(answer({ basis_refs: ['natal.invented'] }), registry))
+      .toThrow(/invented or unauthorized Basis reference/);
+  });
+
+  it('requires structured alignment distinctions rather than a score', () => {
+    const sections = [
+      { id: 'alignment', label: 'Supports the fit', body: 'The role uses a capacity already available to you.' },
+      { id: 'responsibility', label: 'Pulls against it', body: 'The responsibility is clear while authority remains limited.' },
+      { id: 'alignment', label: 'The real tradeoff', body: 'You would accept security in exchange for less control over the terms.' },
+      { id: 'unknowns', label: 'Still needed', body: 'The decision changes if authority can be negotiated directly.' },
+      { id: 'experiment', label: 'A closer version', body: 'Ask for decision authority that matches the outcome you would carry.' }
+    ];
+    const parsed = parseSovereignAnswer(answer({ mode: 'alignment', depth: 'deep', sections }), registry);
+    expect(parsed.sections.map((section) => section.label)).toContain('The real tradeoff');
+    expect(JSON.stringify(parsed)).not.toMatch(/score|percentage|gauge/i);
+  });
+
+  it('requires both people, the interaction, and unknowns in relationship mode', () => {
+    const sections = [
+      { id: 'you', label: 'You may be bringing', body: 'You may seek clarity by naming the question and starting movement.' },
+      { id: 'other', label: 'They may be bringing', body: 'They may need time before their language becomes reliable.' },
+      { id: 'interaction', label: 'What happens between you', body: 'Urgency can shorten the time needed for a considered answer.' },
+      { id: 'responsibility', label: 'What each person can own', body: 'You can name the question without demanding an answer, and they can request time without leaving the pause undefined.' },
+      { id: 'unknowns', label: 'What still needs to be asked directly', body: 'Their motive, feeling, and future action remain unknown.' }
+    ];
+    expect(parseSovereignAnswer(answer({ mode: 'relationship', depth: 'deep', sections }), registry).mode)
+      .toBe('relationship');
+  });
+
+  it('accepts a complete capacity, expression, interaction, and continuation lens', () => {
+    const sections = [
+      section('steady', 'The capacity'),
+      section('shadow', 'How it may be expressing'),
+      section('interaction', 'What happens between you'),
+      section('responsibility', 'What each person can own'),
+      section('unknowns', 'What remains unknown')
+    ];
+    expect(parseSovereignAnswer(answer({ sections }), registry).sections).toHaveLength(5);
+  });
+
+  it('rejects standard and deep answers that exceed the two-to-five section contract', () => {
+    const numbered = (n: string) => ({ id: 'steady' as const, label: `Section ${n}`, body: `Section ${n} supports a correctable interpretation rather than a fixed verdict.` });
+    const sections = [
+      numbered('one'),
+      numbered('two'),
+      numbered('three'),
+      numbered('four'),
+      numbered('five'),
+      numbered('six')
+    ];
+    expect(parseSovereignAnswer(answer({ mode: 'baseline', depth: 'standard', sections: sections.slice(0, 5) }), registry).sections).toHaveLength(5);
+    expect(() => parseSovereignAnswer(answer({ mode: 'baseline', depth: 'deep', sections }), registry))
+      .toThrow(/at most five sections/);
+  });
+
+  it('rejects a partial pattern lens that joins expression to interaction without boundaries', () => {
+    const sections = [
+      section('shadow', 'How it may be expressing'),
+      section('interaction', 'What happens between you')
+    ];
+    expect(() => parseSovereignAnswer(answer({ sections }), registry))
+      .toThrow('A pattern answer that connects expression and interaction is missing steady');
+  });
+
+  it('requires both pressure overreach and observable Gift expression in shadow-and-gift mode', () => {
+    expect(parseSovereignAnswer(answer({ mode: 'shadow_gift' }), registry).mode).toBe('shadow_gift');
+    expect(() => parseSovereignAnswer(answer({
+      mode: 'shadow_gift',
+      depth: 'focused',
+      sections: [{ id: 'shadow', label: 'Shadow', body: 'A valid capacity can overreach under pressure when ownership remains implicit.' }]
+    }), registry)).toThrow(/missing gift/);
+  });
+
+  it('collects only explicit validated Basis registry entries', () => {
+    const context = {
+      baseline: {
+        status: 'completed',
+        withheld: 'Type unavailable',
+        basisRegistry: registry
+      }
+    };
+    expect(deriveAuthorizedBasisRegistry(context)).toEqual(registry);
+    expect(deriveAuthorizedBasisRegistry({ basisRegistry: [{ ...registry[0], display: 'status withheld' }] })).toEqual([]);
+  });
+
+  it('enforces a full system-sectional answer for permitted system questions', () => {
+    const systemSections = [
+      { id: 'system' as const, label: 'Pressure', body: 'Planning and caregiving load currently concentrate on one person late in the week.' },
+      { id: 'responsibility' as const, label: 'Responsibility', body: 'Each participant keeps a distinct role from supplied context; no participant owns another.' },
+      { id: 'unknowns' as const, label: 'Unknowns', body: 'What would change if the planner shared the calendar earlier remains to be confirmed.' }
+    ];
+    expect(parseSovereignAnswer(answer({ mode: 'system', depth: 'deep', sections: systemSections }), registry).mode).toBe('system');
+    expect(() => parseSovereignAnswer(answer({ mode: 'system', depth: 'standard', sections: systemSections }), registry))
+      .toThrow(/System answers require deep depth/);
+    expect(() => parseSovereignAnswer(answer({ mode: 'system', depth: 'deep', sections: systemSections.slice(0, 2) }), registry))
+      .toThrow(/missing unknowns/);
+  });
+
+  it('rejects the score-based external mock because it is not the canonical contract', () => {
+    const externalMock = {
+      version: '2.0',
+      baseline: 'The system is operational within normal parameters.',
+      basis_references: ['basis-core-001'],
+      metadata: {
+        safety_check: true,
+        alignment_score: 0.98,
+        covenant_id: 'cov-standard-public'
+      }
+    };
+
+    expect(sovereignAnswerSchema.safeParse(externalMock).success).toBe(false);
+  });
+
+  it('rejects missing safety metadata and score fields added to an otherwise valid answer', () => {
+    const missingSafetyMode = JSON.parse(answer()) as Record<string, unknown>;
+    delete missingSafetyMode.safety_mode;
+    expect(sovereignAnswerSchema.safeParse(missingSafetyMode).success).toBe(false);
+
+    const scoredAnswer = JSON.parse(answer()) as Record<string, unknown>;
+    scoredAnswer.alignment_score = 0.98;
+    expect(sovereignAnswerSchema.safeParse(scoredAnswer).success).toBe(false);
+  });
+
+  it('parses answers wrapped in think blocks containing internal braces', () => {
+    const rawWithThink = `<think>\nAnalyzing the context:\n{\n       \n       here is internal thought\n}\n</think>\n\`\`\`json\n${answer()}\n\`\`\``;
+    const parsed = parseSovereignAnswer(rawWithThink, registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+    expect(parsed.headline).toContain('Direction becomes responsibility quickly.');
+  });
+
+  it('parses answers wrapped in markdown code blocks with conversational preamble', () => {
+    const rawWithPreamble = `Here is the structured Sovereign answer based on your Baseline:\n\n\`\`\`json\n${answer()}\n\`\`\`\n\nI hope this provides clear reflection.`;
+    const parsed = parseSovereignAnswer(rawWithPreamble, registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+  });
+
+  it('parses answers with single-line comments, multi-line comments, and trailing commas', () => {
+    const rawWithComments = `{\n  // Headline of the answer\n  "version": "sovereign-answer.v2",\n  /* Mode */\n  "mode": "baseline",\n  "depth": "standard",\n  "headline": "Direction becomes responsibility quickly.",\n  "direct_answer": "You may be quick to create direction when a situation has no clear owner, which can be useful until the consequences become yours without matching authority.",\n  "sections": [\n    { "id": "shadow", "label": "Shadow", "body": "You may end uncertainty by taking over a decision before responsibility is shared." },\n    { "id": "gift", "label": "Gift", "body": "You can turn ambiguity into structure without becoming responsible for everyone inside it." },\n  ],\n  "basis_refs": ["natal.sun",],\n  "correction_prompt": "Does this fit your experience?",\n  "actions": [{ "type": "explore_facet", "label": "Explore this quality" }],\n  "confidence": "supported",\n  "safety_mode": "standard",\n}`;
+    const parsed = parseSovereignAnswer(rawWithComments, registry);
+    expect(parsed.version).toBe('sovereign-answer.v2');
+    expect(parsed.sections).toHaveLength(2);
+  });
+});

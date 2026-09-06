@@ -1,33 +1,718 @@
 import { Hono } from 'hono';
-
-type Env = {
-  DB: D1Database;
-  AI: Ai;
-  AI_GATEWAY_ID: string;
-  AI_MODEL: string;
-  ASSETS?: Fetcher;
-};
+import type { Env } from './env';
+import { ThreadCoordinator } from './durable/ThreadCoordinator';
+import { requireAuth, requireSameOrigin } from './security/auth';
+import { withSecurityHeaders } from './security/headers';
+import { getEntitlements, requireFeature } from './db/entitlements';
+import { ensureThread, appendThreadEvent, listThreadMessages, listThreads, recordCorrection, setThreadCovenant, touchThread } from './db/threads';
+import { getTurn, startTurn, updateTurnStatus } from './db/turns';
+import { assertSovereignOutputSafety } from './agent/safety';
+import { runSovereignResult, runSovereignStream } from './agent/sovereign';
+import { handleStripeWebhook } from './routes/stripe';
+import { canUseDevelopmentFixtures, serviceUnavailable } from './runtime';
+import { createInvitation, createPerson, listPeople, requireConsent, setConsent, updateInvitationStatus, type InvitationStatus, type RelationshipMetadataInput } from './db/people';
+import { addSystemMember, cancelDeletionJob, createDeletionJob, createExportJob, createSystem, deleteUnderstanding, freeEntitlements, getActiveDeletionJob, listSystems, listUnderstandings, saveUnderstanding, updateUnderstanding, type SystemType } from './db/product';
+import { createCheckoutSession, createPortalSession, normalizeStripeFixtureEvent, projectSubscriptionEvent, type BillingInterval } from './billing/stripe';
+import { getAiUsage, releaseAiTurn, reserveAiTurn } from './billing/usage';
+import { requestMagicLink, redeemMagicLink, logout } from './auth-public';
+import { clearCurrentConditions, computeCurrentConditions, getBaselineStatus, getModelSafeBaselineContext, parseLocationPrecision, persistBaseline, prepareStoredBaselineFacetProfile, requireCompletedBaseline, type LocationPrecision } from './baseline';
+import { runDueJobs, runOneJob } from './jobs';
+import { applyBiblicalLens, assertCovenantSafe, retrieveScripture } from './covenant/scripture';
+import { resolveAiModelConfig } from '@sovereign/agent-contracts';
 
 const app = new Hono<{ Bindings: Env }>();
 
-app.get('/ready', (c) => c.json({ ready: true, service: 'sovereign-final' }));
-app.get('/health', (c) => c.json({ ok: true }));
-
-// Public shell fallback. The authenticated/product API is deliberately not mocked here;
-// protected Sovereign routes are extracted from OPENAPI in the next implementation stage.
-app.all('*', async (c) => {
-  if (c.env.ASSETS) {
-    return c.env.ASSETS.fetch(c.req.raw);
-  }
-  return c.text('Sovereign assets are not built.', 503);
+app.use('*', async (context, next) => {
+  await next();
+  context.res = withSecurityHeaders(context.res);
 });
 
+async function healthPayload(env: Env) {
+  const db = await env.DB.prepare(`SELECT 1 AS ok,
+    EXISTS(SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'legacy_workers_ai_daily_capacity') AS capacity_ready`)
+    .first<{ ok: number; capacity_ready: number }>();
+  return {
+    ok: db?.ok === 1,
+    sha: env.APP_VERSION,
+    version: env.APP_VERSION,
+    environment: env.APP_ENV,
+    migrationVersion: '0019_deprecate_manual_capacity',
+    dependencies: {
+      d1: db?.ok === 1 ? 'ok' : 'degraded',
+      aiFreeCapacity: db?.capacity_ready === 1 ? 'configured' : 'missing',
+      durableObjects: env.THREADS ? 'configured' : 'missing',
+      assets: env.ASSETS ? 'configured' : 'missing',
+      ai: aiDependencyStatus(env),
+      aiGateway: env.AI_GATEWAY_ID ? 'configured' : 'missing',
+      aiGatewayId: env.AI_GATEWAY_ID || 'missing',
+      baselineEngine: baselineDependencyStatus(env),
+      legacySovvAdapter: env.SOVV_INTERNAL_BASE_URL ? 'configured' : 'disabled',
+      stripe: env.STRIPE_SECRET_KEY && env.STRIPE_WEBHOOK_SECRET ? 'configured' : 'disabled',
+      scripture: env.SCRIPTURE_TRANSLATION || 'WEB'
+    }
+  };
+}
+
+app.get('/healthz', async (context) => context.json(await healthPayload(context.env)));
+app.get('/health', async (context) => context.json(await healthPayload(context.env)));
+app.get('/ready', async (context) => {
+  const payload = await healthPayload(context.env);
+  return context.json({
+    ...payload,
+    ready: payload.ok
+      && payload.dependencies.aiFreeCapacity === 'configured'
+      && payload.dependencies.durableObjects === 'configured'
+      && payload.dependencies.ai !== 'missing'
+      && payload.dependencies.baselineEngine === 'configured',
+    migrationParity: 'current',
+    policyAcceptanceReceipts: 'configured',
+    privacyAccessControls: 'configured',
+    privateExports: 'on-demand-no-artifact',
+    releaseEvidence: {
+      sha: context.env.APP_VERSION,
+      migrationVersion: '0019_deprecate_manual_capacity'
+    }
+  });
+});
+
+function aiDependencyStatus(env: Env): 'configured' | 'missing' {
+  const config = resolveAiModelConfig(env);
+  return config.provider === 'cloudflare-gateway' && env.AI && env.AI_GATEWAY_ID ? 'configured' : 'missing';
+}
+
+function baselineDependencyStatus(env: Env): 'configured' | 'missing' {
+  return env.BASELINE_HORIZONS_URL ? 'configured' : 'missing';
+}
+
+function isSovereignRuntimeReady(env: Env): boolean {
+  const config = resolveAiModelConfig(env);
+  return config.provider === 'cloudflare-gateway' && Boolean(env.AI && env.AI_GATEWAY_ID);
+}
+
+app.post('/api/v1/auth/signup', async (context) => { requireSameOrigin(context.req.raw); return requestMagicLink(context.req.raw, context.env, 'signup'); });
+app.post('/api/v1/auth/login', async (context) => { requireSameOrigin(context.req.raw); return requestMagicLink(context.req.raw, context.env, 'login'); });
+app.get('/api/v1/auth/redeem', async (context) => redeemMagicLink(context.req.raw, context.env));
+app.post('/api/v1/auth/redeem', async (context) => { requireSameOrigin(context.req.raw); return redeemMagicLink(context.req.raw, context.env); });
+app.post('/api/v1/auth/logout', async (context) => { requireSameOrigin(context.req.raw); return logout(context.req.raw, context.env, false); });
+app.post('/api/v1/auth/logout-all', async (context) => { requireSameOrigin(context.req.raw); return logout(context.req.raw, context.env, true); });
+app.get('/api/v1/auth/session', async (context) => context.json({ authenticated: true, ...(await requireAuth(context.req.raw, context.env)) }));
+
+app.post('/api/v1/stripe/webhook', (context) => handleStripeWebhook(context.req.raw, context.env));
+
+app.get('/api/v1/account/onboarding', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  const account = await context.env.DB.prepare('SELECT onboarding_completed_at, plan_intent FROM accounts WHERE id = ?')
+    .bind(auth.accountId)
+    .first<{ onboarding_completed_at?: string | null; plan_intent?: string | null }>();
+  const entitlements = await getEntitlements(context.env, auth.accountId);
+  return context.json({
+    completed: Boolean(account?.onboarding_completed_at),
+    planIntent: account?.plan_intent === 'sovereign_plus' ? 'sovereign_plus' : 'free',
+    effectivePlan: entitlements.plan
+  });
+});
+
+app.post('/api/v1/account/onboarding', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ plan?: 'free' | 'sovereign_plus' }>();
+  if (!body.plan || !['free', 'sovereign_plus'].includes(body.plan)) return context.json({ error: 'Valid plan required' }, 400);
+  await requireCompletedBaseline(context.env, auth.accountId);
+  await context.env.DB.prepare(`UPDATE accounts
+    SET plan_intent = ?, onboarding_completed_at = COALESCE(onboarding_completed_at, datetime('now')), updated_at = datetime('now')
+    WHERE id = ?`)
+    .bind(body.plan, auth.accountId)
+    .run();
+  return context.json({ completed: true, planIntent: body.plan });
+});
+
+app.get('/api/v1/people', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ people: await listPeople(context.env, auth.accountId), consentScopes: ['pair.compare', 'system.include', 'trait.display', 'framework.display', 'current_conditions.use', 'library.link', 'covenant.include'] });
+});
+
+app.post('/api/v1/people', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ displayName?: string; role?: string; metadata?: RelationshipMetadataInput }>();
+  const input: { displayName: string; role: string; metadata?: RelationshipMetadataInput } = { displayName: body.displayName ?? '', role: body.role ?? 'relationship' };
+  if (body.metadata) input.metadata = body.metadata;
+  const person = await createPerson(context.env, auth.accountId, input);
+  return context.json({ person }, 201);
+});
+
+app.post('/api/v1/people/:personId/invitations', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const invitation = await createInvitation(context.env, auth.accountId, context.req.param('personId'), auth.subject);
+  return context.json({ invitation }, 201);
+});
+
+app.patch('/api/v1/invitations/:invitationId', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ status?: InvitationStatus }>();
+  await updateInvitationStatus(context.env, auth.accountId, context.req.param('invitationId'), body.status ?? 'revoked');
+  return context.json({ ok: true, status: body.status });
+});
+
+app.put('/api/v1/people/:personId/consent/:scope', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ granted?: boolean; reason?: string }>();
+  const result = await setConsent(context.env, auth.accountId, context.req.param('personId'), context.req.param('scope'), body.granted === true, auth.subject, body.reason);
+  return context.json({ consent: result });
+});
+
+app.get('/api/v1/systems', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ systems: await listSystems(context.env, auth.accountId), supportedTypes: ['family', 'household', 'friendship_group', 'team', 'workplace', 'custom'] });
+});
+
+app.post('/api/v1/systems', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ name?: string; systemType?: SystemType; metadata?: Record<string, unknown> }>();
+  const systemInput: { name: string; systemType: SystemType; metadata?: Record<string, unknown> } = { name: body.name ?? '', systemType: body.systemType ?? 'custom' };
+  if (body.metadata) systemInput.metadata = body.metadata;
+  const system = await createSystem(context.env, auth.accountId, systemInput);
+  return context.json({ system }, 201);
+});
+
+app.post('/api/v1/systems/:systemId/members', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ personId?: string; metadata?: Record<string, unknown> }>();
+  if (!body.personId) return context.json({ error: 'personId required' }, 400);
+  const membership = await addSystemMember(context.env, auth.accountId, context.req.param('systemId'), body.personId, body.metadata ?? {});
+  return context.json({ membership }, 201);
+});
+
+app.get('/api/v1/library', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ understandings: await listUnderstandings(context.env, auth.accountId), savePolicy: 'explicit_user_approval_only' });
+});
+
+app.post('/api/v1/library', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ title?: string; summary?: string; threadId?: string; links?: Record<string, string>; uncertainty?: string }>();
+  if (!body.title || !body.summary) return context.json({ error: 'title and summary required' }, 400);
+  const saveInput: { title: string; summary: string; threadId?: string; links?: Record<string, string>; uncertainty?: string } = { title: body.title, summary: body.summary };
+  if (body.threadId) saveInput.threadId = body.threadId;
+  if (body.links) saveInput.links = body.links;
+  if (body.uncertainty) saveInput.uncertainty = body.uncertainty;
+  const saved = await saveUnderstanding(context.env, auth.accountId, saveInput);
+  return context.json({ saved }, 201);
+});
+
+app.patch('/api/v1/library/:understandingId', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  await updateUnderstanding(context.env, auth.accountId, context.req.param('understandingId'), await context.req.json<Record<string, unknown>>());
+  return context.json({ ok: true });
+});
+
+app.delete('/api/v1/library/:understandingId', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  await deleteUnderstanding(context.env, auth.accountId, context.req.param('understandingId'));
+  return context.json({ ok: true });
+});
+
+app.get('/api/v1/you', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({
+    accountId: auth.accountId,
+    baseline: await getBaselineStatus(context.env, auth.accountId),
+    locationPermission: 'configured-by-privacy-settings',
+    people: '/api/v1/people',
+    systems: '/api/v1/systems',
+    privacy: {
+      deletion: '/api/v1/deletion-jobs',
+      privateExport: 'disabled',
+      sharing: {
+        mode: 'public-link-only',
+        url: 'https://sovereign.defrag.app',
+        includesPrivateWorkspaceData: false
+      }
+    },
+    billing: '/api/v1/billing/entitlements',
+    accessibility: { reducedMotion: 'supported', textScaling: 'supported' }
+  });
+});
+
+app.post('/api/v1/baseline/onboarding', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const result = await persistBaseline(
+    context.env,
+    auth.accountId,
+    await context.req.json(),
+    {
+      deferFacetProfile: (task) => context.executionCtx.waitUntil(task)
+    }
+  );
+  if (!result.ready) {
+    const responseStatus: 202 | 409 | 503 = result.readinessState === 'facet_profile_preparing'
+      ? 202
+      : result.status === 'partial'
+        ? 503
+        : 409;
+    return context.json({
+      type: 'https://sovereign.defrag.app/problems/baseline-not-ready',
+      error: result.readinessState,
+      message: result.message,
+      nextAction: result.nextAction,
+      baseline: result
+    }, responseStatus);
+  }
+  return context.json({ baseline: result }, 201);
+});
+
+app.get('/api/v1/baseline/status', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ baseline: await getBaselineStatus(context.env, auth.accountId) });
+});
+
+app.post('/api/v1/baseline/profile/prepare', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const baseline = await prepareStoredBaselineFacetProfile(context.env, auth.accountId);
+
+  if (!baseline.ready) {
+    return context.json({
+      type: 'https://sovereign.defrag.app/problems/baseline-profile-not-ready',
+      error: baseline.readinessState ?? 'facet_profile_preparing',
+      message: baseline.readinessMessage ?? 'Your saved Baseline source is intact, but its profile is not ready yet.',
+      nextAction: baseline.nextAction ?? 'retry_baseline',
+      baseline
+    }, 503);
+  }
+
+  return context.json({ baseline });
+});
+
+app.post('/api/v1/current-conditions', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ locationPrecision?: LocationPrecision }>();
+  return context.json({ current: await computeCurrentConditions(context.env, auth.accountId, parseLocationPrecision(body.locationPrecision ?? 'none')) });
+});
+
+app.delete('/api/v1/current-conditions', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ current: await clearCurrentConditions(context.env, auth.accountId) });
+});
+
+app.post('/api/v1/export-jobs', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ exportJob: await createExportJob(context.env, auth.accountId) }, 202);
+});
+
+app.post('/api/v1/jobs/run', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json(await runDueJobs(context.env, 10, auth.accountId));
+});
+
+app.post('/api/v1/deletion-jobs', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ approved?: boolean }>().catch((): { approved?: boolean } => ({}));
+  if (body.approved !== true) return context.json({ error: 'Explicit approval is required.' }, 400);
+  return context.json({ deletionJob: await createDeletionJob(context.env, auth.accountId) }, 202);
+});
+
+app.get('/api/v1/deletion-jobs', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ deletionJob: await getActiveDeletionJob(context.env, auth.accountId) });
+});
+
+app.patch('/api/v1/deletion-jobs/:jobId', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ action?: string }>();
+  if (body.action !== 'cancel') return context.json({ error: 'Only cancellation is available during the grace period.' }, 400);
+  await cancelDeletionJob(context.env, auth.accountId, context.req.param('jobId'));
+  return context.json({ ok: true, status: 'cancelled' });
+});
+
+app.get('/api/v1/billing/entitlements', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  const projected = await getEntitlements(context.env, auth.accountId);
+  return context.json({
+    effective: projected,
+    fallback: freeEntitlements(),
+    aiUsage: await getAiUsage(context.env, auth.accountId, projected.plan)
+  });
+});
+
+app.post('/api/v1/billing/checkout', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const idempotencyKey = context.req.header('x-idempotency-key');
+  if (!idempotencyKey) return context.json({ error: 'Idempotency key required' }, 400);
+  const body = await context.req.json<{ interval?: BillingInterval }>();
+  const session = await createCheckoutSession(context.env, auth.accountId, body.interval ?? 'monthly', idempotencyKey);
+  return context.json({ checkout: session }, 201);
+});
+
+app.post('/api/v1/billing/portal', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const idempotencyKey = context.req.header('x-idempotency-key');
+  if (!idempotencyKey) return context.json({ error: 'Idempotency key required' }, 400);
+  const session = await createPortalSession(context.env, auth.accountId, idempotencyKey);
+  return context.json({ portal: session }, 201);
+});
+
+app.post('/api/v1/billing/stripe-test-event', async (context) => {
+  if (!canUseDevelopmentFixtures(context.env)) return context.json({ error: 'not_found' }, 404);
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ id?: string; type?: string; priceId?: string; status?: string; created?: number; subscriptionId?: string; customerId?: string }>();
+  const testEvent: Parameters<typeof normalizeStripeFixtureEvent>[1] = { id: body.id ?? `evt_${crypto.randomUUID()}`, type: body.type ?? 'customer.subscription.updated', accountId: auth.accountId };
+  if (body.priceId) testEvent.priceId = body.priceId;
+  if (body.status) testEvent.status = body.status;
+  if (body.created) testEvent.created = body.created;
+  if (body.subscriptionId) testEvent.subscriptionId = body.subscriptionId;
+  if (body.customerId) testEvent.customerId = body.customerId;
+  const event = normalizeStripeFixtureEvent(context.env, testEvent);
+  return context.json({ projection: await projectSubscriptionEvent(context.env, event) });
+});
+
+app.post('/api/v1/threads/:threadId/covenant', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const threadId = context.req.param('threadId');
+  const body = await context.req.json<{ enabled?: boolean; personId?: string; bibleTranslation?: string; reference?: string; subject?: string }>();
+  if (body.enabled !== true) { await setThreadCovenant(context.env, auth.accountId, threadId, false); return context.json({ covenantEnabled: false }); }
+  if (!body.bibleTranslation) return context.json({ error: 'Bible translation is required to enable Covenant.' }, 400);
+  requireFeature(await getEntitlements(context.env, auth.accountId), 'covenant.lens');
+  if (body.personId) await requireConsent(context.env, auth.accountId, body.personId, 'covenant.include');
+  await setThreadCovenant(context.env, auth.accountId, threadId, true);
+  const passage = retrieveScripture(body.reference ?? 'James 1:5', body.bibleTranslation);
+  const lens = applyBiblicalLens(passage, body.subject ?? 'this question');
+  assertCovenantSafe(JSON.stringify(lens));
+  return context.json({ covenantEnabled: true, scriptureSeparateFromInterpretation: true, certaintyAboutGodsIntent: false, lens });
+});
+
+app.get('/api/v1/covenant/scripture/:reference', async () => Response.json({ error: 'not_found' }, { status: 404 }));
+
+app.get('/api/v1/today', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ today: await getModelSafeBaselineContext(context.env, auth.accountId) });
+});
+
+app.get('/api/v1/threads', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({ threads: await listThreads(context.env, auth.accountId) });
+});
+
+app.get('/api/v1/threads/:threadId', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  return context.json({
+    threadId: context.req.param('threadId'),
+    messages: await listThreadMessages(context.env, auth.accountId, context.req.param('threadId'))
+  });
+});
+
+app.post('/api/v1/threads/:threadId/corrections', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const threadId = context.req.param('threadId');
+  const body = await context.req.json<{ correction?: 'yes' | 'partly' | 'not_today'; note?: string }>();
+  if (!body.correction || !['yes', 'partly', 'not_today'].includes(body.correction)) return context.json({ error: 'Valid correction required' }, 400);
+  await ensureThread(context.env, auth.accountId, threadId);
+  await recordCorrection(context.env, auth.accountId, threadId, body.correction, body.note);
+  return context.json({ ok: true, savedToThread: true, savedToLibrary: false });
+});
+
+app.get('/api/v1/threads/:threadId/corrections', async (context) => {
+  const auth = await requireAuth(context.req.raw, context.env);
+  const threadId = context.req.param('threadId');
+  const corrections = await context.env.DB.prepare('SELECT correction, note, created_at FROM user_corrections WHERE thread_id = ? AND account_id = ? ORDER BY created_at DESC').bind(threadId, auth.accountId).all<{ correction: string; note: string | null; created_at: string }>();
+  return context.json({ corrections: corrections.results ?? [] });
+});
+
+app.post('/api/v1/explore', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ topic?: string }>();
+  const topic = body.topic?.trim() || 'identity';
+  const baseline = await getModelSafeBaselineContext(context.env, auth.accountId);
+  return context.json({
+    topic,
+    plainLanguage: `Explore ${topic} through Baseline tendency, current amplification, observed behavior, and unknown actual state.`,
+    frameworkDetailsDefault: 'collapsed',
+    context: baseline
+  });
+});
+
+app.post('/api/v1/threads/:threadId/messages', async (context) => {
+  requireSameOrigin(context.req.raw);
+  const auth = await requireAuth(context.req.raw, context.env);
+  await requireCompletedBaseline(context.env, auth.accountId);
+  const body = await context.req.json<{
+    message?: string;
+    context?: {
+      surface?: string;
+      personId?: string;
+      systemId?: string;
+      covenantEnabled?: boolean;
+    };
+  }>();
+  const message = body.message?.trim();
+  if (!message) return context.json({ error: 'Message required' }, 400);
+
+  const idempotencyKey = context.req.header('x-idempotency-key');
+  if (!idempotencyKey) return context.json({ error: 'Idempotency key required' }, 400);
+
+  const entitlements = await getEntitlements(context.env, auth.accountId);
+  const threadId = context.req.param('threadId');
+  const personId = body.context?.personId?.trim() || undefined;
+  const systemId = body.context?.systemId?.trim() || undefined;
+  if (personId && systemId) return context.json({ error: 'Choose either one person or one system for a single question.' }, 400);
+
+  if (personId) {
+    requireFeature(entitlements, 'people.compare');
+    await requireConsent(context.env, auth.accountId, personId, 'pair.compare');
+    await requireConsent(context.env, auth.accountId, personId, 'trait.display');
+  }
+
+  if (systemId) {
+    const system = await context.env.DB.prepare('SELECT system_type FROM systems WHERE id = ? AND account_id = ?')
+      .bind(systemId, auth.accountId)
+      .first<{ system_type: string }>();
+    if (!system) return context.json({ error: 'System not found' }, 404);
+    const feature = ['family', 'household', 'friendship_group'].includes(system.system_type)
+      ? 'systems.family'
+      : 'systems.team';
+    requireFeature(entitlements, feature);
+  }
+
+  await ensureThread(context.env, auth.accountId, threadId, body.context?.surface?.toLowerCase() ?? 'personal');
+  const covenantEnabled = body.context?.covenantEnabled === true;
+  if (covenantEnabled) {
+    requireFeature(entitlements, 'covenant.lens');
+    const thread = await context.env.DB.prepare('SELECT covenant_enabled FROM threads WHERE id = ? AND account_id = ?')
+      .bind(threadId, auth.accountId)
+      .first<{ covenant_enabled: number }>();
+    if (thread?.covenant_enabled !== 1) {
+      return context.json({ error: 'Covenant must be explicitly enabled for this question.' }, 409);
+    }
+    if (personId) await requireConsent(context.env, auth.accountId, personId, 'covenant.include');
+  }
+
+  const messageContext = {
+    surface: body.context?.surface ?? 'Today',
+    ...(personId ? { personId } : {}),
+    ...(systemId ? { systemId } : {}),
+    covenantEnabled
+  };
+  await touchThread(context.env, auth.accountId, threadId, message);
+  const coordinator = context.env.THREADS.get(context.env.THREADS.idFromName(`${auth.accountId}:${threadId}`));
+  const coordination = await coordinator.fetch('https://thread.internal/turn', {
+    method: 'POST',
+    body: JSON.stringify({ idempotencyKey, accountId: auth.accountId, message })
+  });
+  if (!coordination.ok) return coordination;
+  const turn = await coordination.json<{ sequence: number; duplicate: boolean }>();
+  if (turn.duplicate) {
+    const existing = await getTurn(context.env, auth.accountId, threadId, idempotencyKey);
+    return context.json({ duplicate: true, status: existing.status, sequence: existing.seq }, existing.status === 'completed' ? 200 : 409);
+  }
+  const traceId = crypto.randomUUID();
+
+  if (!isSovereignRuntimeReady(context.env)) {
+    if (!canUseDevelopmentFixtures(context.env)) return serviceUnavailable('Sovereign is temporarily unavailable. Cloudflare AI Gateway is not configured, and nothing was guessed or saved as an interpretation.');
+    await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
+    await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, context: messageContext }, traceId);
+    const fallbackText = 'Development fallback only. The OPENAPI-owned Baseline engine is available only after its provider calls complete.\n\nCurrent amplification: no live current-condition result is available here, so nothing is treated as certainty.\n\nObserved behavior: nothing has been confirmed in this turn.\n\nUnknown actual state: only you can confirm what is true today. Does this match today?';
+    assertSovereignOutputSafety(fallbackText);
+    await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_development_response', { developmentFallback: true, text: fallbackText }, traceId);
+    await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'completed');
+    return new Response(encodeTextStream(new ReadableStream<string>({
+      start(controller) {
+        controller.enqueue(fallbackText);
+        controller.close();
+      }
+    })), { status: 202, headers: { 'content-type': 'text/plain; charset=utf-8', 'x-sovereign-plan': entitlements.plan } });
+  }
+
+  const usage = await reserveAiTurn(context.env, auth.accountId, entitlements.plan);
+  await startTurn(context.env, auth.accountId, threadId, idempotencyKey, turn.sequence);
+  await appendThreadEvent(context.env, threadId, turn.sequence, 'user_message', { text: message, context: messageContext }, traceId);
+  const sovereignContext = {
+    env: context.env,
+    accountId: auth.accountId,
+    threadId,
+    traceId,
+    covenantEnabled,
+    plan: entitlements.plan,
+    ...(personId ? { personId } : {}),
+    ...(systemId ? { systemId } : {})
+  };
+  const wantsStructuredAnswer = context.req.header('accept')?.includes('application/vnd.sovereign.answer+json') === true;
+
+  if (wantsStructuredAnswer) {
+    try {
+      const result = await runSovereignResult(message, sovereignContext);
+      await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_response', {
+        redacted: true,
+        text: result.text,
+        answer: result.answer,
+        basis: result.basis
+      }, traceId);
+      await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'completed');
+      return context.json({ text: result.text, answer: result.answer, basis: result.basis }, 202, {
+        'x-sovereign-plan': entitlements.plan,
+        'x-sovereign-ai-remaining': String(usage.remaining)
+      });
+    } catch (error) {
+      await Promise.all([
+        updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_start_failed'),
+        releaseAiTurn(context.env, auth.accountId, usage.periodKey)
+      ]);
+      throw error;
+    }
+  }
+
+  let stream: ReadableStream<string>;
+  try {
+    stream = await runSovereignStream(message, sovereignContext);
+  } catch (error) {
+    await Promise.all([
+      updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'gateway_start_failed'),
+      releaseAiTurn(context.env, auth.accountId, usage.periodKey)
+    ]);
+    throw error;
+  }
+  await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'streaming');
+  const persistedStream = persistAssistantStream(stream, async (text) => {
+    assertSovereignOutputSafety(text);
+    await appendThreadEvent(context.env, threadId, turn.sequence + 1, 'assistant_response', { redacted: true, text }, traceId);
+    await updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'completed');
+  }, async () => {
+    await Promise.all([
+      updateTurnStatus(context.env, auth.accountId, threadId, idempotencyKey, 'failed', 'stream_failed'),
+      releaseAiTurn(context.env, auth.accountId, usage.periodKey)
+    ]);
+  });
+  return new Response(encodeTextStream(persistedStream), {
+    status: turn.duplicate ? 200 : 202,
+    headers: {
+      'content-type': 'text/plain; charset=utf-8',
+      'x-sovereign-plan': entitlements.plan,
+      'x-sovereign-ai-remaining': String(usage.remaining)
+    }
+  });
+});
+
+function encodeTextStream(stream: ReadableStream<string>): ReadableStream<Uint8Array> {
+  const encoder = new TextEncoder();
+  return stream.pipeThrough(new TransformStream<string, Uint8Array>({
+    transform(chunk, controller) {
+      controller.enqueue(encoder.encode(chunk));
+    }
+  }));
+}
+
+function persistAssistantStream(stream: ReadableStream<string>, onComplete: (text: string) => Promise<void>, onFailure: () => Promise<void>): ReadableStream<string> {
+  let collected = '';
+  let failed = false;
+  return stream.pipeThrough(new TransformStream<string, string>({
+    transform(chunk, controller) {
+      collected += chunk;
+      controller.enqueue(chunk);
+    },
+    async flush() {
+      if (!failed) {
+        try {
+          await onComplete(collected.slice(0, 8000));
+        } catch {
+          await onFailure();
+        }
+      }
+    },
+    async cancel() {
+      failed = true;
+      try {
+        await onFailure();
+      } catch {}
+    }
+  }));
+}
+
+
+app.post('/api/tts', async (context) => {
+  requireSameOrigin(context.req.raw);
+  await requireAuth(context.req.raw, context.env);
+  const body = await context.req.json<{ text?: string }>();
+  const text = body.text?.trim();
+
+  if (!text) {
+    return context.json({ error: 'Text required' }, 400);
+  }
+
+  // Edge caching based on hashed text
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  const cacheKey = new Request(`https://cache.local/tts/${hashHex}`);
+
+  const cache = (caches as any).default as Cache;
+  let response = await cache.match(cacheKey);
+
+  if (!response) {
+    if (!context.env.AI) {
+      return context.json({ error: 'AI binding not configured' }, 503);
+    }
+
+    let audioBuffer;
+    try {
+      audioBuffer = await context.env.AI.run('@cf/deepgram/aura-2-en', { text }) as ArrayBuffer;
+    } catch (e) {
+      console.error('TTS Generation failed:', e);
+      return context.json({ error: 'TTS Generation failed' }, 500);
+    }
+
+    response = new Response(audioBuffer, {
+      headers: {
+        'content-type': 'audio/wav',
+        'cache-control': 'public, max-age=86400',
+      },
+    });
+
+    context.executionCtx.waitUntil(cache.put(cacheKey, response.clone()));
+  }
+
+  return response;
+});
+
+app.onError((error, context) => {
+  if (error instanceof Response) return error;
+  return context.json({ error: 'Internal error' }, 500);
+});
+
+app.notFound((context) => context.json({ error: 'Not found' }, 404));
+
+export { ThreadCoordinator };
 export default app;
 
-export class ThreadCoordinator {
-  constructor(private readonly state: DurableObjectState) {}
-
-  async fetch(): Promise<Response> {
-    return Response.json({ ok: true });
+export async function queue(batch: MessageBatch<{ id?: string; kind: string; accountId?: string; payload?: Record<string, unknown> }>, env: Env): Promise<void> {
+  for (const message of batch.messages) {
+    const body = message.body;
+    const result = await runOneJob(env, body.id ?? `queue_${crypto.randomUUID()}`, body.kind, body.accountId, body.payload ?? {});
+    if (result.status === 'completed') message.ack(); else message.retry();
   }
+}
+
+export async function scheduled(_event: ScheduledEvent, env: Env): Promise<void> {
+  await runDueJobs(env, 25);
 }
