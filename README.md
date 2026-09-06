@@ -60,8 +60,9 @@ The launch is **text-first**. The canonical database migration target is `0019_d
 To execute the verified release:
 
 ```bash
-pnpm production:release:text
+pnpm production:release:oauth
 ```
+(or `pnpm production:release:text` for headless environment token deployment)
 
 GitHub Actions, deploy hooks, Cloudflare Pages, and preview Workers are not production release authorities.
 

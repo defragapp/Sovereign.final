@@ -6,12 +6,24 @@ import { join, extname } from 'node:path';
 import { execSync } from 'node:child_process';
 import { chromium } from 'playwright';
 
+const PROTECTED_PATHS = [
+  'apps/worker/',
+  'apps/sovereign-worker/',
+  'apps/web/src/lib/api.ts',
+  'migrations/',
+  'scripts/production-release-oauth.sh',
+  'scripts/cloudflare-production-deploy-v3.mjs',
+  'scripts/assert-main-release.mjs',
+  'wrangler.jsonc',
+];
+
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
     mode: 'verification-only',
     targetRef: 'main',
     targetSurface: 'https://sovereign.defrag.app',
+    canonicalAppSurface: 'https://app.defrag.app',
     releaseCommand: 'pnpm production:release:oauth',
     outputJson: join(process.cwd(), '.tmp', 'release-evidence.json'),
     outputMarkdown: join(process.cwd(), '.tmp', 'release-evidence.md'),
@@ -49,6 +61,16 @@ function runCmd(command, options = {}) {
   }
 }
 
+function isProtectedPath(filePath) {
+  const normalized = filePath.replace(/\\/g, '/');
+  return PROTECTED_PATHS.some((protectedPath) => {
+    if (protectedPath.endsWith('/')) {
+      return normalized.startsWith(protectedPath);
+    }
+    return normalized === protectedPath;
+  });
+}
+
 async function auditVisualQa(distDir) {
   const PORT = 4173;
   const MIME_TYPES = {
@@ -82,13 +104,21 @@ async function auditVisualQa(distDir) {
       }
     });
 
-    server.listen(PORT, async () => {
+    server.listen(0, async () => {
+      const PORT = server.address().port;
       const routes = ['/', '/workspace.html', '/how-it-works.html', '/faq.html', '/security.html'];
       const viewports = [
         { name: 'desktop', width: 1440, height: 900 },
         { name: 'mobile', width: 390, height: 844 },
       ];
-      const results = { desktopOverflow: 0, mobileOverflow: 0, routesAudited: routes.length, details: [] };
+      const results = {
+        desktopOverflow: 0,
+        mobileOverflow: 0,
+        routesAudited: routes.length,
+        consoleErrors: [],
+        missingRoutes: [],
+        details: [],
+      };
       let browser;
 
       try {
@@ -96,13 +126,36 @@ async function auditVisualQa(distDir) {
         for (const vp of viewports) {
           const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height } });
           const page = await context.newPage();
+
+          page.on('console', (msg) => {
+            if (msg.type() === 'error') {
+              results.consoleErrors.push(`[${vp.name}] ${msg.text()}`);
+            }
+          });
+
+          page.on('pageerror', (err) => {
+            results.consoleErrors.push(`[${vp.name}] Page error: ${err.message}`);
+          });
+
           for (const route of routes) {
-            await page.goto(`http://localhost:${PORT}${route}`, { waitUntil: 'networkidle' });
-            const hasOverflow = await page.evaluate(() => {
-              return document.documentElement.scrollWidth > document.documentElement.clientWidth;
+            const resp = await page.goto(`http://localhost:${PORT}${route}`, { waitUntil: 'networkidle' });
+            if (!resp || resp.status() >= 400) {
+              results.missingRoutes.push(`[${vp.name}] ${route} returned status ${resp ? resp.status() : 'failed'}`);
+            }
+
+            const metrics = await page.evaluate(() => {
+              const hasOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth;
+              const bodyRect = document.body.getBoundingClientRect();
+              const rootDocExists = !!document.documentElement && !!document.body;
+              return { hasOverflow, width: bodyRect.width, height: bodyRect.height, rootDocExists };
             });
-            results.details.push({ viewport: vp.name, route, hasOverflow });
-            if (hasOverflow) {
+
+            if (!metrics.rootDocExists) {
+              results.missingRoutes.push(`[${vp.name}] ${route} missing root document element`);
+            }
+
+            results.details.push({ viewport: vp.name, route, ...metrics });
+            if (metrics.hasOverflow) {
               if (vp.name === 'desktop') results.desktopOverflow++;
               if (vp.name === 'mobile') results.mobileOverflow++;
             }
@@ -120,23 +173,36 @@ async function auditVisualQa(distDir) {
   });
 }
 
-async function main() {
-  const options = parseArgs();
+export async function runVerifier(overrideOptions = {}) {
+  const cliOpts = parseArgs();
+  const options = { ...cliOpts, ...overrideOptions };
+
   console.log(`\n==================================================`);
-  console.log(`SOVEREIGN.OS RELEASE VERIFIER`);
+  console.log(`SOVEREIGN.OS AUTHORITATIVE RELEASE VERIFIER`);
   console.log(`Mode: ${options.mode}`);
   console.log(`Target Ref: ${options.targetRef}`);
-  console.log(`Target Surface: ${options.targetSurface}`);
+  console.log(`Authoritative Deploy Command: ${options.releaseCommand}`);
   console.log(`==================================================\n`);
+
+  const initialStatusRes = runCmd('git status --porcelain', { silent: true });
+  const initialWorkingTreeLines = initialStatusRes.success && initialStatusRes.output ? initialStatusRes.output.split('\n').filter(Boolean) : [];
 
   const evidence = {
     timestamp: new Date().toISOString(),
     mode: options.mode,
     targetRef: options.targetRef,
-    commitSha: null,
-    originMainSha: null,
-    workingTreeClean: null,
-    copyLeaks: { passed: true, details: [] },
+    releaseSha: null,
+    git: {
+      headSha: null,
+      originMainSha: null,
+      shaParity: false,
+      workingTreeClean: initialWorkingTreeLines.length === 0,
+    },
+    diffGuard: {
+      passed: true,
+      protectedPathsViolated: [],
+    },
+    copyLeaks: { passed: true, details: [], remediated: false },
     cssIntegrity: { importPrecedenceValid: false },
     verificationGates: {
       typecheck: false,
@@ -149,39 +215,57 @@ async function main() {
       passed: false,
       desktopOverflow: 0,
       mobileOverflow: 0,
+      consoleErrorsCount: 0,
+      missingRoutesCount: 0,
       routesAudited: 0,
+    },
+    mutationAudit: {
+      sourceTreeChanged: false,
+      workingTreeChanged: false,
+      modifiedFilesTracked: [],
+      stagedFilesCount: 0,
     },
     deployment: {
       executed: false,
+      releaseCommand: options.releaseCommand,
       liveTarget: options.targetSurface,
+      canonicalAppTarget: options.canonicalAppSurface,
       readyStatus: null,
+      appReadyStatus: null,
       liveSha: null,
+      appLiveSha: null,
       shaParity: null,
+      migrationParity: null,
     },
     blockers: [],
     releaseDisposition: 'FAIL',
   };
 
-  // 1. Git State & Working Tree Audit
-  console.log(`[1/5] Auditing Git State & Repository Hygiene...`);
+  // 1. Git State, Freeze Release SHA, & Drift Audit
+  console.log(`[1/5] Auditing Git State & Freezing Release SHA...`);
+  runCmd('git fetch origin refs/heads/main', { silent: true });
+
   const headShaRes = runCmd('git rev-parse HEAD', { silent: true });
-  evidence.commitSha = headShaRes.success ? headShaRes.output : 'UNKNOWN';
+  evidence.git.headSha = headShaRes.success ? headShaRes.output : 'UNKNOWN';
 
   const originMainRes = runCmd('git rev-parse origin/main', { silent: true });
-  evidence.originMainSha = originMainRes.success ? originMainRes.output : 'UNKNOWN';
+  evidence.git.originMainSha = originMainRes.success ? originMainRes.output : 'UNKNOWN';
 
-  const statusRes = runCmd('git status --porcelain', { silent: true });
-  evidence.workingTreeClean = statusRes.success && statusRes.output.length === 0;
-  console.log(`  - Commit SHA: ${evidence.commitSha}`);
-  console.log(`  - origin/main SHA: ${evidence.originMainSha}`);
-  console.log(`  - Working Tree Clean: ${evidence.workingTreeClean}`);
+  // FREEZE RELEASE SHA from origin/main
+  evidence.releaseSha = evidence.git.originMainSha;
+  evidence.git.shaParity = evidence.git.headSha === evidence.git.originMainSha;
 
-  if (options.mode === 'verification-only' && !evidence.workingTreeClean) {
-    console.log(`  ! Note: Working tree is dirty in verification-only mode. No changes will be mutated.`);
+  console.log(`  - Local HEAD SHA: ${evidence.git.headSha}`);
+  console.log(`  - Frozen Release SHA (origin/main): ${evidence.releaseSha}`);
+  console.log(`  - Git Drift Parity (HEAD == origin/main): ${evidence.git.shaParity}`);
+
+  if (!evidence.git.shaParity) {
+    console.error(`  ! FAIL: Git drift detected! Local HEAD (${evidence.git.headSha}) does not match origin/main (${evidence.git.originMainSha}).`);
+    evidence.blockers.push(`Git drift detected: HEAD !== origin/main`);
   }
 
-  // 2. Copy Leak & CSS Authority Audit
-  console.log(`\n[2/5] Auditing Public Contract Copy & CSS Precedence...`);
+  // 2. Copy Leak & CSS Authority Audit + Diff Guard
+  console.log(`\n[2/5] Auditing Public Contract Copy, CSS Precedence & Diff Guard...`);
   const mainTsxPath = join(process.cwd(), 'apps', 'web', 'src', 'main.tsx');
   if (existsSync(mainTsxPath)) {
     const mainTsx = readFileSync(mainTsxPath, 'utf-8');
@@ -202,10 +286,9 @@ async function main() {
       lastIdx = idx;
     }
     evidence.cssIntegrity.importPrecedenceValid = orderValid;
-    console.log(`  - CSS Precedence Valid: ${orderValid}`);
+    console.log(`  - CSS Import Precedence Valid: ${orderValid}`);
   }
 
-  // Check for exposed BASIS: uppercase label in App.tsx
   const appTsxPath = join(process.cwd(), 'apps', 'web', 'src', 'App.tsx');
   if (existsSync(appTsxPath)) {
     const appTsx = readFileSync(appTsxPath, 'utf-8');
@@ -214,15 +297,38 @@ async function main() {
       evidence.copyLeaks.details.push('Exposed raw BASIS: uppercase label in App.tsx');
       console.log(`  ! Copy leak detected: Exposed BASIS: uppercase label in App.tsx`);
       if (options.mode !== 'verification-only') {
-        console.log(`  -> Remediating BASIS: label to Sources: in App.tsx...`);
+        console.log(`  -> Constrained remediation: Replacing BASIS: with Sources: in App.tsx...`);
         const remediated = appTsx.replace("BASIS:", "Sources:");
         writeFileSync(appTsxPath, remediated, 'utf-8');
         evidence.copyLeaks.remediated = true;
         evidence.copyLeaks.passed = true;
+        evidence.mutationAudit.modifiedFilesTracked.push('apps/web/src/App.tsx');
       }
     } else {
       console.log(`  - Public Copy Leak Audit: Passed (no raw BASIS: labels found)`);
     }
+  }
+
+  // Perform Diff Guard Check on Protected Paths
+  const currentDiffRes = runCmd('git diff --name-only', { silent: true });
+  const currentStagedRes = runCmd('git diff --cached --name-only', { silent: true });
+  const modifiedFiles = [
+    ...(currentDiffRes.output ? currentDiffRes.output.split('\n').filter(Boolean) : []),
+    ...(currentStagedRes.output ? currentStagedRes.output.split('\n').filter(Boolean) : []),
+  ];
+
+  for (const file of modifiedFiles) {
+    if (isProtectedPath(file)) {
+      evidence.diffGuard.passed = false;
+      evidence.diffGuard.protectedPathsViolated.push(file);
+    }
+  }
+
+  if (!evidence.diffGuard.passed) {
+    console.error(`  ! FAIL: Diff Guard triggered! Protected paths modified: ${evidence.diffGuard.protectedPathsViolated.join(', ')}`);
+    evidence.blockers.push(`Protected paths modified: ${evidence.diffGuard.protectedPathsViolated.join(', ')}`);
+  } else {
+    console.log(`  - Diff Guard Audit: Passed (0 protected paths touched)`);
   }
 
   // 3. Verification Gates Execution
@@ -251,79 +357,124 @@ async function main() {
   const gatesAllPassed = Object.values(evidence.verificationGates).every(Boolean);
   console.log(`  - All Verification Gates Passed: ${gatesAllPassed}`);
 
-  // 4. Visual QA Audit
+  // 4. Deterministic Visual QA Audit
   console.log(`\n[4/5] Running Multi-Viewport Visual QA (Playwright)...`);
   const distDir = join(process.cwd(), 'apps', 'web', 'dist');
   if (existsSync(distDir)) {
     const vqa = await auditVisualQa(distDir);
     evidence.visualQa.desktopOverflow = vqa.desktopOverflow;
     evidence.visualQa.mobileOverflow = vqa.mobileOverflow;
+    evidence.visualQa.consoleErrorsCount = vqa.consoleErrors ? vqa.consoleErrors.length : 0;
+    evidence.visualQa.missingRoutesCount = vqa.missingRoutes ? vqa.missingRoutes.length : 0;
     evidence.visualQa.routesAudited = vqa.routesAudited;
-    evidence.visualQa.passed = vqa.desktopOverflow === 0 && vqa.mobileOverflow === 0;
+    evidence.visualQa.passed =
+      vqa.desktopOverflow === 0 &&
+      vqa.mobileOverflow === 0 &&
+      evidence.visualQa.consoleErrorsCount === 0 &&
+      evidence.visualQa.missingRoutesCount === 0;
+
     console.log(`  - Desktop Horizontal Overflow Count: ${vqa.desktopOverflow}`);
     console.log(`  - Mobile Horizontal Overflow Count: ${vqa.mobileOverflow}`);
+    console.log(`  - Console Error Count: ${evidence.visualQa.consoleErrorsCount}`);
+    console.log(`  - Missing / Broken Routes Count: ${evidence.visualQa.missingRoutesCount}`);
     console.log(`  - Visual QA Passed: ${evidence.visualQa.passed}`);
   } else {
     console.error(`  ! Web dist directory missing. Skipping visual QA.`);
+    evidence.visualQa.passed = false;
   }
 
-  // 5. Mode Handling & Deployment Verification
+  // 5. Constrained Staging & Production Deployment Verification
   console.log(`\n[5/5] Processing Mode Actions & Deployment Verification...`);
   if (options.mode === 'verification-only') {
     console.log(`  - Mode is verification-only. Zero mutations performed. Deploy skipped.`);
   } else if (options.mode === 'release-preparation' || options.mode === 'production-release') {
-    console.log(`  - Staging hygiene changes...`);
-    runCmd('git add -A');
-    const postStatus = runCmd('git status --porcelain', { silent: true });
-    if (postStatus.success && postStatus.output.length > 0) {
+    if (evidence.mutationAudit.modifiedFilesTracked.length > 0) {
+      console.log(`  - Staging explicitly allowed hygiene files: ${evidence.mutationAudit.modifiedFilesTracked.join(', ')}`);
+      for (const file of evidence.mutationAudit.modifiedFilesTracked) {
+        runCmd(`git add ${file}`);
+      }
+      evidence.mutationAudit.stagedFilesCount = evidence.mutationAudit.modifiedFilesTracked.length;
+      
       console.log(`  - Committing release hygiene pass...`);
       runCmd('git commit -m "chore(release): final launch hygiene"');
       console.log(`  - Pushing to origin/main...`);
       runCmd('git push origin main');
-      const newHead = runCmd('git rev-parse HEAD', { silent: true });
-      if (newHead.success) evidence.commitSha = newHead.output;
+
+      const postPushSha = runCmd('git rev-parse HEAD', { silent: true });
+      if (postPushSha.success) {
+        evidence.git.headSha = postPushSha.output;
+        evidence.git.originMainSha = postPushSha.output;
+        evidence.releaseSha = postPushSha.output;
+        evidence.git.shaParity = true;
+      }
     } else {
-      console.log(`  - Working tree already clean. No commit needed.`);
+      console.log(`  - Working tree clean. No hygiene changes needed to stage.`);
     }
 
     if (options.mode === 'production-release') {
-      console.log(`  -> Executing Production Release: ${options.releaseCommand}`);
+      console.log(`  -> Executing Authoritative Production Release: ${options.releaseCommand}`);
       const deployRes = runCmd(options.releaseCommand);
       evidence.deployment.executed = deployRes.success;
 
       if (deployRes.success) {
-        console.log(`  -> Querying live ready endpoint: ${options.targetSurface}/ready`);
-        const readyCurl = runCmd(`curl -s ${options.targetSurface}/ready`, { silent: true });
-        if (readyCurl.success) {
+        console.log(`  -> Verifying live ready endpoints against frozen release SHA: ${evidence.releaseSha}`);
+        const surfaceCurl = runCmd(`curl -s ${options.targetSurface}/ready`, { silent: true });
+        const appCurl = runCmd(`curl -s ${options.canonicalAppSurface}/ready`, { silent: true });
+
+        if (surfaceCurl.success && appCurl.success) {
           try {
-            const readyJson = JSON.parse(readyCurl.output);
-            evidence.deployment.readyStatus = readyJson.ready === true;
-            evidence.deployment.liveSha = readyJson.sha;
-            evidence.deployment.shaParity = readyJson.sha === evidence.commitSha;
-            console.log(`  - Live Endpoint Ready: ${evidence.deployment.readyStatus}`);
-            console.log(`  - Live SHA: ${evidence.deployment.liveSha}`);
-            console.log(`  - Expected SHA: ${evidence.commitSha}`);
-            console.log(`  - SHA Parity: ${evidence.deployment.shaParity}`);
+            const surfaceJson = JSON.parse(surfaceCurl.output);
+            const appJson = JSON.parse(appCurl.output);
+
+            evidence.deployment.readyStatus = surfaceJson.ready === true;
+            evidence.deployment.appReadyStatus = appJson.ready === true;
+            evidence.deployment.liveSha = surfaceJson.sha;
+            evidence.deployment.appLiveSha = appJson.sha;
+            evidence.deployment.shaParity =
+              surfaceJson.sha === evidence.releaseSha && appJson.sha === evidence.releaseSha;
+            evidence.deployment.migrationParity =
+              surfaceJson.migrationVersion === appJson.migrationVersion;
+
+            console.log(`  - Public Domain (${options.targetSurface}/ready) Ready: ${evidence.deployment.readyStatus} (SHA: ${evidence.deployment.liveSha})`);
+            console.log(`  - App Domain (${options.canonicalAppSurface}/ready) Ready: ${evidence.deployment.appReadyStatus} (SHA: ${evidence.deployment.appLiveSha})`);
+            console.log(`  - Frozen Release SHA: ${evidence.releaseSha}`);
+            console.log(`  - Dual Domain SHA Parity: ${evidence.deployment.shaParity}`);
+            console.log(`  - Migration Parity: ${evidence.deployment.migrationParity}`);
           } catch (e) {
             console.error(`  ! Failed to parse /ready JSON output:`, e.message);
             evidence.blockers.push(`Failed to parse /ready JSON`);
           }
         } else {
-          evidence.blockers.push(`Failed to reach /ready endpoint`);
+          evidence.blockers.push(`Failed to reach live /ready endpoint`);
         }
       } else {
-        evidence.blockers.push(`Deployment command failed or was blocked by auth`);
+        evidence.blockers.push(`Deployment command failed or was blocked by external auth/network`);
       }
     }
   }
+
+  // Mutation Audit Check
+  const postStatusRes = runCmd('git status --porcelain', { silent: true });
+  const postWorkingTreeLines = postStatusRes.success && postStatusRes.output
+    ? postStatusRes.output.split('\n').filter(Boolean).filter(line => !line.includes('.tmp/'))
+    : [];
+
+  const initialModified = initialWorkingTreeLines.filter(l => !l.startsWith('??')).join('\n');
+  const postModified = postWorkingTreeLines.filter(l => !l.startsWith('??')).join('\n');
+  evidence.mutationAudit.sourceTreeChanged = initialModified !== postModified;
+  evidence.mutationAudit.workingTreeChanged = initialWorkingTreeLines.join('\n') !== postWorkingTreeLines.join('\n');
 
   // Calculate Final Release Disposition
   const gatesPassed = Object.values(evidence.verificationGates).every(Boolean);
   const visualPassed = evidence.visualQa.passed;
   const cssValid = evidence.cssIntegrity.importPrecedenceValid;
   const copyValid = evidence.copyLeaks.passed;
+  const diffGuardValid = evidence.diffGuard.passed;
+  const gitParityValid = evidence.git.shaParity;
 
-  if (!gatesPassed || !visualPassed || !cssValid || !copyValid) {
+  const corePreflightPassed = gatesPassed && visualPassed && cssValid && copyValid && diffGuardValid && gitParityValid;
+
+  if (!corePreflightPassed) {
     evidence.releaseDisposition = 'FAIL';
   } else if (options.mode === 'production-release' && (!evidence.deployment.executed || !evidence.deployment.shaParity)) {
     evidence.releaseDisposition = 'PASS_WITH_BLOCKER';
@@ -347,32 +498,39 @@ async function main() {
 
 - **Mode**: \`${evidence.mode}\`
 - **Disposition**: **\`${evidence.releaseDisposition}\`**
-- **Calculated Commit SHA**: \`${evidence.commitSha}\`
-- **origin/main SHA**: \`${evidence.originMainSha}\`
-- **Working Tree Clean**: \`${evidence.workingTreeClean}\`
+- **Frozen Release SHA**: \`${evidence.releaseSha}\`
+- **Local HEAD SHA**: \`${evidence.git.headSha}\`
+- **origin/main SHA**: \`${evidence.git.originMainSha}\`
+- **Git Parity**: \`${evidence.git.shaParity ? 'PASS' : 'FAIL'}\`
+- **Working Tree Clean**: \`${evidence.git.workingTreeClean}\`
+
+## Diff Guard & Contract Integrity
+- Diff Guard (Protected Paths): \`${evidence.diffGuard.passed ? 'PASS' : 'FAIL'}\`
+- CSS Import Precedence: \`${evidence.cssIntegrity.importPrecedenceValid ? 'PASS' : 'FAIL'}\`
+- Copy Leak Audit: \`${evidence.copyLeaks.passed ? 'PASS' : 'FAIL'}\`
 
 ## Verification Gates
-- TypeScript: \`${evidence.verificationGates.typecheck ? 'PASS' : 'FAIL'}\`
-- Web & Worker Build: \`${evidence.verificationGates.build ? 'PASS' : 'FAIL'}\`
-- Test Suite: \`${evidence.verificationGates.test ? 'PASS' : 'FAIL'}\`
-- Foundation Gate: \`${evidence.verificationGates.verifyFoundation ? 'PASS' : 'FAIL'}\`
-- Cloudflare Build Gate: \`${evidence.verificationGates.verifyCloudflareBuild ? 'PASS' : 'FAIL'}\`
+- TypeScript (\`pnpm typecheck\`): \`${evidence.verificationGates.typecheck ? 'PASS' : 'FAIL'}\`
+- Web & Worker Build (\`pnpm build\`): \`${evidence.verificationGates.build ? 'PASS' : 'FAIL'}\`
+- Test Suite (\`pnpm test\`): \`${evidence.verificationGates.test ? 'PASS' : 'FAIL'}\`
+- Foundation Gate (\`pnpm verify:foundation\`): \`${evidence.verificationGates.verifyFoundation ? 'PASS' : 'FAIL'}\`
+- Cloudflare Build Gate (\`pnpm verify:cloudflare-build\`): \`${evidence.verificationGates.verifyCloudflareBuild ? 'PASS' : 'FAIL'}\`
 
 ## Visual QA Audit (Playwright)
 - Audited Routes: \`${evidence.visualQa.routesAudited}\`
 - Desktop Horizontal Overflow (1440x900): \`${evidence.visualQa.desktopOverflow}\`
 - Mobile Horizontal Overflow (390x844): \`${evidence.visualQa.mobileOverflow}\`
+- Console Errors: \`${evidence.visualQa.consoleErrorsCount}\`
 - Visual QA Status: \`${evidence.visualQa.passed ? 'PASS' : 'FAIL'}\`
 
 ## Deployment & SHA Parity
 - Executed Deployment: \`${evidence.deployment.executed}\`
-- Live Ready Status: \`${evidence.deployment.readyStatus}\`
-- Live SHA: \`${evidence.deployment.liveSha}\`
-- Expected SHA: \`${evidence.commitSha}\`
-- SHA Parity: \`${evidence.deployment.shaParity}\`
+- Authoritative Release Command: \`${evidence.deployment.releaseCommand}\`
+- Live Target (/ready): \`${evidence.deployment.liveTarget}\`
+- Dual Domain SHA Parity: \`${evidence.deployment.shaParity}\`
 
 ## Blockers
-${evidence.blockers.length === 0 ? '- None' : evidence.blockers.map(b => `- ${b}`).join('\n')}
+${evidence.blockers.length === 0 ? '- None' : evidence.blockers.map((b) => `- ${b}`).join('\n')}
 `;
     writeFileSync(options.outputMarkdown, mdContent, 'utf-8');
     console.log(`Saved Markdown Evidence: ${options.outputMarkdown}\n`);
@@ -380,14 +538,20 @@ ${evidence.blockers.length === 0 ? '- None' : evidence.blockers.map(b => `- ${b}
     console.error(`Failed to write evidence files:`, err.message);
   }
 
-  if (evidence.releaseDisposition === 'FAIL') {
-    process.exit(1);
-  } else {
-    process.exit(0);
-  }
+  return evidence;
 }
 
-main().catch((err) => {
-  console.error('Fatal execution error:', err);
-  process.exit(1);
-});
+if (process.argv[1] && process.argv[1].endsWith('release-verifier.mjs')) {
+  runVerifier()
+    .then((ev) => {
+      if (ev.releaseDisposition === 'FAIL') {
+        process.exit(1);
+      } else {
+        process.exit(0);
+      }
+    })
+    .catch((err) => {
+      console.error('Fatal execution error:', err);
+      process.exit(1);
+    });
+}
