@@ -20,8 +20,18 @@
   --v0-blue: #2f93ff;
   --v0-blue-bright: #78c7ff;
   --v0-blue-soft: rgba(47, 147, 255, 0.13);
-  --v0-shell: min(1120px, calc(100vw - 72px));
-  --v0-display: system-ui, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --v0-display:
+    "Geist Sans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI Variable Display",
+    "Segoe UI",
+    system-ui,
+    "Helvetica Neue",
+    Helvetica,
+    Arial,
+    sans-serif;
   --v0-sans:
     system-ui,
 

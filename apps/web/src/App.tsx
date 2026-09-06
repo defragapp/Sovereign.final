@@ -264,45 +264,27 @@ function Landing() {
               {/* Sovereign Response */}
               <div className="space-y-4 max-w-2xl">
                 <div className="flex items-center gap-2 font-utility text-[10px] text-[var(--sage)]">
-                  <span>GROUNDED REFERENCE · SOVEREIGN ANSWER V2</span>
+                  <span>SOVEREIGN ANSWER</span>
                 </div>
 
                 <h3 className="font-statement text-xl sm:text-2xl text-[var(--cream)] font-medium leading-snug">
                   Separate the immediate observation from the pressure to solve their perception all at once.
                 </h3>
 
-                {/* Observable vs Possible Pattern */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 space-y-1">
-                    <span className="font-utility text-[9px] text-[var(--subtle)] tracking-wider">What is Observable</span>
-                    <p className="font-explanation text-xs sm:text-[13px] text-[var(--cream)] leading-relaxed">
-                      When communication feels misunderstood, speech pauses to draft multiple alternative formulations before responding.
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 space-y-1">
-                    <span className="font-utility text-[9px] text-[var(--subtle)] tracking-wider">One Possible Pattern</span>
-                    <p className="font-explanation text-xs sm:text-[13px] text-[var(--muted)] leading-relaxed">
-                      Refining words repeatedly can become an attempt to avoid being misunderstood.
-                    </p>
-                  </div>
-                </div>
+                <p className="font-explanation text-sm text-[var(--cream)]/90 leading-relaxed">
+                  When communication feels misunderstood, speech often pauses to draft multiple alternative formulations before responding. Refining words repeatedly can become an attempt to avoid being misunderstood—even before you know whether the other person is actually questioning your intent.
+                </p>
 
-                {/* Explicit Unknowns */}
-                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 space-y-1">
-                  <span className="font-utility text-[9px] text-[var(--subtle)] tracking-wider">What Remains Unknown</span>
+                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1.5">
+                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">Suggested Next Step</span>
                   <p className="font-explanation text-xs sm:text-[13px] text-[var(--muted)] leading-relaxed">
-                    Whether the other person is actually questioning your intent or simply processing quietly at their own pace.
+                    State your central point clearly in one sentence, then pause and allow room for them to respond before clarifying further.
                   </p>
                 </div>
 
-                {/* Grounding / Basis Badges */}
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[var(--surface-3)] px-2.5 py-1 text-[var(--muted)]">
-                    Basis: Baseline Context · Communication
-                  </span>
-                  <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[var(--surface-3)] px-2.5 py-1 text-[var(--muted)]">
-                    Filter: Grounded · Non-Diagnostic
-                  </span>
+                <div className="flex items-center justify-between pt-1 text-xs text-[var(--subtle)] border-t border-[var(--line)]">
+                  <span>Based on your Baseline · Communication & Decision Context</span>
+                  <button onClick={() => go('/signup')} className="text-[var(--muted)] hover:text-[var(--cream)] underline underline-offset-4 transition-colors">See source details →</button>
                 </div>
               </div>
 
