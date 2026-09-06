@@ -523,7 +523,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
   }
 
   return (
-    <div className={`intelligence-workspace glassmorphic-window ${contextOpen ? 'context-open' : ''} ${railCollapsed ? 'rail-collapsed' : ''}`}>
+    <div className={`intelligence-workspace workspace-window ${contextOpen ? 'context-open' : ''} ${railCollapsed ? 'rail-collapsed' : ''}`}>
       <aside className="intelligence-sidebar" aria-label="Sovereign navigation">
         <div className="intelligence-sidebar-header">
           <a className="intelligence-brand" href="/app">
@@ -583,24 +583,20 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
       </aside>
 
       <main className="intelligence-main">
-        <header className="intelligence-topbar flex items-center justify-between px-6 py-3 border-b border-white/10 bg-[#080a0d]/80 backdrop-blur-md">
+        <header className="intelligence-topbar flex items-center justify-between px-6 py-3.5 border-b border-[var(--line)] bg-[#080a0d]">
           <button className="mobile-menu-trigger" onClick={() => setMenuOpen(true)} aria-label="Open workspace menu">S</button>
           <div className="topbar-title-group flex items-center gap-3">
-            <strong>Sovereign</strong>
-            <span className="topbar-surface-tag">{surface}</span>
-            <span className="inline-flex items-center gap-1.5 text-xs font-mono text-neutral-400 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Baseline Active
-            </span>
+            <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign</span>
+            <span className="text-xs text-[var(--muted)] border-l border-[var(--line)] pl-3">{surface}</span>
           </div>
-          <div className="topbar-actions">
-            {status && status !== 'Ready' && <span className={`workspace-status ${apiState} text-xs text-amber-300 font-mono px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20`}>{status}</span>}
-            <button className="topbar-search-btn" onClick={() => setContextOpen((open) => !open)} aria-label="Search and filter context">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <div className="topbar-actions flex items-center gap-3">
+            {status && status !== 'Ready' && <span className={`workspace-status ${apiState} text-xs text-amber-300 px-3 py-1 bg-amber-500/10 rounded-full border border-amber-500/20`}>{status}</span>}
+            <button className="topbar-search-btn text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors flex items-center gap-1.5" onClick={() => setContextOpen((open) => !open)} aria-label="Search and filter context">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-              <span>{contextOpen ? 'Close' : 'Adjust'}</span>
+              <span>{contextOpen ? 'Close context' : 'Context'}</span>
             </button>
           </div>
         </header>

@@ -19,7 +19,7 @@
   font-family: var(--geist-font);
 }
 
-.glassmorphic-window {
+.workspace-window {
   max-width: 96rem; /* 6xl */
   height: 88vh;
   margin: 2rem auto;

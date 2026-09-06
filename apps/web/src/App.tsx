@@ -190,13 +190,22 @@ function Header() {
    PUBLIC LANDING PAGE — SOVEREIGN.OS NARRATIVE PROGRESSION
    ========================================================================= */
 function Landing() {
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+
+  const sampleQuestions = [
+    "Why do I keep overthinking what to say when I feel misunderstood?",
+    "How can I set a clear boundary without causing avoidable tension?",
+    "What pattern repeats when our team feels under intense pressure?",
+    "Why does my response under stress feel so different from my intent?"
+  ];
+
   return (
     <div className="page-noise min-h-screen bg-[var(--ink)] text-[var(--cream)]">
       <Header />
 
-      <main className="mx-auto max-w-5xl px-4 sm:px-6 pb-20 md:px-8">
+      <main className="mx-auto max-w-4xl px-4 sm:px-6 pb-24 md:px-8 space-y-20 sm:space-y-28">
         {/* 1. HERO */}
-        <section className="pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
+        <section className="pt-16 sm:pt-24 text-center">
           <div className="max-w-3xl mx-auto flex flex-col items-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3.5 py-1 text-[11px] font-medium text-[var(--muted)] mb-8 tracking-wide">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
@@ -205,7 +214,7 @@ function Landing() {
 
             <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-tight text-[var(--cream)] leading-[1.06]">
               Healing isn’t optional.<br />
-              <span className="text-[var(--cream)]/90">Holding onto the pain is.</span>
+              <span className="text-[var(--cream)]/85">Holding onto the pain is.</span>
             </h1>
 
             <p className="mt-6 max-w-xl font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
@@ -215,153 +224,154 @@ function Landing() {
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
               <button
                 onClick={() => go('/signup')}
-                className="rounded-full bg-[var(--cream)] px-6 py-2.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-md hover:scale-[1.01]"
+                className="rounded-full bg-[var(--cream)] px-7 py-3 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-md hover:scale-[1.01]"
               >
                 Get started
               </button>
               <button
                 onClick={() => go('/how-it-works')}
-                className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-5 py-2.5 text-sm font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-all"
+                className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-all"
               >
                 How it works
               </button>
             </div>
           </div>
+        </section>
 
-          {/* 2. PRODUCT PROOF */}
-          <div className="mt-12 sm:mt-16 rounded-2xl border border-[var(--line-strong)] bg-[var(--surface)] shadow-2xl overflow-hidden text-left">
-            {/* Window Chrome */}
-            <div className="flex items-center justify-between border-b border-[var(--line)] px-4 sm:px-6 py-3 bg-[var(--surface-2)]">
-              <div className="flex items-center gap-2.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--line-strong)]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--line-strong)]" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--line-strong)]" />
-                </div>
-                <span className="text-[11px] font-medium text-[var(--muted)] ml-2">Today — Sovereign Workspace</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
-                <span className="font-utility text-[9px] text-[var(--sage)]">Private Reference · Sources ready</span>
-              </div>
-            </div>
+        {/* 2. 01 · YOU (SELF EXPLORATION DEMONSTRATION) */}
+        <section className="border-t border-[var(--line)] pt-16 sm:pt-20 space-y-6">
+          <div>
+            <span className="font-utility text-[10px] text-[var(--subtle)]">01 · YOU</span>
+            <h2 className="mt-1 font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
+              Personal Baseline & Self Exploration
+            </h2>
+            <p className="mt-2 font-explanation text-sm text-[var(--muted)] max-w-xl leading-relaxed">
+              Explore how you think, decide, communicate, create, connect, respond under pressure, and grow. Sovereign starts with your private Baseline rather than a blank prompt.
+            </p>
+          </div>
 
-            {/* Workspace Conversation */}
-            <div className="relative z-10 p-5 sm:p-7 md:p-9 space-y-6">
-              {/* User Inquiry */}
-              <div className="flex justify-end">
-                <div className="max-w-[90%] sm:max-w-[75%] rounded-2xl rounded-br-sm border border-[var(--line-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--cream)] leading-relaxed shadow-sm">
-                  Why do I keep overthinking what to say when I feel misunderstood?
-                </div>
-              </div>
-
-              {/* Sovereign Response */}
-              <div className="space-y-4 max-w-2xl">
-                <h3 className="font-statement text-xl sm:text-2xl text-[var(--cream)] font-medium leading-snug">
-                  Separate the immediate observation from the pressure to solve their perception all at once.
-                </h3>
-
-                <p className="font-explanation text-sm text-[var(--cream)]/90 leading-relaxed">
-                  When communication feels misunderstood, speech often pauses to draft multiple alternative formulations before responding. Refining words repeatedly can become an attempt to avoid being misunderstood—even before you know whether the other person is actually questioning your intent.
-                </p>
-
-                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1.5">
-                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">Suggested Next Step</span>
-                  <p className="font-explanation text-xs sm:text-[13px] text-[var(--muted)] leading-relaxed">
-                    State your central point clearly in one sentence, then pause and allow room for them to respond before clarifying further.
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-between pt-1 text-xs text-[var(--subtle)] border-t border-[var(--line)]">
-                  <span>Based on your Baseline</span>
-                  <button onClick={() => go('/signup')} className="text-[var(--muted)] hover:text-[var(--cream)] underline underline-offset-4 transition-colors">See source details →</button>
-                </div>
-              </div>
-
-              {/* Matching Verification Control */}
-              <div className="border-t border-[var(--line)] pt-4 flex flex-col sm:flex-row gap-3 sm:items-center justify-between text-xs text-[var(--subtle)]">
-                <span>Does this match today?</span>
-                <div className="flex gap-2">
-                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-3 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)] transition-colors">Yes</button>
-                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-3 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)] transition-colors">Partly</button>
-                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-3 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)] transition-colors">Not today</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Live Workspace Input Composer Mock */}
-            <div className="relative z-10 border-t border-[var(--line)] bg-[var(--surface-2)] p-3 sm:p-4 flex items-center justify-between gap-3">
-              <div className="text-xs text-[var(--subtle)] select-none truncate">
-                Ask about a situation, conversation, or decision...
-              </div>
+          {/* Interactive Question Selector */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            {sampleQuestions.map((q, idx) => (
               <button
-                onClick={() => go('/signup')}
-                className="rounded-lg bg-[var(--cream)] p-2 text-[var(--ink)] hover:bg-white transition-colors shrink-0"
-                aria-label="Send inquiry"
+                key={idx}
+                onClick={() => setActiveQuestionIndex(idx)}
+                className={`rounded-full px-3.5 py-1.5 text-xs transition-colors border ${
+                  activeQuestionIndex === idx
+                    ? 'border-[var(--cream)] bg-[var(--cream)] text-[var(--ink)] font-medium'
+                    : 'border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--cream)]'
+                }`}
               >
-                <ArrowUp className="h-3.5 w-3.5" />
+                {q}
               </button>
+            ))}
+          </div>
+
+          {/* Clean Conversation Demonstration */}
+          <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface)] p-6 sm:p-8 space-y-6 shadow-xl">
+            {/* User Question */}
+            <div className="flex justify-end">
+              <div className="max-w-[90%] sm:max-w-[80%] rounded-2xl rounded-br-sm border border-[var(--line-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--cream)] leading-relaxed shadow-sm">
+                {sampleQuestions[activeQuestionIndex]}
+              </div>
+            </div>
+
+            {/* Sovereign Answer */}
+            <div className="space-y-4 max-w-2xl">
+              <h3 className="font-statement text-xl sm:text-2xl text-[var(--cream)] font-medium leading-snug">
+                Separate the immediate observation from the pressure to solve their perception all at once.
+              </h3>
+
+              <p className="font-explanation text-sm text-[var(--cream)]/90 leading-relaxed">
+                When communication feels misunderstood, speech often pauses to draft multiple alternative formulations before responding. Refining words repeatedly can become an attempt to avoid being misunderstood—even before you know whether the other person is actually questioning your intent.
+              </p>
+
+              <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1.5">
+                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">Suggested Next Step</span>
+                <p className="font-explanation text-xs sm:text-[13px] text-[var(--muted)] leading-relaxed">
+                  State your central point clearly in one sentence, then pause and allow room for them to respond before clarifying further.
+                </p>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 text-xs text-[var(--subtle)] border-t border-[var(--line)]">
+                <span>Based on your Baseline</span>
+                <button onClick={() => go('/signup')} className="text-[var(--muted)] hover:text-[var(--cream)] underline underline-offset-4 transition-colors">See source details →</button>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* 3. ONE VALUE SECTION */}
-        <section className="border-t border-[var(--line)] py-20 sm:py-28">
-          <div className="grid gap-10 md:grid-cols-[1fr_auto] items-center justify-between">
-            <div className="max-w-xl space-y-4">
-              <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">The Baseline</span>
-              <h2 className="font-statement text-3xl sm:text-4xl text-[var(--cream)] font-medium">
-                A private reference built around you.
+        {/* 3. 02 · YOU + YOUR PEOPLE (RELATIONSHIP INTELLIGENCE) */}
+        <section className="border-t border-[var(--line)] pt-16 sm:pt-20">
+          <div className="grid gap-8 md:grid-cols-2 items-center">
+            <div className="space-y-4">
+              <span className="font-utility text-[10px] text-[var(--subtle)]">02 · YOU + YOUR PEOPLE</span>
+              <h2 className="font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
+                See why the same moment lands differently—and how to bridge the gap.
               </h2>
               <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                Instead of starting every conversation from zero, Sovereign begins with your Baseline: a private reference that gives the system persistent context for how you operate. It stays strictly private to you, grounding your inquiries as situations, relationships, and systems evolve.
+                Shared relationship intelligence begins through a private invitation. When both people permit access, Sovereign examines how each person's Baseline shapes how the same situation is experienced—without mind-reading, scoring compatibility, or taking sides.
               </p>
             </div>
 
-            <div className="relative rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-8 overflow-hidden flex flex-col items-center justify-center text-center shrink-0 sm:w-72">
-              <ReferenceField className="absolute inset-0 w-full h-full opacity-25 pointer-events-none" />
-              <div className="relative z-10 space-y-2.5">
-                <SovereignMark size={28} className="mx-auto text-[var(--cream)]" />
-                <div className="font-utility text-[10px] text-[var(--sage)] tracking-widest">LIVING REFERENCE</div>
-                <div className="font-statement text-lg text-[var(--cream)]">Your Baseline</div>
-                <div className="font-explanation text-xs text-[var(--muted)]">Private · Grounded · Persistent</div>
+            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-[var(--line)] pb-3 text-xs text-[var(--muted)]">
+                <span>Relational Context</span>
+                <span className="text-[var(--sage)] font-utility text-[10px]">2 SHARED BASELINES</span>
+              </div>
+              <div className="space-y-3 text-xs text-[var(--cream)]/90 leading-relaxed">
+                <div className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
+                  <div className="font-medium text-[var(--cream)]">Your perspective</div>
+                  <div className="text-[var(--muted)]">Seeks early clarity and structural closure before moving forward.</div>
+                </div>
+                <div className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
+                  <div className="font-medium text-[var(--cream)]">Their perspective</div>
+                  <div className="text-[var(--muted)]">Requires open space to process possibilities before committing to a decision.</div>
+                </div>
+                <div className="p-3.5 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-3)] space-y-1">
+                  <div className="font-medium text-[var(--sage)]">The Bridge</div>
+                  <div className="text-[var(--cream)]">Agree on the decision criteria first, then set a specific time to resume choices.</div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* 4. CAPABILITY STRIP */}
-        <section className="border-t border-[var(--line)] py-16 sm:py-20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 divide-y md:divide-y-0 md:divide-x divide-[var(--line)]">
-            <div className="space-y-2 md:pr-6">
-              <span className="font-utility text-[10px] text-[var(--subtle)]">01 · YOU</span>
-              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">Personal Baseline</h3>
-              <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                Explore how you think, decide, communicate, create, connect, respond under pressure, and grow.
-              </p>
+        {/* 4. 03 · FROM 1:1 TO THE WHOLE SYSTEM */}
+        <section className="border-t border-[var(--line)] pt-16 sm:pt-20">
+          <div className="grid gap-8 md:grid-cols-2 items-center">
+            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-6 space-y-4 order-2 md:order-1">
+              <div className="flex items-center justify-between border-b border-[var(--line)] pb-3 text-xs text-[var(--muted)]">
+                <span>System Dynamics</span>
+                <span className="text-[var(--sage)] font-utility text-[10px]">FAMILY & TEAM MAPPING</span>
+              </div>
+              <div className="space-y-3 text-xs text-[var(--cream)]/90 leading-relaxed">
+                <div className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
+                  <div className="font-medium text-[var(--cream)]">System Observation</div>
+                  <div className="text-[var(--muted)]">Responsibility concentrates around the person with highest initial initiative, causing others to step back.</div>
+                </div>
+                <div className="p-3.5 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-3)] space-y-1">
+                  <div className="font-medium text-[var(--sage)]">System Shift</div>
+                  <div className="text-[var(--cream)]">Explicitly assign ownership boundaries rather than waiting for voluntary pickup under pressure.</div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2 pt-6 md:pt-0 md:px-6">
-              <span className="font-utility text-[10px] text-[var(--subtle)]">02 · YOU + YOUR PEOPLE</span>
-              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">Relationship Intelligence</h3>
-              <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                See why the same moment lands differently—and how to bridge the gap using shared, consent-based references.
-              </p>
-            </div>
-
-            <div className="space-y-2 pt-6 md:pt-0 md:pl-6">
+            <div className="space-y-4 order-1 md:order-2">
               <span className="font-utility text-[10px] text-[var(--subtle)]">03 · FROM 1:1 TO THE WHOLE SYSTEM</span>
-              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">System Dynamics</h3>
-              <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                Understand how the whole system functions across families, workplace teams, and groups while keeping each person distinct.
+              <h2 className="font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
+                Understand how the whole system functions.
+              </h2>
+              <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+                Expand from individual and 1:1 relationships to families, workplace teams, and groups. Sovereign keeps each participant distinct, mapping roles, pressure points, and communication dynamics in clean, ordinary language.
               </p>
             </div>
           </div>
         </section>
 
-        {/* 4.5 COMPARISON */}
-        <section className="border-t border-[var(--line)] py-16 sm:py-20">
-          <div className="max-w-2xl mx-auto text-center space-y-4">
+        {/* 5. WHY THIS AI IS DIFFERENT */}
+        <section className="border-t border-[var(--line)] pt-16 sm:pt-20 text-center">
+          <div className="max-w-2xl mx-auto space-y-4">
             <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">WHY THIS AI IS DIFFERENT</span>
             <h2 className="font-statement text-2xl sm:text-4xl text-[var(--cream)] font-medium">
               Most AI starts with the prompt.<br />
@@ -373,84 +383,72 @@ function Landing() {
           </div>
         </section>
 
-        {/* 5. PRICING */}
-        <section className="border-t border-[var(--line)] py-20 sm:py-28">
+        {/* 6. ACCESS & PRICING */}
+        <section className="border-t border-[var(--line)] pt-16 sm:pt-20">
           <div className="max-w-xl">
             <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">Access & Pricing</span>
-            <h2 className="mt-2 font-statement text-3xl sm:text-4xl text-[var(--cream)] font-medium">
+            <h2 className="mt-2 font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
               Simple, transparent access.
             </h2>
-            <p className="mt-3 font-explanation text-sm sm:text-base text-[var(--muted)]">
+            <p className="mt-2 font-explanation text-sm text-[var(--muted)]">
               Start with your private Baseline at no cost. Add depth when you are ready to examine relationships and whole systems.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-7 md:p-8 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 flex flex-col justify-between space-y-6">
+              <div className="space-y-3">
                 <div>
                   <span className="font-utility text-xs text-[var(--muted)]">STANDARD</span>
-                  <div className="mt-1 font-statement text-3xl text-[var(--cream)]">Free ($0)</div>
+                  <div className="mt-1 font-statement text-2xl text-[var(--cream)]">Free ($0)</div>
                 </div>
-                <p className="font-explanation text-xs sm:text-sm text-[var(--muted)]">
+                <p className="font-explanation text-xs text-[var(--muted)]">
                   A private Baseline and a quiet way to begin asking questions.
                 </p>
-                <div className="space-y-2 font-explanation text-xs text-[var(--cream)]/90 pt-1">
+                <div className="space-y-1.5 font-explanation text-xs text-[var(--cream)]/90 pt-1">
                   <div>— Private personal Baseline</div>
                   <div>— Today thinking environment</div>
                   <div>— 10 AI turns per month</div>
-                  <div>— Strict architectural privacy</div>
                 </div>
               </div>
               <button
                 onClick={() => go('/signup')}
-                className="w-full rounded-lg border border-[var(--line)] py-2.5 text-xs font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-colors"
+                className="w-full rounded-lg border border-[var(--line)] py-2 text-xs font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-colors"
               >
                 Start Free
               </button>
             </div>
 
-            <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-7 md:p-8 flex flex-col justify-between space-y-6">
-              <div className="space-y-4">
+            <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-6 flex flex-col justify-between space-y-6">
+              <div className="space-y-3">
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="font-utility text-xs text-[var(--sage)]">SOVEREIGN+</span>
-                    <div className="mt-1 font-statement text-3xl text-[var(--cream)]">$20 / mo</div>
+                    <div className="mt-1 font-statement text-2xl text-[var(--cream)]">$20 / mo</div>
                   </div>
                   <Sparkles className="h-4 w-4 text-[var(--sage)]" />
                 </div>
-                <p className="font-explanation text-xs sm:text-sm text-[var(--muted)]">
+                <p className="font-explanation text-xs text-[var(--muted)]">
                   Room for deeper personal exploration, relational intelligence, and systems.
                 </p>
-                <div className="space-y-2 font-explanation text-xs text-[var(--cream)]/90 pt-1">
+                <div className="space-y-1.5 font-explanation text-xs text-[var(--cream)]/90 pt-1">
                   <div>— Everything in Free</div>
                   <div>— 300 AI turns per month</div>
-                  <div>— Relational inquiry & comparisons</div>
-                  <div>— Multi-participant system mapping</div>
-                  <div>— Extended library retention</div>
+                  <div>— Relational inquiry & system dynamics</div>
                 </div>
               </div>
               <button
                 onClick={() => go('/signup')}
-                className="w-full rounded-lg bg-[var(--cream)] py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors"
+                className="w-full rounded-lg bg-[var(--cream)] py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors"
               >
                 Start Sovereign+
               </button>
             </div>
           </div>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => go('/pricing')}
-              className="text-xs text-[var(--muted)] hover:text-[var(--cream)] transition-colors underline underline-offset-4"
-            >
-              Compare full plan details & voluntary support →
-            </button>
-          </div>
         </section>
 
-        {/* 6. FINAL CTA */}
-        <section className="border-t border-[var(--line)] py-24 sm:py-32 text-center">
+        {/* 7. FINAL ACTION */}
+        <section className="border-t border-[var(--line)] pt-20 text-center">
           <div className="max-w-xl mx-auto space-y-6">
             <SovereignMark size={28} className="mx-auto text-[var(--cream)]" />
             <h2 className="font-statement text-3xl sm:text-5xl text-[var(--cream)] font-medium leading-tight">
