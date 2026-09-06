@@ -19,6 +19,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { RelationalInquiryDemo } from '@/components/RelationalInquiryDemo';
+import { SystemDynamicDemo } from '@/components/SystemDynamicDemo';
 import {
   checkSession,
   requestSignup,
@@ -200,22 +202,34 @@ function Landing() {
     {
       q: 'Why do I keep overthinking what to say?',
       headline: 'Cognitive precision is trying to compensate for felt uncertainty.',
-      body: 'Your Baseline indicates a tendency to refine language repeatedly until the outcome feels safe. When communication feels high-stakes, notice what you actually observed versus what you fear will be inferred. Naming the simple observation directly reduces the compulsion to resolve the other person’s perception in advance.'
+      observable: 'Hesitating before speaking while drafting multiple alternative formulations in your head.',
+      pattern: 'Language precision is being deployed to predict and control how the other person will perceive you.',
+      unknowns: 'The other person’s actual internal state, intent, and receptivity at this moment.',
+      guidance: 'Name what you actually observed directly out loud rather than trying to resolve the other person’s reaction in advance.'
     },
     {
       q: 'Why does this conversation keep going the same way?',
       headline: 'The dynamic has settled into an unrecognized polarity.',
-      body: 'When one person steps back to preserve internal calm, the other intensifies their inquiry to protect connection. Sovereign examines the interaction structure between two distinct Baselines without assigning fault or collapsing both perspectives into one narrative.'
+      observable: 'A recurring loop where one person seeks immediate answers and the other pulls back into quiet reflection.',
+      pattern: 'Urgency triggers withdrawal; withdrawal triggers more urgency. Both participants are attempting to protect safety.',
+      unknowns: 'Whether either person realizes they are operating from a reactive reflex rather than the current conversation topic.',
+      guidance: 'Pause the content debate and explicitly name the pacing difference between you.'
     },
     {
       q: 'What am I missing about what is happening between us?',
       headline: 'Two distinct baselines are interpreting the same silence differently.',
-      body: 'Where your internal rhythm registers processing space, the other person registers emotional withdrawal. Sovereign holds both references simultaneously, making visible what is occurring between people rather than assuming either person’s motive.'
+      observable: 'A period of silence or delayed response is followed by tension or emotional distance.',
+      pattern: 'Where your internal rhythm registers processing space, the other person’s rhythm registers withdrawal or exclusion.',
+      unknowns: 'Whether the silence indicates emotional fatigue, careful thought, or unresolved frustration.',
+      guidance: 'State your intended meaning clearly rather than assuming the other person shares your internal interpretation of silence.'
     },
     {
       q: 'How should I approach this decision?',
       headline: 'Separate the irreversible commitment from the exploratory step.',
-      body: 'Your Baseline operates with greater clarity when values alignment precedes execution planning. Test the smallest reversible action first before seeking definitive certainty on the whole system.'
+      observable: 'Reviewing tradeoffs repeatedly without reaching a feeling of internal completion or certainty.',
+      pattern: 'Seeking absolute certainty before taking the first reversible action.',
+      unknowns: 'Key variables and practical feedback that can only emerge after an exploratory move is made.',
+      guidance: 'Identify the smallest reversible test you can take today before committing the full system.'
     }
   ];
 
@@ -277,15 +291,35 @@ function Landing() {
                   <h3 className="font-statement text-xl md:text-2xl text-[var(--cream)]">
                     Separate the immediate observation from the pressure to solve their perception all at once.
                   </h3>
-                  <p className="font-explanation text-sm md:text-[15px] leading-relaxed">
-                    When communication feels misunderstood, your Baseline tends to seek immediate cognitive precision. Naming what was actually observed versus what was inferred reduces the internal pressure to resolve the other person’s reaction in advance.
-                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3 space-y-1">
+                      <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">What is Observable</span>
+                      <p className="font-explanation text-xs text-[var(--cream)] leading-relaxed">
+                        When communication feels misunderstood, speech is paused to draft multiple alternative formulations before responding.
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3 space-y-1">
+                      <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">One Possible Pattern</span>
+                      <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">
+                        High cognitive precision is deployed to prevent felt disconnection and anticipate perceived reactions.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-[var(--line)] bg-[#0c0c0b] p-3 space-y-1">
+                    <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">What Remains Unknown</span>
+                    <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">
+                      Whether the other person is actually questioning your intent or simply processing quietly at their own pace.
+                    </p>
+                  </div>
+
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-1 text-[var(--muted)]">
                       Basis: Baseline Cognitive Synthesis
                     </span>
                     <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-1 text-[var(--muted)]">
-                      Dynamic: High Uncertainty Filter
+                      Filter: Grounded · Non-Diagnostic
                     </span>
                   </div>
                 </div>
@@ -341,7 +375,7 @@ function Landing() {
               Start with what is actually happening.
             </h2>
             <p className="mt-4 font-explanation text-[15px] max-w-xl">
-              Real questions from real situations. Sovereign does not offer generic AI advice; it grounds every response in your context.
+              Real questions from real situations. Sovereign does not offer generic advice; it separates what is observable from possible patterns while keeping unknowns explicit.
             </p>
           </div>
 
@@ -364,10 +398,36 @@ function Landing() {
                   </button>
 
                   {isOpen && (
-                    <div className="border-t border-[var(--line)] bg-[var(--surface-2)] p-5 md:p-6 space-y-3">
-                      <div className="font-utility text-[10px] text-[var(--sage)]">SOVEREIGN RESPONSE</div>
+                    <div className="border-t border-[var(--line)] bg-[var(--surface-2)] p-5 md:p-6 space-y-4">
+                      <div className="flex items-center gap-2 font-utility text-[10px] text-[var(--sage)]">
+                        <span>SOVEREIGN RESPONSE</span>
+                        <span>·</span>
+                        <span>GROUNDED SYNTHESIS</span>
+                      </div>
                       <h4 className="font-statement text-base md:text-lg text-[var(--cream)]">{item.headline}</h4>
-                      <p className="font-explanation text-sm leading-relaxed">{item.body}</p>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                        <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3 space-y-1">
+                          <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">Observable Situation</span>
+                          <p className="font-explanation text-xs text-[var(--cream)] leading-relaxed">{item.observable}</p>
+                        </div>
+                        <div className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3 space-y-1">
+                          <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">Possible Dynamic</span>
+                          <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">{item.pattern}</p>
+                        </div>
+                      </div>
+
+                      <div className="rounded-lg border border-[var(--line)] bg-[#0c0c0b] p-3 space-y-1">
+                        <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">What Remains Unknown</span>
+                        <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">{item.unknowns}</p>
+                      </div>
+
+                      <div className="pt-2 flex items-start gap-2.5">
+                        <div className="sovereign-mark shrink-0 mt-0.5" />
+                        <p className="font-explanation text-xs text-[var(--cream)] leading-relaxed">
+                          <span className="text-[var(--sage)] font-medium">Grounded approach:</span> {item.guidance}
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -412,54 +472,22 @@ function Landing() {
         </section>
 
         {/* 04 — SHOW RELATIONSHIPS */}
-        <section className="border-t border-[var(--line)] py-20 md:py-28">
-          <div className="grid gap-12 md:grid-cols-[1.1fr_1fr] items-center">
-            <div>
-              <p className="font-utility text-[var(--sage)] mb-4">04 · Relationships</p>
-              <h2 className="font-statement text-3xl md:text-4xl text-[var(--cream)]">
-                Understand what happens between people.
-              </h2>
-              <p className="mt-6 font-explanation text-[15px] leading-relaxed">
-                Sovereign can keep two people distinct while helping you examine what is happening between them. It does not treat a relationship as one person being right and the other wrong.
-              </p>
-              <div className="mt-8 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-2">
-                <div className="font-utility text-[10px] text-[var(--sage)]">REAL SITUATION</div>
-                <div className="font-statement text-sm text-[var(--cream)]">&ldquo;Why do we keep having the same argument?&rdquo;</div>
-                <p className="font-explanation text-xs leading-relaxed text-[var(--muted)]">
-                  Because both participants are defending a genuine need, but expressing it through opposing coping styles. Sovereign surfaces the dynamic between you without forcing either of you into someone else’s mold.
-                </p>
-              </div>
-            </div>
-
-            {/* Visual Relationship Composition */}
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-8 flex flex-col items-center justify-center text-center relative">
-              <div className="w-full max-w-xs space-y-4">
-                <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3">
-                  <span className="font-utility text-[10px] text-[var(--cream)]">YOU (BASELINE A)</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="h-4 w-px bg-[var(--line-strong)]" />
-                  <span className="font-utility text-[9px] text-[var(--subtle)]">CONVERSATION</span>
-                  <div className="h-4 w-px bg-[var(--line-strong)]" />
-                </div>
-                <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3">
-                  <span className="font-utility text-[10px] text-[var(--sage)]">PERSON (BASELINE B)</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="h-4 w-px bg-[var(--line-strong)]" />
-                  <span className="font-utility text-[9px] text-[var(--subtle)]">RECURRING PATTERN</span>
-                  <div className="h-4 w-px bg-[var(--line-strong)]" />
-                </div>
-                <div className="rounded-lg border border-[var(--line-strong)] bg-[#0d0d0c] p-3">
-                  <span className="font-utility text-[10px] text-[var(--cream)]">THE DYNAMIC BETWEEN</span>
-                </div>
-              </div>
-            </div>
+        <section className="border-t border-[var(--line)] py-20 md:py-28 space-y-10">
+          <div className="max-w-3xl">
+            <p className="font-utility text-[var(--sage)] mb-4">04 · Relationships</p>
+            <h2 className="font-statement text-3xl md:text-4xl text-[var(--cream)]">
+              Understand what happens between people.
+            </h2>
+            <p className="mt-4 font-explanation text-[15px] leading-relaxed">
+              Sovereign can keep two people distinct while helping you examine what is happening between them. It does not treat a relationship as one person being right and the other wrong.
+            </p>
           </div>
+
+          <RelationalInquiryDemo />
         </section>
 
         {/* 05 — THE WHOLE SYSTEM */}
-        <section className="border-t border-[var(--line)] py-20 md:py-28">
+        <section className="border-t border-[var(--line)] py-20 md:py-28 space-y-10">
           <div className="max-w-3xl">
             <p className="font-utility text-[var(--sage)] mb-4">05 · The Whole System</p>
             <h2 className="font-display text-4xl md:text-5xl text-[var(--cream)]">
@@ -481,6 +509,8 @@ function Landing() {
               Sovereign helps you look at patterns across a larger system without collapsing everyone into one story. It recognizes that groups develop their own equilibrium, unspoken pressures, and recurring loops that no single person created alone.
             </p>
           </div>
+
+          <SystemDynamicDemo />
         </section>
 
         {/* BUILT FOR REAL LIFE */}
