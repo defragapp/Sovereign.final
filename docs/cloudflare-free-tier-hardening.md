@@ -164,3 +164,14 @@ Automated Browser evidence is explicit:
 - text-first release without Browser Rendering → both fields `false`.
 
 Human desktop/iPhone QA is separate evidence and never changes those automated fields by itself.
+
+## Stripe Webhook Security Policy Decision
+
+- **Decision**: Remove redundant Cloudflare Access application/policy protecting `/api/v1/stripe/webhook` (and legacy alias paths).
+- **Security Boundary**: The Worker application (`apps/worker/src/routes/stripe.ts`) is the primary and authoritative security boundary, enforcing mandatory HMAC-SHA256 signature verification (`verifyStripeSignature`) via `STRIPE_WEBHOOK_SECRET`.
+- **Policy Rationale**:
+  - Stripe makes server-to-server HTTP calls to webhooks without interactive IdP login context.
+  - A Cloudflare Access policy with `Bypass: Everyone` adds zero protection while producing security center warnings.
+  - Edge IP allowlisting was deliberately rejected to prevent operational fragility and maintain `STRIPE_WEBHOOK_SECRET` cryptographic verification as the sole authority.
+  - Inbound requests lacking valid `stripe-signature` headers continue to be rejected by the Worker with HTTP `400 Invalid signature`.
+
