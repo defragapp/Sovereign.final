@@ -27,6 +27,7 @@ function parseArgs() {
     releaseCommand: 'pnpm production:release:oauth',
     outputJson: join(process.cwd(), '.tmp', 'release-evidence.json'),
     outputMarkdown: join(process.cwd(), '.tmp', 'release-evidence.md'),
+    silent: false,
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -37,6 +38,7 @@ function parseArgs() {
     else if (arg === '--release-command' && args[i + 1]) options.releaseCommand = args[++i];
     else if (arg === '--output-json' && args[i + 1]) options.outputJson = args[++i];
     else if (arg === '--output-markdown' && args[i + 1]) options.outputMarkdown = args[++i];
+    else if (arg === '--silent') options.silent = true;
   }
 
   if (!['verification-only', 'release-preparation', 'production-release'].includes(options.mode)) {
@@ -47,7 +49,7 @@ function parseArgs() {
   return options;
 }
 
-function runCmd(command, options = {}) {
+function defaultRunCmd(command, options = {}) {
   try {
     const output = execSync(command, {
       cwd: process.cwd(),
@@ -71,8 +73,7 @@ function isProtectedPath(filePath) {
   });
 }
 
-async function auditVisualQa(distDir) {
-  const PORT = 4173;
+async function defaultAuditVisualQa(distDir) {
   const MIME_TYPES = {
     '.html': 'text/html; charset=utf-8',
     '.js': 'application/javascript; charset=utf-8',
@@ -173,19 +174,25 @@ async function auditVisualQa(distDir) {
   });
 }
 
-export async function runVerifier(overrideOptions = {}) {
+export async function runVerifier(overrideOptions = {}, deps = {}) {
   const cliOpts = parseArgs();
   const options = { ...cliOpts, ...overrideOptions };
+  const runCmdImpl = deps.runCmd || defaultRunCmd;
+  const auditVisualQaImpl = deps.auditVisualQa || defaultAuditVisualQa;
+  const log = options.silent ? () => {} : console.log;
+  const logError = options.silent ? () => {} : console.error;
 
-  console.log(`\n==================================================`);
-  console.log(`SOVEREIGN.OS AUTHORITATIVE RELEASE VERIFIER`);
-  console.log(`Mode: ${options.mode}`);
-  console.log(`Target Ref: ${options.targetRef}`);
-  console.log(`Authoritative Deploy Command: ${options.releaseCommand}`);
-  console.log(`==================================================\n`);
+  log(`\n==================================================`);
+  log(`SOVEREIGN.OS AUTHORITATIVE RELEASE VERIFIER`);
+  log(`Mode: ${options.mode}`);
+  log(`Target Ref: ${options.targetRef}`);
+  log(`Authoritative Deploy Command: ${options.releaseCommand}`);
+  log(`==================================================\n`);
 
-  const initialStatusRes = runCmd('git status --porcelain', { silent: true });
-  const initialWorkingTreeLines = initialStatusRes.success && initialStatusRes.output ? initialStatusRes.output.split('\n').filter(Boolean) : [];
+  const initialStatusRes = runCmdImpl('git status --porcelain', { silent: true });
+  const initialWorkingTreeLines = initialStatusRes.success && initialStatusRes.output
+    ? initialStatusRes.output.split('\n').filter(Boolean).filter(line => !line.includes('.tmp/'))
+    : [];
 
   const evidence = {
     timestamp: new Date().toISOString(),
@@ -242,30 +249,30 @@ export async function runVerifier(overrideOptions = {}) {
   };
 
   // 1. Git State, Freeze Release SHA, & Drift Audit
-  console.log(`[1/5] Auditing Git State & Freezing Release SHA...`);
-  runCmd('git fetch origin refs/heads/main', { silent: true });
+  log(`[1/5] Auditing Git State & Freezing Release SHA...`);
+  runCmdImpl('git fetch origin refs/heads/main', { silent: true });
 
-  const headShaRes = runCmd('git rev-parse HEAD', { silent: true });
+  const headShaRes = runCmdImpl('git rev-parse HEAD', { silent: true });
   evidence.git.headSha = headShaRes.success ? headShaRes.output : 'UNKNOWN';
 
-  const originMainRes = runCmd('git rev-parse origin/main', { silent: true });
+  const originMainRes = runCmdImpl('git rev-parse origin/main', { silent: true });
   evidence.git.originMainSha = originMainRes.success ? originMainRes.output : 'UNKNOWN';
 
   // FREEZE RELEASE SHA from origin/main
   evidence.releaseSha = evidence.git.originMainSha;
   evidence.git.shaParity = evidence.git.headSha === evidence.git.originMainSha;
 
-  console.log(`  - Local HEAD SHA: ${evidence.git.headSha}`);
-  console.log(`  - Frozen Release SHA (origin/main): ${evidence.releaseSha}`);
-  console.log(`  - Git Drift Parity (HEAD == origin/main): ${evidence.git.shaParity}`);
+  log(`  - Local HEAD SHA: ${evidence.git.headSha}`);
+  log(`  - Frozen Release SHA (origin/main): ${evidence.releaseSha}`);
+  log(`  - Git Drift Parity (HEAD == origin/main): ${evidence.git.shaParity}`);
 
   if (!evidence.git.shaParity) {
-    console.error(`  ! FAIL: Git drift detected! Local HEAD (${evidence.git.headSha}) does not match origin/main (${evidence.git.originMainSha}).`);
+    logError(`  ! FAIL: Git drift detected! Local HEAD (${evidence.git.headSha}) does not match origin/main (${evidence.git.originMainSha}).`);
     evidence.blockers.push(`Git drift detected: HEAD !== origin/main`);
   }
 
   // 2. Copy Leak & CSS Authority Audit + Diff Guard
-  console.log(`\n[2/5] Auditing Public Contract Copy, CSS Precedence & Diff Guard...`);
+  log(`\n[2/5] Auditing Public Contract Copy, CSS Precedence & Diff Guard...`);
   const mainTsxPath = join(process.cwd(), 'apps', 'web', 'src', 'main.tsx');
   if (existsSync(mainTsxPath)) {
     const mainTsx = readFileSync(mainTsxPath, 'utf-8');
@@ -286,7 +293,7 @@ export async function runVerifier(overrideOptions = {}) {
       lastIdx = idx;
     }
     evidence.cssIntegrity.importPrecedenceValid = orderValid;
-    console.log(`  - CSS Import Precedence Valid: ${orderValid}`);
+    log(`  - CSS Import Precedence Valid: ${orderValid}`);
   }
 
   const appTsxPath = join(process.cwd(), 'apps', 'web', 'src', 'App.tsx');
@@ -295,9 +302,9 @@ export async function runVerifier(overrideOptions = {}) {
     if (appTsx.includes('BASIS:')) {
       evidence.copyLeaks.passed = false;
       evidence.copyLeaks.details.push('Exposed raw BASIS: uppercase label in App.tsx');
-      console.log(`  ! Copy leak detected: Exposed BASIS: uppercase label in App.tsx`);
+      log(`  ! Copy leak detected: Exposed BASIS: uppercase label in App.tsx`);
       if (options.mode !== 'verification-only') {
-        console.log(`  -> Constrained remediation: Replacing BASIS: with Sources: in App.tsx...`);
+        log(`  -> Constrained remediation: Replacing BASIS: with Sources: in App.tsx...`);
         const remediated = appTsx.replace("BASIS:", "Sources:");
         writeFileSync(appTsxPath, remediated, 'utf-8');
         evidence.copyLeaks.remediated = true;
@@ -305,13 +312,13 @@ export async function runVerifier(overrideOptions = {}) {
         evidence.mutationAudit.modifiedFilesTracked.push('apps/web/src/App.tsx');
       }
     } else {
-      console.log(`  - Public Copy Leak Audit: Passed (no raw BASIS: labels found)`);
+      log(`  - Public Copy Leak Audit: Passed (no raw BASIS: labels found)`);
     }
   }
 
   // Perform Diff Guard Check on Protected Paths
-  const currentDiffRes = runCmd('git diff --name-only', { silent: true });
-  const currentStagedRes = runCmd('git diff --cached --name-only', { silent: true });
+  const currentDiffRes = runCmdImpl('git diff --name-only', { silent: true });
+  const currentStagedRes = runCmdImpl('git diff --cached --name-only', { silent: true });
   const modifiedFiles = [
     ...(currentDiffRes.output ? currentDiffRes.output.split('\n').filter(Boolean) : []),
     ...(currentStagedRes.output ? currentStagedRes.output.split('\n').filter(Boolean) : []),
@@ -325,43 +332,43 @@ export async function runVerifier(overrideOptions = {}) {
   }
 
   if (!evidence.diffGuard.passed) {
-    console.error(`  ! FAIL: Diff Guard triggered! Protected paths modified: ${evidence.diffGuard.protectedPathsViolated.join(', ')}`);
+    logError(`  ! FAIL: Diff Guard triggered! Protected paths modified: ${evidence.diffGuard.protectedPathsViolated.join(', ')}`);
     evidence.blockers.push(`Protected paths modified: ${evidence.diffGuard.protectedPathsViolated.join(', ')}`);
   } else {
-    console.log(`  - Diff Guard Audit: Passed (0 protected paths touched)`);
+    log(`  - Diff Guard Audit: Passed (0 protected paths touched)`);
   }
 
   // 3. Verification Gates Execution
-  console.log(`\n[3/5] Executing Authoritative Verification Gates...`);
+  log(`\n[3/5] Executing Authoritative Verification Gates...`);
   
-  console.log(`  -> Running pnpm typecheck...`);
-  const typecheck = runCmd('pnpm typecheck');
+  log(`  -> Running pnpm typecheck...`);
+  const typecheck = runCmdImpl('pnpm typecheck');
   evidence.verificationGates.typecheck = typecheck.success;
 
-  console.log(`  -> Running pnpm build...`);
-  const build = runCmd('pnpm build');
+  log(`  -> Running pnpm build...`);
+  const build = runCmdImpl('pnpm build');
   evidence.verificationGates.build = build.success;
 
-  console.log(`  -> Running pnpm test...`);
-  const test = runCmd('pnpm test');
+  log(`  -> Running pnpm test...`);
+  const test = runCmdImpl('pnpm test');
   evidence.verificationGates.test = test.success;
 
-  console.log(`  -> Running pnpm verify:foundation...`);
-  const foundation = runCmd('pnpm verify:foundation');
+  log(`  -> Running pnpm verify:foundation...`);
+  const foundation = runCmdImpl('pnpm verify:foundation');
   evidence.verificationGates.verifyFoundation = foundation.success;
 
-  console.log(`  -> Running pnpm verify:cloudflare-build...`);
-  const cfBuild = runCmd('pnpm verify:cloudflare-build');
+  log(`  -> Running pnpm verify:cloudflare-build...`);
+  const cfBuild = runCmdImpl('pnpm verify:cloudflare-build');
   evidence.verificationGates.verifyCloudflareBuild = cfBuild.success;
 
   const gatesAllPassed = Object.values(evidence.verificationGates).every(Boolean);
-  console.log(`  - All Verification Gates Passed: ${gatesAllPassed}`);
+  log(`  - All Verification Gates Passed: ${gatesAllPassed}`);
 
   // 4. Deterministic Visual QA Audit
-  console.log(`\n[4/5] Running Multi-Viewport Visual QA (Playwright)...`);
+  log(`\n[4/5] Running Multi-Viewport Visual QA (Playwright)...`);
   const distDir = join(process.cwd(), 'apps', 'web', 'dist');
-  if (existsSync(distDir)) {
-    const vqa = await auditVisualQa(distDir);
+  if (existsSync(distDir) || deps.auditVisualQa) {
+    const vqa = await auditVisualQaImpl(distDir);
     evidence.visualQa.desktopOverflow = vqa.desktopOverflow;
     evidence.visualQa.mobileOverflow = vqa.mobileOverflow;
     evidence.visualQa.consoleErrorsCount = vqa.consoleErrors ? vqa.consoleErrors.length : 0;
@@ -373,34 +380,34 @@ export async function runVerifier(overrideOptions = {}) {
       evidence.visualQa.consoleErrorsCount === 0 &&
       evidence.visualQa.missingRoutesCount === 0;
 
-    console.log(`  - Desktop Horizontal Overflow Count: ${vqa.desktopOverflow}`);
-    console.log(`  - Mobile Horizontal Overflow Count: ${vqa.mobileOverflow}`);
-    console.log(`  - Console Error Count: ${evidence.visualQa.consoleErrorsCount}`);
-    console.log(`  - Missing / Broken Routes Count: ${evidence.visualQa.missingRoutesCount}`);
-    console.log(`  - Visual QA Passed: ${evidence.visualQa.passed}`);
+    log(`  - Desktop Horizontal Overflow Count: ${vqa.desktopOverflow}`);
+    log(`  - Mobile Horizontal Overflow Count: ${vqa.mobileOverflow}`);
+    log(`  - Console Error Count: ${evidence.visualQa.consoleErrorsCount}`);
+    log(`  - Missing / Broken Routes Count: ${evidence.visualQa.missingRoutesCount}`);
+    log(`  - Visual QA Passed: ${evidence.visualQa.passed}`);
   } else {
-    console.error(`  ! Web dist directory missing. Skipping visual QA.`);
+    logError(`  ! Web dist directory missing. Skipping visual QA.`);
     evidence.visualQa.passed = false;
   }
 
   // 5. Constrained Staging & Production Deployment Verification
-  console.log(`\n[5/5] Processing Mode Actions & Deployment Verification...`);
+  log(`\n[5/5] Processing Mode Actions & Deployment Verification...`);
   if (options.mode === 'verification-only') {
-    console.log(`  - Mode is verification-only. Zero mutations performed. Deploy skipped.`);
+    log(`  - Mode is verification-only. Zero mutations performed. Deploy skipped.`);
   } else if (options.mode === 'release-preparation' || options.mode === 'production-release') {
     if (evidence.mutationAudit.modifiedFilesTracked.length > 0) {
-      console.log(`  - Staging explicitly allowed hygiene files: ${evidence.mutationAudit.modifiedFilesTracked.join(', ')}`);
+      log(`  - Staging explicitly allowed hygiene files: ${evidence.mutationAudit.modifiedFilesTracked.join(', ')}`);
       for (const file of evidence.mutationAudit.modifiedFilesTracked) {
-        runCmd(`git add ${file}`);
+        runCmdImpl(`git add ${file}`);
       }
       evidence.mutationAudit.stagedFilesCount = evidence.mutationAudit.modifiedFilesTracked.length;
       
-      console.log(`  - Committing release hygiene pass...`);
-      runCmd('git commit -m "chore(release): final launch hygiene"');
-      console.log(`  - Pushing to origin/main...`);
-      runCmd('git push origin main');
+      log(`  - Committing release hygiene pass...`);
+      runCmdImpl('git commit -m "chore(release): final launch hygiene"');
+      log(`  - Pushing to origin/main...`);
+      runCmdImpl('git push origin main');
 
-      const postPushSha = runCmd('git rev-parse HEAD', { silent: true });
+      const postPushSha = runCmdImpl('git rev-parse HEAD', { silent: true });
       if (postPushSha.success) {
         evidence.git.headSha = postPushSha.output;
         evidence.git.originMainSha = postPushSha.output;
@@ -408,18 +415,18 @@ export async function runVerifier(overrideOptions = {}) {
         evidence.git.shaParity = true;
       }
     } else {
-      console.log(`  - Working tree clean. No hygiene changes needed to stage.`);
+      log(`  - Working tree clean. No hygiene changes needed to stage.`);
     }
 
     if (options.mode === 'production-release') {
-      console.log(`  -> Executing Authoritative Production Release: ${options.releaseCommand}`);
-      const deployRes = runCmd(options.releaseCommand);
+      log(`  -> Executing Authoritative Production Release: ${options.releaseCommand}`);
+      const deployRes = runCmdImpl(options.releaseCommand);
       evidence.deployment.executed = deployRes.success;
 
       if (deployRes.success) {
-        console.log(`  -> Verifying live ready endpoints against frozen release SHA: ${evidence.releaseSha}`);
-        const surfaceCurl = runCmd(`curl -s ${options.targetSurface}/ready`, { silent: true });
-        const appCurl = runCmd(`curl -s ${options.canonicalAppSurface}/ready`, { silent: true });
+        log(`  -> Verifying live ready endpoints against frozen release SHA: ${evidence.releaseSha}`);
+        const surfaceCurl = runCmdImpl(`curl -s ${options.targetSurface}/ready`, { silent: true });
+        const appCurl = runCmdImpl(`curl -s ${options.canonicalAppSurface}/ready`, { silent: true });
 
         if (surfaceCurl.success && appCurl.success) {
           try {
@@ -435,13 +442,13 @@ export async function runVerifier(overrideOptions = {}) {
             evidence.deployment.migrationParity =
               surfaceJson.migrationVersion === appJson.migrationVersion;
 
-            console.log(`  - Public Domain (${options.targetSurface}/ready) Ready: ${evidence.deployment.readyStatus} (SHA: ${evidence.deployment.liveSha})`);
-            console.log(`  - App Domain (${options.canonicalAppSurface}/ready) Ready: ${evidence.deployment.appReadyStatus} (SHA: ${evidence.deployment.appLiveSha})`);
-            console.log(`  - Frozen Release SHA: ${evidence.releaseSha}`);
-            console.log(`  - Dual Domain SHA Parity: ${evidence.deployment.shaParity}`);
-            console.log(`  - Migration Parity: ${evidence.deployment.migrationParity}`);
+            log(`  - Public Domain (${options.targetSurface}/ready) Ready: ${evidence.deployment.readyStatus} (SHA: ${evidence.deployment.liveSha})`);
+            log(`  - App Domain (${options.canonicalAppSurface}/ready) Ready: ${evidence.deployment.appReadyStatus} (SHA: ${evidence.deployment.appLiveSha})`);
+            log(`  - Frozen Release SHA: ${evidence.releaseSha}`);
+            log(`  - Dual Domain SHA Parity: ${evidence.deployment.shaParity}`);
+            log(`  - Migration Parity: ${evidence.deployment.migrationParity}`);
           } catch (e) {
-            console.error(`  ! Failed to parse /ready JSON output:`, e.message);
+            logError(`  ! Failed to parse /ready JSON output:`, e.message);
             evidence.blockers.push(`Failed to parse /ready JSON`);
           }
         } else {
@@ -454,7 +461,7 @@ export async function runVerifier(overrideOptions = {}) {
   }
 
   // Mutation Audit Check
-  const postStatusRes = runCmd('git status --porcelain', { silent: true });
+  const postStatusRes = runCmdImpl('git status --porcelain', { silent: true });
   const postWorkingTreeLines = postStatusRes.success && postStatusRes.output
     ? postStatusRes.output.split('\n').filter(Boolean).filter(line => !line.includes('.tmp/'))
     : [];
@@ -482,19 +489,20 @@ export async function runVerifier(overrideOptions = {}) {
     evidence.releaseDisposition = 'PASS';
   }
 
-  console.log(`\n==================================================`);
-  console.log(`FINAL RELEASE DISPOSITION: ${evidence.releaseDisposition}`);
-  console.log(`==================================================\n`);
+  log(`\n==================================================`);
+  log(`FINAL RELEASE DISPOSITION: ${evidence.releaseDisposition}`);
+  log(`==================================================\n`);
 
-  // Write Evidence Artifacts
-  try {
-    const tmpDir = join(process.cwd(), '.tmp');
-    if (!existsSync(tmpDir)) mkdirSync(tmpDir, { recursive: true });
+  // Write Evidence Artifacts (skip disk write if silent testing mode requested via options.skipDiskWrite)
+  if (!options.skipDiskWrite) {
+    try {
+      const tmpDir = join(process.cwd(), '.tmp');
+      if (!existsSync(tmpDir)) mkdirSync(tmpDir, { recursive: true });
 
-    writeFileSync(options.outputJson, JSON.stringify(evidence, null, 2), 'utf-8');
-    console.log(`Saved JSON Evidence: ${options.outputJson}`);
+      writeFileSync(options.outputJson, JSON.stringify(evidence, null, 2), 'utf-8');
+      log(`Saved JSON Evidence: ${options.outputJson}`);
 
-    const mdContent = `# Sovereign.OS Release Verification Evidence
+      const mdContent = `# Sovereign.OS Release Verification Evidence
 
 - **Mode**: \`${evidence.mode}\`
 - **Disposition**: **\`${evidence.releaseDisposition}\`**
@@ -532,10 +540,11 @@ export async function runVerifier(overrideOptions = {}) {
 ## Blockers
 ${evidence.blockers.length === 0 ? '- None' : evidence.blockers.map((b) => `- ${b}`).join('\n')}
 `;
-    writeFileSync(options.outputMarkdown, mdContent, 'utf-8');
-    console.log(`Saved Markdown Evidence: ${options.outputMarkdown}\n`);
-  } catch (err) {
-    console.error(`Failed to write evidence files:`, err.message);
+      writeFileSync(options.outputMarkdown, mdContent, 'utf-8');
+      log(`Saved Markdown Evidence: ${options.outputMarkdown}\n`);
+    } catch (err) {
+      logError(`Failed to write evidence files:`, err.message);
+    }
   }
 
   return evidence;
