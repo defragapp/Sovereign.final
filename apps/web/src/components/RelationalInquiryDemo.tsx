@@ -33,7 +33,7 @@ const SCENARIOS: Scenario[] = [
     },
     observable: 'One person evaluates the work against objective criteria; the other is listening for whether their underlying intent was seen and valued.',
     pattern: 'Analytical feedback without warm framing can register as unappreciative. When the other person asks for reassurance, it can feel like resistance to the critique.',
-    insight: 'Sovereign keeps both perspectives intact: acknowledging shared intent first allows high-precision critique to be received without friction.'
+    insight: 'Sovereign keeps both perspectives intact: acknowledging shared intent first allows direct feedback to be received without friction.'
   },
   {
     title: 'Autonomy & Closeness',

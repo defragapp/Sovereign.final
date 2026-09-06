@@ -17,7 +17,7 @@ const SYSTEMS: Record<SystemType, SystemDetail> = {
   families: {
     type: 'families',
     label: 'Families',
-    dynamicName: 'Tension Absorption / Triangulation',
+    dynamicName: 'Tension Absorption / Family Buffering',
     nodes: [
       { id: 'you', label: 'You', role: 'Baseline A', x: 80, y: 140 },
       { id: 'parent', label: 'Parent / Elder', role: 'Baseline B', x: 200, y: 50 },
@@ -30,7 +30,7 @@ const SYSTEMS: Record<SystemType, SystemDetail> = {
   teams: {
     type: 'teams',
     label: 'Teams',
-    dynamicName: 'Over-Functioning / Execution Vacuum',
+    dynamicName: 'Stepping In / Coordination Imbalance',
     nodes: [
       { id: 'you', label: 'You', role: 'Initiative & Review', x: 80, y: 140 },
       { id: 'lead', label: 'Lead / Sponsor', role: 'Direction & Ambiguity', x: 200, y: 50 },
@@ -43,7 +43,7 @@ const SYSTEMS: Record<SystemType, SystemDetail> = {
   groups: {
     type: 'groups',
     label: 'Groups',
-    dynamicName: 'Consensus Smoothing / Unvoiced Divergence',
+    dynamicName: 'Public Agreement / Unvoiced Hesitation',
     nodes: [
       { id: 'you', label: 'You', role: 'Divergent Signal', x: 80, y: 140 },
       { id: 'center', label: 'Group Norm', role: 'Cohesion Pressure', x: 200, y: 50 },
@@ -56,7 +56,7 @@ const SYSTEMS: Record<SystemType, SystemDetail> = {
   partnerships: {
     type: 'partnerships',
     label: 'Partnerships',
-    dynamicName: 'Stress Asymmetry / Differing Recovery Rhythms',
+    dynamicName: 'Opposite Recovery Rhythms Under Stress',
     nodes: [
       { id: 'you', label: 'Partner A (You)', role: 'Reflective Processing', x: 80, y: 140 },
       { id: 'stressor', label: 'External Stress', role: 'Work / Demands', x: 200, y: 50 },
@@ -141,7 +141,7 @@ export function SystemDynamicDemo() {
         >
           <div className="font-utility text-[9px] uppercase tracking-wider">Step 03</div>
           <div className="font-statement text-xs mt-0.5">The Whole System</div>
-          <div className="font-explanation text-[11px] text-[var(--muted)] hidden sm:block">Equilibrium & feedback loops</div>
+          <div className="font-explanation text-[11px] text-[var(--muted)] hidden sm:block">Interconnected loops & balance</div>
         </button>
       </div>
 
@@ -221,7 +221,7 @@ export function SystemDynamicDemo() {
           {/* STAGE 3 DYNAMIC LABEL */}
           {stage === 3 && (
             <text x="200" y="115" textAnchor="middle" fill="var(--sage)" fontSize="10" fontFamily="monospace" letterSpacing="0.1em">
-              EQUILIBRIUM LOOP
+              RECURRING SYSTEM LOOP
             </text>
           )}
         </svg>
@@ -264,7 +264,7 @@ export function SystemDynamicDemo() {
               </div>
 
               <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1.5">
-                <span className="font-utility text-[10px] text-[var(--subtle)]">HOW THE SYSTEM STABILIZES (EQUILIBRIUM)</span>
+                <span className="font-utility text-[10px] text-[var(--subtle)]">HOW THE PATTERN STABILIZES</span>
                 <p className="font-explanation text-xs leading-relaxed text-[var(--muted)]">
                   {sys.equilibrium}
                 </p>

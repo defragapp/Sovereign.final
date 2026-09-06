@@ -201,19 +201,19 @@ function Landing() {
   const realQuestions = [
     {
       q: 'Why do I keep overthinking what to say?',
-      headline: 'Cognitive precision is trying to compensate for felt uncertainty.',
+      headline: 'Refining your words repeatedly can become a way of trying to avoid being misunderstood.',
       observable: 'Hesitating before speaking while drafting multiple alternative formulations in your head.',
-      pattern: 'Language precision is being deployed to predict and control how the other person will perceive you.',
+      pattern: 'Careful phrasing is being used to predict and protect against perceived reactions.',
       unknowns: 'The other person’s actual internal state, intent, and receptivity at this moment.',
-      guidance: 'Name what you actually observed directly out loud rather than trying to resolve the other person’s reaction in advance.'
+      guidance: 'Name what you actually observed directly out loud rather than trying to anticipate their reaction in advance.'
     },
     {
       q: 'Why does this conversation keep going the same way?',
-      headline: 'The dynamic has settled into an unrecognized polarity.',
+      headline: 'One person’s urgency can increase the other person’s need for space, which keeps the same conversation repeating.',
       observable: 'A recurring loop where one person seeks immediate answers and the other pulls back into quiet reflection.',
-      pattern: 'Urgency triggers withdrawal; withdrawal triggers more urgency. Both participants are attempting to protect safety.',
+      pattern: 'Urgency triggers withdrawal, and withdrawal triggers more urgency. Neither person intended to cause distance.',
       unknowns: 'Whether either person realizes they are operating from a reactive reflex rather than the current conversation topic.',
-      guidance: 'Pause the content debate and explicitly name the pacing difference between you.'
+      guidance: 'Pause the debate on the topic and agree on a clear time to talk so both pacing needs are respected.'
     },
     {
       q: 'What am I missing about what is happening between us?',
@@ -241,7 +241,7 @@ function Landing() {
         {/* HERO SECTION */}
         <section className="pt-16 pb-20 md:pt-24 md:pb-28">
           <div className="max-w-3xl">
-            <h1 className="font-display text-5xl md:text-7xl text-[var(--cream)]">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-7xl tracking-tight text-[var(--cream)]">
               Understand yourself.<br />
               Understand your people.<br />
               <span className="text-[var(--muted)]">See the whole system.</span>
@@ -284,9 +284,9 @@ function Landing() {
 
                 <div className="space-y-4 max-w-[95%]">
                   <div className="flex items-center gap-2 font-utility text-[10px] text-[var(--sage)]">
-                    <span>GROUNDED INTELLIGENCE</span>
+                    <span>GROUNDED REFERENCE</span>
                     <span>·</span>
-                    <span>CONFIDENCE: HIGH</span>
+                    <span>BASED ON YOUR BASELINE</span>
                   </div>
                   <h3 className="font-statement text-xl md:text-2xl text-[var(--cream)]">
                     Separate the immediate observation from the pressure to solve their perception all at once.
@@ -302,7 +302,7 @@ function Landing() {
                     <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3 space-y-1">
                       <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">One Possible Pattern</span>
                       <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">
-                        High cognitive precision is deployed to prevent felt disconnection and anticipate perceived reactions.
+                        Refining your words repeatedly can become a way of trying to avoid being misunderstood.
                       </p>
                     </div>
                   </div>
@@ -316,7 +316,7 @@ function Landing() {
 
                   <div className="flex flex-wrap items-center gap-2 pt-1">
                     <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-1 text-[var(--muted)]">
-                      Basis: Baseline Cognitive Synthesis
+                      Basis: Baseline Context · Communication
                     </span>
                     <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-1 text-[var(--muted)]">
                       Filter: Grounded · Non-Diagnostic
@@ -360,7 +360,7 @@ function Landing() {
                 <div className="font-utility text-[11px] text-[var(--subtle)]">SOVEREIGN REFERENCE</div>
                 <h3 className="font-statement text-2xl text-[var(--cream)]">Your Baseline</h3>
                 <p className="font-explanation text-xs max-w-xs text-[var(--muted)]">
-                  a private reference built around you, sealed in your personal database
+                  A private reference built around you that stays private to you.
                 </p>
               </div>
             </div>
@@ -544,7 +544,7 @@ function Landing() {
               Your personal context stays yours.
             </h3>
             <p className="mt-4 font-explanation text-sm md:text-[15px] leading-relaxed max-w-2xl">
-              Your raw birth details and exact coordinates remain sealed in private database storage and are never passed into language-model prompt context. Sovereign extracts only derived interpretative themes. Your conversations are never used to train public AI models.
+              Your Baseline stays private to you. The context you choose to provide becomes part of your private reference. Your raw details are never shared with AI model providers or used to train models, and Sovereign only uses derived themes to answer your questions.
             </p>
           </div>
         </section>
@@ -972,7 +972,7 @@ function Onboarding() {
               Let&apos;s build your Baseline.
             </h1>
             <p className="mt-2 font-explanation text-sm">
-              This becomes the private reference Sovereign uses to understand your context. Your birth details remain strictly in your private database and never enter language-model prompt context.
+              This becomes the private reference Sovereign uses to understand your context. Your birth details stay private to you and are never shared with AI model providers or used to train models.
             </p>
 
             <form onSubmit={handleBaselineSubmit} className="mt-6 space-y-4">
