@@ -2,45 +2,93 @@
 
 :root {
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #efece4;
-  background: #0b0b0a;
+  color: #f4f0e8;
+  background: #09090b;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink: #0b0b0a;
+  --ink: #09090b;
   --cream: #f4f0e8;
-  --muted: #a6a39c;
-  --subtle: #706e68;
-  --surface: #131312;
-  --surface-2: #181816;
-  --line: rgba(244,240,232,.12);
-  --line-strong: rgba(244,240,232,.24);
-  --ring: rgba(244,240,232,.7);
-  --ring-soft: rgba(244,240,232,.08);
+  --muted: #a3a099;
+  --subtle: #686660;
+  --surface: #111110;
+  --surface-2: #161614;
+  --surface-3: #1c1c19;
+  --line: rgba(244, 240, 232, 0.07);
+  --line-strong: rgba(244, 240, 232, 0.16);
+  --ring: rgba(244, 240, 232, 0.7);
+  --ring-soft: rgba(244, 240, 232, 0.08);
   --sage: #aebaa7;
+  --clay: #c4aba1;
 }
 
 * { box-sizing: border-box; }
-html { background: var(--ink); }
-body { margin: 0; min-width: 320px; background: var(--ink); color: var(--cream); }
+html { background: var(--ink); scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; background: var(--ink); color: var(--cream); -webkit-font-smoothing: antialiased; }
 button, input, textarea { font: inherit; }
-::selection { background: rgba(244,240,232,.2); }
+::selection { background: rgba(244, 240, 232, 0.18); }
 
 .page-noise::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: .03;
+  opacity: .025;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
 }
 
+/* Sovereign Mark */
 .sovereign-mark {
-  width: 26px;
-  height: 26px;
-  border-radius: 9px;
-  background: radial-gradient(circle at 65% 30%, #f8f5ee 0 14%, #bebbb2 15% 25%, transparent 26%),
-    linear-gradient(135deg, #f4f0e8 0 48%, #aebaa7 49% 72%, #20201d 73%);
-  box-shadow: 0 0 24px rgba(244,240,232,.08);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(244, 240, 232, 0.22);
+  background: radial-gradient(circle, rgba(244, 240, 232, 0.14) 0%, rgba(17, 17, 16, 0.8) 100%);
+  box-shadow: 0 0 16px rgba(244, 240, 232, 0.04);
+}
+.sovereign-mark::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cream);
+  opacity: 0.85;
+}
+
+/* Typographic Hierarchy */
+.font-display {
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+  font-weight: 500;
+}
+.font-statement {
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  font-weight: 500;
+}
+.font-explanation {
+  line-height: 1.7;
+  color: var(--muted);
+}
+.font-utility {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--subtle);
+}
+
+/* Quiet Surface Cards */
+.sovereign-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  transition: border-color 0.25s ease;
+}
+.sovereign-card:hover {
+  border-color: var(--line-strong);
 }
 
 .answer-prose p { margin: 0; }
@@ -49,3 +97,4 @@ button, input, textarea { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
 }
+
