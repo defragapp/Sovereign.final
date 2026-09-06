@@ -29,3 +29,7 @@ The first acceptance path is:
 `account → Baseline → first real AI turn → rendered answer`
 
 No mocked AI answer, simulated entitlement, or fake account state may be presented as production capability.
+Current canonical migration target is `0019_deprecate_manual_capacity`.
+The verified deployment command is `pnpm production:release:text`.
+Release evidence must describe what actually ran.
+Worlds/video generation is not part of the current launch runtime.

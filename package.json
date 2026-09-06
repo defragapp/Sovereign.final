@@ -11,8 +11,24 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
+    "verify:foundation": "node scripts/verify-foundation.mjs",
+    "verify:migrations": "node scripts/validate-migrations.mjs && node scripts/verify-migration-upgrade.mjs",
+    "scan:secrets": "node scripts/scan-secrets.mjs",
+    "scan:production-fixtures": "node scripts/scan-production-fixtures.mjs",
+    "verify:release-config": "node scripts/verify-direct-preview-config.mjs",
+    "verify:production-release": "node scripts/verify-production-release-v3.mjs scripts/verify-production-release-v2.mjs",
+    "verify:intelligence-release": "node scripts/verify-intelligence-release-v2.mjs",
+    "verify:visual-intelligence": "node scripts/verify-visual-intelligence-release-v2.mjs",
+    "verify:premium-platform": "node scripts/verify-premium-platform-release-v2.mjs",
+    "verify:worker-bundle-size": "node scripts/verify-worker-bundle-size.mjs",
     "verify:live-visual-release": "node scripts/verify-live-visual-release-v3.mjs",
+    "verify:cloudflare-build": "node scripts/cloudflare-build-diagnostics.mjs",
+    "preview:bootstrap": "node scripts/cloudflare-preview-bootstrap.mjs",
     "production:release:text": "node scripts/assert-main-release.mjs --require-current-origin-main && node scripts/cloudflare-production-text-release.mjs",
+    "production:release:oauth": "bash scripts/production-release-oauth.sh",
     "production:deploy:v3": "node scripts/cloudflare-production-deploy-v3.mjs"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.13"
   }
 }

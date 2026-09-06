@@ -53,6 +53,18 @@ The frontend is fully wired to the production Cloudflare Worker API client (`app
 - [`docs/DRIFT_REGISTER.md`](docs/DRIFT_REGISTER.md) — launch identity, language, capability, URL, and visual drift controls
 - [`docs/BUILD_HANDOFF.md`](docs/BUILD_HANDOFF.md) — immediate implementation order and wiring expectations
 
+## Production Release
+
+The launch is **text-first**. The canonical database migration target is `0019_deprecate_manual_capacity`, with capacity reservation tracking governed by `0018_workers_ai_capacity_reservations` and `0013_workers_ai_free_capacity`. Private account export is available through authenticated on-demand generation from D1.
+
+To execute the verified release:
+
+```bash
+pnpm production:release:text
+```
+
+GitHub Actions, deploy hooks, Cloudflare Pages, and preview Workers are not production release authorities.
+
 ## Source of truth
 
 Proven production behavior is extracted from `defragapp/OPENAPI`.
