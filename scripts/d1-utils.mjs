@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 
 export function runWranglerCli(args, options = {}) {
-  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args], {
+  const result = spawnSync('pnpm', ['--filter', './apps/worker', 'exec', 'wrangler', ...args], {
     cwd: options.cwd || root,
     env: options.env || process.env,
     encoding: 'utf8',
