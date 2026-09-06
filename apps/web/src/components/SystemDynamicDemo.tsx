@@ -75,7 +75,7 @@ export function SystemDynamicDemo() {
   const sys = SYSTEMS[activeSystem];
 
   return (
-    <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8 space-y-6">
+    <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 sm:p-6 md:p-8 space-y-6 overflow-hidden">
       {/* HEADER & SELECTORS */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--line)] pb-4">
         <div>
@@ -107,7 +107,7 @@ export function SystemDynamicDemo() {
       <div className="grid grid-cols-3 gap-2 border-b border-[var(--line)] pb-4 text-center">
         <button
           onClick={() => setStage(1)}
-          className={`py-2 px-3 rounded-lg border transition text-left ${
+          className={`py-2 px-2 sm:px-3 rounded-lg border transition text-left ${
             stage === 1
               ? 'border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--cream)]'
               : 'border-transparent text-[var(--subtle)] hover:text-[var(--muted)]'
@@ -120,7 +120,7 @@ export function SystemDynamicDemo() {
 
         <button
           onClick={() => setStage(2)}
-          className={`py-2 px-3 rounded-lg border transition text-left ${
+          className={`py-2 px-2 sm:px-3 rounded-lg border transition text-left ${
             stage === 2
               ? 'border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--cream)]'
               : 'border-transparent text-[var(--subtle)] hover:text-[var(--muted)]'
@@ -133,7 +133,7 @@ export function SystemDynamicDemo() {
 
         <button
           onClick={() => setStage(3)}
-          className={`py-2 px-3 rounded-lg border transition text-left ${
+          className={`py-2 px-2 sm:px-3 rounded-lg border transition text-left ${
             stage === 3
               ? 'border-[var(--line-strong)] bg-[var(--surface-2)] text-[var(--cream)]'
               : 'border-transparent text-[var(--subtle)] hover:text-[var(--muted)]'

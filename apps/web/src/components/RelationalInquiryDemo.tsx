@@ -54,15 +54,15 @@ export function RelationalInquiryDemo() {
   const scenario = SCENARIOS[activeIdx];
 
   return (
-    <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8 space-y-6">
-      <div className="flex items-center justify-between border-b border-[var(--line)] pb-4">
+    <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 sm:p-6 md:p-8 space-y-6 overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[var(--line)] pb-4">
         <div>
           <span className="font-utility text-[10px] text-[var(--sage)]">RELATIONAL INQUIRY DEMONSTRATION</span>
           <div className="font-statement text-base md:text-lg text-[var(--cream)] mt-1">
             Examining what happens between two distinct references
           </div>
         </div>
-        <div className="flex gap-1 bg-[var(--surface-2)] p-1 rounded-lg border border-[var(--line)]">
+        <div className="flex flex-wrap gap-1 bg-[var(--surface-2)] p-1 rounded-lg border border-[var(--line)]">
           {SCENARIOS.map((s, idx) => (
             <button
               key={s.title}
