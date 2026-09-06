@@ -22,11 +22,9 @@
 |-------|-------|
 | Product | Sovereign.OS |
 | Repository | `defragapp/Sovereign.final` |
-| Upstream Reference Source | `defragapp/OPENAPI` (historical reference) |
 | Active Branch | `main` |
-| Current HEAD Commit SHA | `be12cdf463ec1c33f2c525f29aa3f7d2f9d6ea4f` |
-| `origin/main` SHA | `be12cdf463ec1c33f2c525f29aa3f7d2f9d6ea4f` |
-| Release SHA Parity | In sync (`HEAD` == `origin/main`) |
+| Release Target Authority | Exact current verified `origin/main` commit SHA at execution time |
+| Release SHA Parity Invariant | Enforced prior to deploy by `scripts/assert-main-release.mjs` (`HEAD` == `origin/main`) |
 | Primary Worker Name | `sovereign-agent` (`apps/worker/wrangler.jsonc`) / `sovv-web` (production direct) |
 | Cloudflare Account ID | `8b1954d216d65077c6480d62583fe2c2` (configured in production config) |
 | Target Custom Domains | `sovereign.defrag.app`, `app.defrag.app`, `defrag.app`, `www.defrag.app` |

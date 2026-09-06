@@ -3,7 +3,7 @@
 **Target Production Surface:** [https://sovereign.defrag.app](https://sovereign.defrag.app)  
 **Repository:** [defragapp/Sovereign.final](https://github.com/defragapp/Sovereign.final.git)  
 **Branch:** `main`  
-**Latest Push:** Commit `be12cdf`  
+**Release Target Invariant:** Exact current verified `origin/main` commit SHA (enforced by `scripts/assert-main-release.mjs`)  
 **Current Status:**  
 - **Source / Local Certification:** PASS  
 - **Deployment Certification:** BLOCKED (Cloudflare credentials missing in environment)  
