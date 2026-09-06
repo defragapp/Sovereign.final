@@ -41,10 +41,12 @@ pnpm --filter @sovereign/web dev
 pnpm --filter @sovereign/worker dev
 ```
 
-The current frontend is a branded shell for rapid implementation. Do not ship it with mocked answers or simulated account state; the send path must be replaced by the real Sovereign thread endpoint before production.
+The frontend is fully wired to the production Cloudflare Worker API client (`apps/web/src/lib/api.ts`). There are no mock send paths, simulated account states, or fake AI responses in the production application. The user journey connects live:
+`Landing (/) → Auth (/signup, /login, /auth/redeem) → Baseline (/onboarding) → Workspace (/app) → Thread messages (/api/v1/threads/:threadId/messages) → Sovereign Answer v2`.
 
 ## Documentation
 
+- [`docs/SOVEREIGN_RELEASE_PLAN.md`](docs/SOVEREIGN_RELEASE_PLAN.md) — release plan, gate verification status, and deployment runbook
 - [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) — complete launch implementation plan
 - [`docs/UI_UX_CONTRACT.md`](docs/UI_UX_CONTRACT.md) — public, auth, workspace, and AI-answer visual/interaction contract
 - [`docs/EXTRACTION_MANIFEST.md`](docs/EXTRACTION_MANIFEST.md) — protected extraction scope from `OPENAPI`

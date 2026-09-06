@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 
-const scopes = ['apps/web/src', 'apps/sovereign-worker/src'];
+const scopes = ['apps/web/src', 'apps/worker/src', 'apps/sovereign-worker/src'];
 const forbidden = [
   /billing\.test/i,
   /test-billing\.invalid/i,
@@ -25,7 +25,7 @@ assert.equal(violatesPolicy('<input placeholder="fixture email" />'), true);
 assert.equal(violatesPolicy("const field = { placeholder: 'mock account' };"), true);
 assert.equal(violatesPolicy('const provider = { AI_PROVIDER: fixture };'), true);
 const files = spawnSync('git', ['ls-files', ...scopes], { encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
-assert(files.some((file) => file.startsWith('apps/web/src/')) && files.some((file) => file.startsWith('apps/sovereign-worker/src/')));
+assert(files.some((file) => file.startsWith('apps/web/src/')) && files.some((file) => file.startsWith('apps/worker/src/') || file.startsWith('apps/sovereign-worker/src/')));
 const violations = [];
 for (const file of files) {
   if (fixtureAllowed.test(file) || !existsSync(file)) continue;
