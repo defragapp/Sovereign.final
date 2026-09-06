@@ -26,6 +26,14 @@
     "preview:bootstrap": "node scripts/cloudflare-preview-bootstrap.mjs",
     "production:release:text": "node scripts/assert-main-release.mjs --require-current-origin-main && node scripts/cloudflare-production-text-release.mjs",
     "production:release:oauth": "bash scripts/production-release-oauth.sh",
+    "smoke:auth": "tsx scripts/auth-smoke.ts",
+    "smoke:baseline": "tsx scripts/baseline-smoke.ts",
+    "smoke:jobs": "tsx scripts/jobs-smoke.ts",
+    "smoke:worker-gateway": "tsx scripts/worker-gateway-smoke.ts",
+    "smoke:stripe": "tsx scripts/stripe-smoke.ts",
+    "smoke:product": "tsx scripts/product-smoke.ts",
+    "smoke:release-closure": "tsx scripts/release-closure-smoke.ts",
+    "production:deploy": "node scripts/cloudflare-production-deploy-v3.mjs",
     "production:deploy:v3": "node scripts/cloudflare-production-deploy-v3.mjs"
   },
   "devDependencies": {
