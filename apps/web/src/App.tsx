@@ -108,7 +108,7 @@ export function SovereignMark({ size = 20, className = '' }: { size?: number; cl
    ========================================================================= */
 export function ReferenceField({ className = '' }: { className?: string }) {
   return (
-    <div className={`relative overflow-hidden pointer-events-none select-none ${className}`} aria-hidden="true">
+    <div className={`overflow-hidden pointer-events-none select-none ${className}`} aria-hidden="true">
       <svg className="w-full h-full text-[var(--line-strong)] opacity-40" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
         <line x1="200" y1="20" x2="200" y2="220" stroke="currentColor" strokeDasharray="3 3" strokeWidth="1" />
         <line x1="60" y1="120" x2="340" y2="120" stroke="currentColor" strokeDasharray="3 3" strokeWidth="1" />
@@ -161,29 +161,31 @@ export function App() {
    ========================================================================= */
 function Header() {
   return (
-    <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 sm:px-6 py-6 md:px-8">
-      <button aria-label="Sovereign home" onClick={() => go('/')} className="flex items-center gap-2.5 group shrink-0">
-        <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
-        <span className="text-[15px] font-medium tracking-tight text-[var(--cream)]">Sovereign</span>
-      </button>
-      <nav className="hidden items-center gap-7 md:flex">
-        <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition">How it works</button>
-        <button onClick={() => go('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition">Pricing</button>
-        <button onClick={() => go('/faq')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition">FAQ</button>
-      </nav>
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        <button
-          onClick={() => go('/login')}
-          className="px-2.5 sm:px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--cream)] transition whitespace-nowrap"
-        >
-          Sign in
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[var(--ink)]/80 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6 md:px-8">
+        <button aria-label="Sovereign home" onClick={() => go('/')} className="flex items-center gap-2.5 group shrink-0">
+          <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
+          <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign</span>
         </button>
-        <button
-          onClick={() => go('/signup')}
-          className="rounded-lg bg-[var(--cream)] px-3 sm:px-3.5 py-1.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition whitespace-nowrap"
-        >
-          <span className="hidden sm:inline">Start with </span>Baseline
-        </button>
+        <nav className="hidden items-center gap-8 md:flex">
+          <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">How it works</button>
+          <button onClick={() => go('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">Pricing</button>
+          <button onClick={() => go('/faq')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">FAQ</button>
+        </nav>
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => go('/login')}
+            className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] px-2.5 py-1.5 transition-colors whitespace-nowrap"
+          >
+            Sign in
+          </button>
+          <button
+            onClick={() => go('/signup')}
+            className="rounded-full bg-[var(--cream)] px-3.5 py-1.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm"
+          >
+            Start with Baseline
+          </button>
+        </div>
       </div>
     </header>
   );
@@ -197,116 +199,158 @@ function Landing() {
     <div className="page-noise min-h-screen bg-[var(--ink)] text-[var(--cream)]">
       <Header />
 
-      <main className="mx-auto max-w-5xl px-4 sm:px-6 pb-28 md:px-8">
+      <main className="mx-auto max-w-5xl px-4 sm:px-6 pb-20 md:px-8">
         {/* 1. HERO */}
-        <section className="pt-16 pb-20 md:pt-24 md:pb-28">
-          <div className="max-w-3xl">
-            <h1 className="font-display text-4xl sm:text-5xl md:text-7xl tracking-tight text-[var(--cream)]">
+        <section className="pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
+          <div className="max-w-3xl mx-auto flex flex-col items-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1 text-[11px] font-medium text-[var(--muted)] mb-8">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
+              <span>Private Personal AI</span>
+            </div>
+
+            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-tight text-[var(--cream)] leading-[1.06]">
               Understand yourself.<br />
               Understand your people.<br />
               <span className="text-[var(--muted)]">See the whole system.</span>
             </h1>
-            <p className="mt-8 max-w-xl font-explanation text-base md:text-lg text-[var(--cream)]/90">
-              A private AI system designed to help you understand yourself, your people, and the systems around you.
+
+            <p className="mt-6 max-w-xl font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
+              Sovereign.OS is a private AI system that builds a personal reference from your Baseline and uses that context to help you understand yourself, your relationships, and the systems around you.
             </p>
-            <div className="mt-9 flex items-center gap-4">
+
+            <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
               <button
                 onClick={() => go('/signup')}
-                className="rounded-lg bg-[var(--cream)] px-5 py-2.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition"
+                className="rounded-full bg-[var(--cream)] px-6 py-2.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-md hover:scale-[1.01]"
               >
                 Start with your Baseline
+              </button>
+              <button
+                onClick={() => go('/how-it-works')}
+                className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-5 py-2.5 text-sm font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-all"
+              >
+                How it works
               </button>
             </div>
           </div>
 
           {/* 2. PRODUCT PROOF */}
-          <div className="mt-16 relative rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 sm:p-6 md:p-8 shadow-2xl overflow-hidden">
-            <ReferenceField className="absolute -right-12 -top-12 w-96 h-64 opacity-25" />
-            <div className="relative z-10">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line)] pb-4">
-                <div className="flex items-center gap-2.5">
-                  <SovereignMark size={16} />
-                  <span className="text-xs font-medium tracking-tight text-[var(--cream)]">Sovereign Workspace</span>
+          <div className="mt-12 sm:mt-16 rounded-2xl border border-[var(--line-strong)] bg-[var(--surface)] shadow-2xl overflow-hidden text-left">
+            {/* Window Chrome */}
+            <div className="flex items-center justify-between border-b border-[var(--line)] px-4 sm:px-6 py-3 bg-[var(--surface-2)]">
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--line-strong)]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--line-strong)]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[var(--line-strong)]" />
                 </div>
-                <span className="font-utility text-[10px]">Private Reference · Grounded</span>
+                <span className="text-[11px] font-medium text-[var(--muted)] ml-2">Today — Sovereign Workspace</span>
               </div>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
+                <span className="font-utility text-[9px] text-[var(--sage)]">Private Reference · Grounded</span>
+              </div>
+            </div>
 
-              <div className="py-6 space-y-6">
-                <div className="ml-auto max-w-[90%] sm:max-w-[85%] rounded-xl bg-[var(--surface-2)] border border-[var(--line)] px-4 py-3 text-sm leading-relaxed text-[var(--cream)]">
+            {/* Workspace Conversation */}
+            <div className="relative z-10 p-5 sm:p-7 md:p-9 space-y-6">
+              {/* User Inquiry */}
+              <div className="flex justify-end">
+                <div className="max-w-[90%] sm:max-w-[75%] rounded-2xl rounded-br-sm border border-[var(--line-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--cream)] leading-relaxed shadow-sm">
                   Why do I keep overthinking what to say when I feel misunderstood?
                 </div>
+              </div>
 
-                <div className="space-y-4 max-w-[95%]">
-                  <div className="flex items-center gap-2 font-utility text-[10px] text-[var(--sage)]">
-                    <span>GROUNDED REFERENCE</span>
-                  </div>
-                  <h3 className="font-statement text-xl md:text-2xl text-[var(--cream)]">
-                    Separate the immediate observation from the pressure to solve their perception all at once.
-                  </h3>
+              {/* Sovereign Response */}
+              <div className="space-y-4 max-w-2xl">
+                <div className="flex items-center gap-2 font-utility text-[10px] text-[var(--sage)]">
+                  <span>GROUNDED REFERENCE · SOVEREIGN ANSWER V2</span>
+                </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                    <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3 space-y-1">
-                      <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">What is Observable</span>
-                      <p className="font-explanation text-xs text-[var(--cream)] leading-relaxed">
-                        When communication feels misunderstood, speech is paused to draft multiple alternative formulations before responding.
-                      </p>
-                    </div>
-                    <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3 space-y-1">
-                      <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">One Possible Pattern</span>
-                      <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">
-                        Refining your words repeatedly can become a way of trying to avoid being misunderstood.
-                      </p>
-                    </div>
-                  </div>
+                <h3 className="font-statement text-xl sm:text-2xl text-[var(--cream)] font-medium leading-snug">
+                  Separate the immediate observation from the pressure to solve their perception all at once.
+                </h3>
 
-                  <div className="rounded-lg border border-[var(--line)] bg-[#0c0c0b] p-3 space-y-1">
-                    <span className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">What Remains Unknown</span>
-                    <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">
-                      Whether the other person is actually questioning your intent or simply processing quietly at their own pace.
+                {/* Observable vs Possible Pattern */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 space-y-1">
+                    <span className="font-utility text-[9px] text-[var(--subtle)] tracking-wider">What is Observable</span>
+                    <p className="font-explanation text-xs sm:text-[13px] text-[var(--cream)] leading-relaxed">
+                      When communication feels misunderstood, speech pauses to draft multiple alternative formulations before responding.
                     </p>
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-1 text-[var(--muted)]">
-                      Basis: Baseline Context · Communication
-                    </span>
-                    <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-1 text-[var(--muted)]">
-                      Filter: Grounded · Non-Diagnostic
-                    </span>
+                  <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 space-y-1">
+                    <span className="font-utility text-[9px] text-[var(--subtle)] tracking-wider">One Possible Pattern</span>
+                    <p className="font-explanation text-xs sm:text-[13px] text-[var(--muted)] leading-relaxed">
+                      Refining words repeatedly can become an attempt to avoid being misunderstood.
+                    </p>
                   </div>
                 </div>
-              </div>
 
-              <div className="border-t border-[var(--line)] pt-4 flex flex-col sm:flex-row gap-2.5 sm:items-center justify-between text-xs text-[var(--subtle)]">
-                <span>Does this match today?</span>
-                <div className="flex gap-2">
-                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-2.5 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)]">Yes</button>
-                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-2.5 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)]">Partly</button>
-                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-2.5 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)]">Not today</button>
+                {/* Explicit Unknowns */}
+                <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-3.5 space-y-1">
+                  <span className="font-utility text-[9px] text-[var(--subtle)] tracking-wider">What Remains Unknown</span>
+                  <p className="font-explanation text-xs sm:text-[13px] text-[var(--muted)] leading-relaxed">
+                    Whether the other person is actually questioning your intent or simply processing quietly at their own pace.
+                  </p>
+                </div>
+
+                {/* Grounding / Basis Badges */}
+                <div className="flex flex-wrap items-center gap-2 pt-1">
+                  <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[var(--surface-3)] px-2.5 py-1 text-[var(--muted)]">
+                    Basis: Baseline Context · Communication
+                  </span>
+                  <span className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[var(--surface-3)] px-2.5 py-1 text-[var(--muted)]">
+                    Filter: Grounded · Non-Diagnostic
+                  </span>
                 </div>
               </div>
+
+              {/* Matching Verification Control */}
+              <div className="border-t border-[var(--line)] pt-4 flex flex-col sm:flex-row gap-3 sm:items-center justify-between text-xs text-[var(--subtle)]">
+                <span>Does this match today?</span>
+                <div className="flex gap-2">
+                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-3 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)] transition-colors">Yes</button>
+                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-3 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)] transition-colors">Partly</button>
+                  <button onClick={() => go('/signup')} className="rounded-md border border-[var(--line)] px-3 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)] transition-colors">Not today</button>
+                </div>
+              </div>
+            </div>
+
+            {/* Live Workspace Input Composer Mock */}
+            <div className="relative z-10 border-t border-[var(--line)] bg-[var(--surface-2)] p-3 sm:p-4 flex items-center justify-between gap-3">
+              <div className="text-xs text-[var(--subtle)] select-none truncate">
+                Ask about a situation, conversation, or decision...
+              </div>
+              <button
+                onClick={() => go('/signup')}
+                className="rounded-lg bg-[var(--cream)] p-2 text-[var(--ink)] hover:bg-white transition-colors shrink-0"
+                aria-label="Send inquiry"
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
         </section>
 
         {/* 3. ONE VALUE SECTION */}
-        <section className="border-t border-[var(--line)] py-16 md:py-24">
-          <div className="grid gap-8 md:grid-cols-[1fr_auto] items-center justify-between">
-            <div className="max-w-xl">
-              <span className="font-utility text-[10px] text-[var(--sage)]">PRIVATE CONTEXT</span>
-              <h2 className="mt-2 font-statement text-3xl md:text-4xl text-[var(--cream)]">
+        <section className="border-t border-[var(--line)] py-20 sm:py-28">
+          <div className="grid gap-10 md:grid-cols-[1fr_auto] items-center justify-between">
+            <div className="max-w-xl space-y-4">
+              <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">The Baseline</span>
+              <h2 className="font-statement text-3xl sm:text-4xl text-[var(--cream)] font-medium">
                 Context that stays with you.
               </h2>
-              <p className="mt-4 font-explanation text-sm md:text-base leading-relaxed text-[var(--muted)]">
-                Instead of starting every conversation from zero, Sovereign begins with your Baseline: a private reference that gives the system persistent context for how you tend to operate. It stays strictly private to you, grounding your inquiries as situations, relationships, and systems evolve.
+              <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+                Instead of starting every conversation from zero, Sovereign begins with your Baseline: a private reference that gives the system persistent context for how you operate. It stays strictly private to you, grounding your inquiries as situations, relationships, and systems evolve.
               </p>
             </div>
 
-            <div className="flex flex-col items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface)] px-8 py-7 text-center relative overflow-hidden shrink-0 sm:w-64">
-              <ReferenceField className="absolute inset-0 w-full h-full opacity-25" />
-              <div className="relative z-10 space-y-2">
-                <SovereignMark size={24} className="mx-auto text-[var(--cream)]" />
-                <div className="font-utility text-[10px] text-[var(--sage)]">LIVING REFERENCE</div>
+            <div className="relative rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-8 overflow-hidden flex flex-col items-center justify-center text-center shrink-0 sm:w-72">
+              <ReferenceField className="absolute inset-0 w-full h-full opacity-25 pointer-events-none" />
+              <div className="relative z-10 space-y-2.5">
+                <SovereignMark size={28} className="mx-auto text-[var(--cream)]" />
+                <div className="font-utility text-[10px] text-[var(--sage)] tracking-widest">LIVING REFERENCE</div>
                 <div className="font-statement text-lg text-[var(--cream)]">Your Baseline</div>
                 <div className="font-explanation text-xs text-[var(--muted)]">Private · Grounded · Persistent</div>
               </div>
@@ -314,29 +358,58 @@ function Landing() {
           </div>
         </section>
 
-        {/* 4. PRICING */}
-        <section className="border-t border-[var(--line)] py-16 md:py-24">
+        {/* 4. CAPABILITY STRIP */}
+        <section className="border-t border-[var(--line)] py-16 sm:py-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 divide-y md:divide-y-0 md:divide-x divide-[var(--line)]">
+            <div className="space-y-2 md:pr-6">
+              <span className="font-utility text-[10px] text-[var(--subtle)]">01 / SELF</span>
+              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">Personal Baseline</h3>
+              <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+                A persistent reference for your own decisions, tendencies, and communication.
+              </p>
+            </div>
+
+            <div className="space-y-2 pt-6 md:pt-0 md:px-6">
+              <span className="font-utility text-[10px] text-[var(--subtle)]">02 / PEOPLE</span>
+              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">Relational Inquiry</h3>
+              <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+                Examine interactions between two distinct references rather than generic advice.
+              </p>
+            </div>
+
+            <div className="space-y-2 pt-6 md:pt-0 md:pl-6">
+              <span className="font-utility text-[10px] text-[var(--subtle)]">03 / SYSTEMS</span>
+              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">System Dynamics</h3>
+              <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+                Map tensions, roles, and communication across teams, families, and groups.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. PRICING */}
+        <section className="border-t border-[var(--line)] py-20 sm:py-28">
           <div className="max-w-xl">
-            <span className="font-utility text-[10px] text-[var(--sage)]">ACCESS & PRICING</span>
-            <h2 className="mt-2 font-statement text-3xl md:text-4xl text-[var(--cream)]">
+            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">Access & Pricing</span>
+            <h2 className="mt-2 font-statement text-3xl sm:text-4xl text-[var(--cream)] font-medium">
               Simple, transparent access.
             </h2>
-            <p className="mt-4 font-explanation text-[15px] text-[var(--muted)]">
+            <p className="mt-3 font-explanation text-sm sm:text-base text-[var(--muted)]">
               Start with your private Baseline at no cost. Add depth when you are ready to examine relationships and whole systems.
             </p>
           </div>
 
           <div className="mt-10 grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-7 md:p-8 space-y-6 flex flex-col justify-between">
+            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-7 md:p-8 flex flex-col justify-between space-y-6">
               <div className="space-y-4">
                 <div>
                   <span className="font-utility text-xs text-[var(--muted)]">STANDARD</span>
                   <div className="mt-1 font-statement text-3xl text-[var(--cream)]">Free ($0)</div>
                 </div>
-                <p className="font-explanation text-sm text-[var(--muted)]">
+                <p className="font-explanation text-xs sm:text-sm text-[var(--muted)]">
                   A private Baseline and a quiet way to begin asking questions.
                 </p>
-                <div className="space-y-2 font-explanation text-xs text-[var(--cream)] pt-2">
+                <div className="space-y-2 font-explanation text-xs text-[var(--cream)]/90 pt-1">
                   <div>— Private personal Baseline</div>
                   <div>— Today thinking environment</div>
                   <div>— 10 AI turns per month</div>
@@ -345,35 +418,35 @@ function Landing() {
               </div>
               <button
                 onClick={() => go('/signup')}
-                className="w-full rounded-lg border border-[var(--line)] py-2.5 text-xs text-[var(--cream)] hover:border-[var(--line-strong)] transition"
+                className="w-full rounded-lg border border-[var(--line)] py-2.5 text-xs font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-colors"
               >
                 Start Free
               </button>
             </div>
 
-            <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-7 md:p-8 space-y-6 flex flex-col justify-between">
+            <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-7 md:p-8 flex flex-col justify-between space-y-6">
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="font-utility text-xs text-[var(--sage)]">SOVEREIGN+</span>
                     <div className="mt-1 font-statement text-3xl text-[var(--cream)]">$20 / mo</div>
                   </div>
-                  <Sparkles className="h-5 w-5 text-[var(--sage)]" />
+                  <Sparkles className="h-4 w-4 text-[var(--sage)]" />
                 </div>
-                <p className="font-explanation text-sm text-[var(--muted)]">
+                <p className="font-explanation text-xs sm:text-sm text-[var(--muted)]">
                   Room for deeper personal exploration, relational intelligence, and systems.
                 </p>
-                <div className="space-y-2 font-explanation text-xs text-[var(--cream)] pt-2">
+                <div className="space-y-2 font-explanation text-xs text-[var(--cream)]/90 pt-1">
                   <div>— Everything in Free</div>
                   <div>— 300 AI turns per month</div>
-                  <div>— People & relational dynamic comparisons</div>
+                  <div>— Relational inquiry & comparisons</div>
                   <div>— Multi-participant system mapping</div>
                   <div>— Extended library retention</div>
                 </div>
               </div>
               <button
                 onClick={() => go('/signup')}
-                className="w-full rounded-lg bg-[var(--cream)] py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition"
+                className="w-full rounded-lg bg-[var(--cream)] py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors"
               >
                 Start Sovereign+
               </button>
@@ -383,27 +456,27 @@ function Landing() {
           <div className="mt-6 text-center">
             <button
               onClick={() => go('/pricing')}
-              className="text-xs text-[var(--muted)] hover:text-[var(--cream)] transition underline"
+              className="text-xs text-[var(--muted)] hover:text-[var(--cream)] transition-colors underline underline-offset-4"
             >
               Compare full plan details & voluntary support →
             </button>
           </div>
         </section>
 
-        {/* 5. FINAL CTA */}
-        <section className="border-t border-[var(--line)] py-20 md:py-28 text-center">
+        {/* 6. FINAL CTA */}
+        <section className="border-t border-[var(--line)] py-24 sm:py-32 text-center">
           <div className="max-w-xl mx-auto space-y-6">
             <SovereignMark size={28} className="mx-auto text-[var(--cream)]" />
-            <h2 className="font-statement text-3xl md:text-5xl text-[var(--cream)]">
+            <h2 className="font-statement text-3xl sm:text-5xl text-[var(--cream)] font-medium">
               Start with your Baseline.
             </h2>
-            <p className="font-explanation text-sm md:text-base text-[var(--muted)]">
+            <p className="font-explanation text-sm sm:text-base text-[var(--muted)]">
               Establish your private reference in under two minutes.
             </p>
             <div className="pt-2">
               <button
                 onClick={() => go('/signup')}
-                className="rounded-lg bg-[var(--cream)] px-6 py-3 text-sm font-medium text-[var(--ink)] hover:bg-white transition"
+                className="rounded-full bg-[var(--cream)] px-7 py-3 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-lg hover:scale-[1.01]"
               >
                 Start with your Baseline
               </button>
@@ -412,18 +485,18 @@ function Landing() {
         </section>
       </main>
 
-      {/* 6. MINIMAL FOOTER */}
-      <footer className="border-t border-[var(--line)] py-8 text-center text-xs text-[var(--subtle)]">
-        <div className="mx-auto max-w-5xl px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* 7. MINIMAL FOOTER */}
+      <footer className="border-t border-[var(--line)] py-8 text-xs text-[var(--subtle)]">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <SovereignMark size={14} />
             <span>Sovereign.OS</span>
           </div>
           <div className="flex gap-6">
-            <button onClick={() => go('/terms')} className="hover:text-[var(--cream)]">Terms</button>
-            <button onClick={() => go('/privacy')} className="hover:text-[var(--cream)]">Privacy</button>
-            <button onClick={() => go('/pricing')} className="hover:text-[var(--cream)]">Pricing</button>
-            <button onClick={() => go('/faq')} className="hover:text-[var(--cream)]">FAQ</button>
+            <button onClick={() => go('/terms')} className="hover:text-[var(--cream)] transition-colors">Terms</button>
+            <button onClick={() => go('/privacy')} className="hover:text-[var(--cream)] transition-colors">Privacy</button>
+            <button onClick={() => go('/pricing')} className="hover:text-[var(--cream)] transition-colors">Pricing</button>
+            <button onClick={() => go('/faq')} className="hover:text-[var(--cream)] transition-colors">FAQ</button>
           </div>
           <div>© {new Date().getFullYear()} Sovereign.OS. Private personal AI.</div>
         </div>
