@@ -168,10 +168,13 @@ Human desktop/iPhone QA is separate evidence and never changes those automated f
 ## Stripe Webhook Security Policy Decision
 
 - **Decision**: Remove redundant Cloudflare Access application/policy protecting `/api/v1/stripe/webhook` (and legacy alias paths).
-- **Security Boundary**: The Worker application (`apps/worker/src/routes/stripe.ts`) is the primary and authoritative security boundary, enforcing mandatory HMAC-SHA256 signature verification (`verifyStripeSignature`) via `STRIPE_WEBHOOK_SECRET`.
+- **Status Audit**:
+  - **Application Security Boundary**: `VERIFIED` (Worker enforces mandatory HMAC-SHA256 signature verification in code)
+  - **Security Policy Decision**: `DOCUMENTED` (Recorded in repo release & security architecture documentation)
+  - **Cloudflare Access Resource Deletion**: `NOT INDEPENDENTLY VERIFIED` (Requires direct dashboard or Cloudflare Access API deletion; local CLI/code verification cannot independently confirm edge dashboard removal)
 - **Policy Rationale**:
-  - Stripe makes server-to-server HTTP calls to webhooks without interactive IdP login context.
-  - A Cloudflare Access policy with `Bypass: Everyone` adds zero protection while producing security center warnings.
-  - Edge IP allowlisting was deliberately rejected to prevent operational fragility and maintain `STRIPE_WEBHOOK_SECRET` cryptographic verification as the sole authority.
-  - Inbound requests lacking valid `stripe-signature` headers continue to be rejected by the Worker with HTTP `400 Invalid signature`.
+  - **Why Access Policy is Redundant**: Stripe calls webhooks server-to-server without interactive IdP/Access headers. A Cloudflare Access application with `Bypass: Everyone` adds zero security while generating overprovisioned policy warnings in Cloudflare Security Insights.
+  - **Why Signature Verification Remains Mandatory**: Cryptographic HMAC-SHA256 verification using `STRIPE_WEBHOOK_SECRET` in `apps/worker/src/routes/stripe.ts` is the authoritative security boundary for authenticating webhook events.
+  - **Why IP Allowlisting Was Not Adopted**: Restricting access to Stripe IP ranges creates an operational dependency on external IP lists without replacing or strengthening application-level signature verification.
+  - **Inbound Enforcement**: The Worker continues rejecting unsigned or forged payloads with HTTP `400 Invalid signature`.
 

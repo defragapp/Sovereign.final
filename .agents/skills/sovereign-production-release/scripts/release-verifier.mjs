@@ -24,7 +24,7 @@ function parseArgs() {
     targetRef: 'main',
     targetSurface: 'https://sovereign.defrag.app',
     canonicalAppSurface: 'https://app.defrag.app',
-    releaseCommand: 'pnpm production:release:oauth',
+    releaseCommand: 'pnpm production:release:text',
     outputJson: join(process.cwd(), '.tmp', 'release-evidence.json'),
     outputMarkdown: join(process.cwd(), '.tmp', 'release-evidence.md'),
     silent: false,
