@@ -31,18 +31,20 @@ Documentation covering actual API/routes, authentication, authorization, data mo
 ## 4. Operations
 Documentation covering deployment, release authority, readiness, rollback, migrations, failure handling, capacity, and scaling.
 - **[Production Release Procedure](production-release.md)** — Canonical production release authority and sequence.
+- **[Active Launch Acceptance Record](release/LAUNCH_ACCEPTANCE.md)** — Authoritative launch acceptance record and gate status for `defragapp/Sovereign.final`.
 - **[Release Gates](release-gates.md)** — Current launch acceptance checklist and gates.
 - **[Preview and Production Preparation](release-prep.md)** — Resource inventory and preparation guidance for releases.
 - **[Launch Saturation and Rollback Runbook](launch-saturation-runbook.md)** — Runbook for controlled canary validation.
 - **Consolidation Reports**: Evidence-backed inventories and dispositions during drift recovery.
   - [2026‑08‑31 Canonical Consolidation Report](consolidation/2026-08-31-canonical-consolidation-report.md)
 - **Historical References**:
+  - [Historical Launch Acceptance Record (OPENAPI)](release/HISTORICAL_OPENAPI_ACCEPTANCE.md) — Historical launch record from `defragapp/OPENAPI` (Aug 27, 2026).
   - [Historical production redeploy request (2026-07-26)](production-redeploy-2026-07-26.md)
   - [Historical production-safe convergence checkpoint](production-safe-convergence-rollback.md)
 
 ## 5. Governance
 Documentation covering major architectural decisions, separating current from historical context, and security.
-- **[Repository Operating Rules](../AGENTS.md)** — Canonical operating rules for the `defragapp/OPENAPI` repository.
+- **[Repository Operating Rules](../AGENTS.md)** — Canonical operating rules for the `defragapp/Sovereign.final` repository.
 - **[Security Policy](../SECURITY.md)** — Security policies and vulnerability reporting.
 - **[SOC 2 Readiness Controls](security/soc2-readiness-controls.md)** — Readiness evidence and controls.
 - **[Security Incident Response Runbook](security/incident-response-runbook.md)** — Current incident-response engineering runbook.
