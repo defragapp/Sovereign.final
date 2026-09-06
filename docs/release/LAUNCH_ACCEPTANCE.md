@@ -11,8 +11,8 @@
 | Certification Category | Status | Details |
 |------------------------|--------|---------|
 | **SOURCE / LOCAL CERTIFICATION** | **PASS** | Complete implementation, 0 type errors, 442/442 unit/contract tests passing, 19 migrations verified non-destructive, 0 secret/fixture leaks, worker packaging passes, bundle budget passes, all local smoke suites pass. |
-| **DEPLOYMENT CERTIFICATION** | **BLOCKED** | Current `Sovereign.final` production deployment has **not** been executed or verified from this environment because Cloudflare credentials (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`) are not configured in the execution environment. |
-| **AUTHENTICATED PRODUCTION E2E** | **BLOCKED** | No authorized production test account or session is available to verify authenticated end-to-end user journeys against live production infrastructure. |
+| **DEPLOYMENT CERTIFICATION** | **PASS** | Cloudflare OAuth authenticated (`defragapp@gmail.com`). Canonical production deployment (`pnpm production:release:text`) succeeded to Worker `sovv-web` on account `8b1954d216d65077c6480d62583fe2c2`. Verified live SHA parity and `ready: true` across both `https://sovereign.defrag.app/ready` and `https://app.defrag.app/ready`. Public asset bundle replaced. Remote D1 migration verified. |
+| **AUTHENTICATED PRODUCTION E2E** | **BLOCKED** | Live production auth endpoints enforce Cloudflare Turnstile verification (`TURNSTILE_FAILED: required`) and transactional magic link delivery via Resend. No authorized test account inbox is available to automated CLI runner without human interaction. Synthetic/mock accounts and touching existing user data are strictly prohibited. |
 
 ---
 
@@ -93,15 +93,15 @@ To maintain absolute fidelity in the release record, verification activities are
 
 ---
 
-## Deployment Certification: BLOCKED
+## Deployment Certification: PASS
 
 | Field | Status / Value | Reason |
 |-------|----------------|--------|
-| Target Worker | `sovv-web` / `sovereign-agent` | Configured in `wrangler.jsonc` |
-| Cloudflare Deployment | **BLOCKED** | `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` are not available in this environment. `wrangler deploy` cannot authenticate to the Cloudflare API. |
-| Live `/ready` Parity | **NOT VERIFIED** | Cannot query live endpoints for this repository until deployment occurs. |
-| Remote D1 Migration | **BLOCKED** | Remote execution of migration `0019_deprecate_manual_capacity` requires Cloudflare API authentication. |
-| DMARC / DNS Parity | **NOT VERIFIED** | Historical records exist in `HISTORICAL_OPENAPI_ACCEPTANCE.md`, but live DNS validation for this specific deployment cannot be confirmed without Cloudflare access. |
+| Target Worker | `sovv-web` | Production Worker deployed via canonical pipeline |
+| Cloudflare Deployment | **PASS** | Deployed successfully using `pnpm production:release:text` with Cloudflare OAuth credentials |
+| Live `/ready` Parity | **PASS** | Verified on `https://sovereign.defrag.app/ready` and `https://app.defrag.app/ready` |
+| Remote D1 Migration | **PASS** | Migration `0019_deprecate_manual_capacity` verified applied in D1 database `sovereign-openapi-db` |
+| DMARC / DNS Parity | **PASS** | DNS TXT `_dmarc.defrag.app` verified `v=DMARC1; p=reject;` (`dmarcStatus: verified`) |
 
 ---
 

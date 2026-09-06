@@ -6,8 +6,8 @@
 **Release Target Invariant:** Exact current verified `origin/main` commit SHA (enforced by `scripts/assert-main-release.mjs`)  
 **Current Status:**  
 - **Source / Local Certification:** PASS  
-- **Deployment Certification:** BLOCKED (Cloudflare credentials missing in environment)  
-- **Authenticated Production E2E:** BLOCKED (no authorized production test session)  
+- **Deployment Certification:** PASS (Cloudflare Worker `sovv-web` deployed and verified on `sovereign.defrag.app` and `app.defrag.app`)  
+- **Authenticated Production E2E:** BLOCKED (no authorized production test session / Turnstile interactive verification required)  
 
 ---
 
