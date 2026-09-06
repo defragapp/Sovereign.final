@@ -590,7 +590,7 @@ export function SovereignIntelligenceWorkspace({ onboardingVerified = false }: {
             <span className="topbar-surface-tag">{surface}</span>
             <span className="inline-flex items-center gap-1.5 text-xs font-mono text-neutral-400 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              Baseline Reference Active · {workspace.today?.baseline?.status === 'completed' ? 'User' : 'Account'}
+              Baseline Active
             </span>
           </div>
           <div className="topbar-actions">

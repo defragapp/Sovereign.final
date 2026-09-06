@@ -122,11 +122,6 @@ export function ReferenceField({ className = '' }: { className?: string }) {
         <circle cx="290" cy="120" r="3" fill="var(--cream)" />
         <circle cx="200" cy="190" r="3" fill="var(--cream)" />
         <circle cx="200" cy="120" r="4.5" stroke="var(--cream)" strokeWidth="1" fill="var(--ink)" />
-        
-        <text x="200" y="38" textAnchor="middle" fill="var(--subtle)" fontSize="8.5" fontFamily="monospace" letterSpacing="0.2em">DECISION</text>
-        <text x="75" y="123" textAnchor="end" fill="var(--subtle)" fontSize="8.5" fontFamily="monospace" letterSpacing="0.2em">COMMUNICATION</text>
-        <text x="325" y="123" textAnchor="start" fill="var(--subtle)" fontSize="8.5" fontFamily="monospace" letterSpacing="0.2em">RELATIONSHIP</text>
-        <text x="200" y="210" textAnchor="middle" fill="var(--subtle)" fontSize="8.5" fontFamily="monospace" letterSpacing="0.2em">BASELINE</text>
       </svg>
     </div>
   );
@@ -183,7 +178,7 @@ function Header() {
             onClick={() => go('/signup')}
             className="rounded-full bg-[var(--cream)] px-3.5 py-1.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm"
           >
-            Start with Baseline
+            Get started
           </button>
         </div>
       </div>
@@ -203,19 +198,18 @@ function Landing() {
         {/* 1. HERO */}
         <section className="pt-16 pb-12 sm:pt-24 sm:pb-16 text-center">
           <div className="max-w-3xl mx-auto flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3 py-1 text-[11px] font-medium text-[var(--muted)] mb-8">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3.5 py-1 text-[11px] font-medium text-[var(--muted)] mb-8 tracking-wide">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
-              <span>Private Personal AI</span>
+              <span>PERSONAL AI FOR REAL LIFE</span>
             </div>
 
             <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-tight text-[var(--cream)] leading-[1.06]">
-              Understand yourself.<br />
-              Understand your people.<br />
-              <span className="text-[var(--muted)]">See the whole system.</span>
+              Healing isn’t optional.<br />
+              <span className="text-[var(--cream)]/90">Holding onto the pain is.</span>
             </h1>
 
             <p className="mt-6 max-w-xl font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
-              Sovereign.OS is a private AI system that builds a personal reference from your Baseline and uses that context to help you understand yourself, your relationships, and the systems around you.
+              Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
@@ -223,7 +217,7 @@ function Landing() {
                 onClick={() => go('/signup')}
                 className="rounded-full bg-[var(--cream)] px-6 py-2.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-md hover:scale-[1.01]"
               >
-                Start with your Baseline
+                Get started
               </button>
               <button
                 onClick={() => go('/how-it-works')}
@@ -248,7 +242,7 @@ function Landing() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
-                <span className="font-utility text-[9px] text-[var(--sage)]">Private Reference · Grounded</span>
+                <span className="font-utility text-[9px] text-[var(--sage)]">Private Reference · Sources ready</span>
               </div>
             </div>
 
@@ -263,10 +257,6 @@ function Landing() {
 
               {/* Sovereign Response */}
               <div className="space-y-4 max-w-2xl">
-                <div className="flex items-center gap-2 font-utility text-[10px] text-[var(--sage)]">
-                  <span>SOVEREIGN ANSWER</span>
-                </div>
-
                 <h3 className="font-statement text-xl sm:text-2xl text-[var(--cream)] font-medium leading-snug">
                   Separate the immediate observation from the pressure to solve their perception all at once.
                 </h3>
@@ -283,7 +273,7 @@ function Landing() {
                 </div>
 
                 <div className="flex items-center justify-between pt-1 text-xs text-[var(--subtle)] border-t border-[var(--line)]">
-                  <span>Based on your Baseline · Communication & Decision Context</span>
+                  <span>Based on your Baseline</span>
                   <button onClick={() => go('/signup')} className="text-[var(--muted)] hover:text-[var(--cream)] underline underline-offset-4 transition-colors">See source details →</button>
                 </div>
               </div>
@@ -321,7 +311,7 @@ function Landing() {
             <div className="max-w-xl space-y-4">
               <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">The Baseline</span>
               <h2 className="font-statement text-3xl sm:text-4xl text-[var(--cream)] font-medium">
-                Context that stays with you.
+                A private reference built around you.
               </h2>
               <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
                 Instead of starting every conversation from zero, Sovereign begins with your Baseline: a private reference that gives the system persistent context for how you operate. It stays strictly private to you, grounding your inquiries as situations, relationships, and systems evolve.
@@ -344,28 +334,42 @@ function Landing() {
         <section className="border-t border-[var(--line)] py-16 sm:py-20">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 divide-y md:divide-y-0 md:divide-x divide-[var(--line)]">
             <div className="space-y-2 md:pr-6">
-              <span className="font-utility text-[10px] text-[var(--subtle)]">01 / SELF</span>
+              <span className="font-utility text-[10px] text-[var(--subtle)]">01 · YOU</span>
               <h3 className="font-statement text-lg text-[var(--cream)] font-medium">Personal Baseline</h3>
               <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                A persistent reference for your own decisions, tendencies, and communication.
+                Explore how you think, decide, communicate, create, connect, respond under pressure, and grow.
               </p>
             </div>
 
             <div className="space-y-2 pt-6 md:pt-0 md:px-6">
-              <span className="font-utility text-[10px] text-[var(--subtle)]">02 / PEOPLE</span>
-              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">Relational Inquiry</h3>
+              <span className="font-utility text-[10px] text-[var(--subtle)]">02 · YOU + YOUR PEOPLE</span>
+              <h3 className="font-statement text-lg text-[var(--cream)] font-medium">Relationship Intelligence</h3>
               <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                Examine interactions between two distinct references rather than generic advice.
+                See why the same moment lands differently—and how to bridge the gap using shared, consent-based references.
               </p>
             </div>
 
             <div className="space-y-2 pt-6 md:pt-0 md:pl-6">
-              <span className="font-utility text-[10px] text-[var(--subtle)]">03 / SYSTEMS</span>
+              <span className="font-utility text-[10px] text-[var(--subtle)]">03 · FROM 1:1 TO THE WHOLE SYSTEM</span>
               <h3 className="font-statement text-lg text-[var(--cream)] font-medium">System Dynamics</h3>
               <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
-                Map tensions, roles, and communication across teams, families, and groups.
+                Understand how the whole system functions across families, workplace teams, and groups while keeping each person distinct.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* 4.5 COMPARISON */}
+        <section className="border-t border-[var(--line)] py-16 sm:py-20">
+          <div className="max-w-2xl mx-auto text-center space-y-4">
+            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">WHY THIS AI IS DIFFERENT</span>
+            <h2 className="font-statement text-2xl sm:text-4xl text-[var(--cream)] font-medium">
+              Most AI starts with the prompt.<br />
+              Sovereign starts with you.
+            </h2>
+            <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+              Generic chatbots start blank every time you ask a question. Sovereign maintains your private Baseline so every answer understands your patterns, communication style, and values without requiring you to re-explain yourself.
+            </p>
           </div>
         </section>
 
@@ -449,8 +453,10 @@ function Landing() {
         <section className="border-t border-[var(--line)] py-24 sm:py-32 text-center">
           <div className="max-w-xl mx-auto space-y-6">
             <SovereignMark size={28} className="mx-auto text-[var(--cream)]" />
-            <h2 className="font-statement text-3xl sm:text-5xl text-[var(--cream)] font-medium">
-              Start with your Baseline.
+            <h2 className="font-statement text-3xl sm:text-5xl text-[var(--cream)] font-medium leading-tight">
+              Know yourself.<br />
+              Understand your people.<br />
+              See the whole system.
             </h2>
             <p className="font-explanation text-sm sm:text-base text-[var(--muted)]">
               Establish your private reference in under two minutes.
@@ -460,7 +466,7 @@ function Landing() {
                 onClick={() => go('/signup')}
                 className="rounded-full bg-[var(--cream)] px-7 py-3 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-lg hover:scale-[1.01]"
               >
-                Start with your Baseline
+                Get started
               </button>
             </div>
           </div>
