@@ -10,21 +10,23 @@
 :root {
   /* Font assets */
   @font-face {
-    font-family: 'SovereignDisplay';
+    font-family: 'Canela';
     src: url('/fonts/sovereign-display.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
   }
   @font-face {
-    font-family: 'SovereignSans';
+    font-family: 'Suisse';
     src: url('/fonts/sovereign-sans.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
   }
-  --display-serif: 'SovereignDisplay', serif;
-  --body-sans: 'SovereignSans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --serif-primary: 'Canela', 'Didot', 'Bodoni MT', serif;
+  --sans-primary: 'Suisse', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --display-serif: var(--serif-primary);
+  --body-sans: var(--sans-primary);
   /* Existing variables */
   --sov-reading: 68ch;
   --sov-content: 960px;
@@ -129,8 +131,12 @@
 .sovereign-landing .landing-hero-copy::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.04), transparent 60%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 650px;
+  height: 380px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03) 0%, transparent 70%);
   pointer-events: none;
   z-index: -1;
 }

@@ -245,25 +245,25 @@ function Landing() {
               <span>PRIVATE PERSONAL AI</span>
             </div>
 
-            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-[0.02em] text-[var(--cream)] leading-[1.08]">
+            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-[0.02em] text-[var(--cream)] leading-[1.08]" style={{ fontFamily: 'var(--serif-primary)' }}>
               Know how you operate.<br />
               Read the room.
             </h1>
 
-            <p className="mt-8 max-w-2xl font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
+            <p className="max-w-2xl mx-auto text-white/60 text-lg leading-relaxed mt-6">
               Sovereign is private AI built on your Baseline. It does not give generic advice. It uses your unique mechanics to decode decisions, navigate relationship friction, and expose unseen dynamics in groups.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex flex-row items-center justify-center gap-4 mt-8">
               <button
                 onClick={() => go('/signup')}
-                className="bg-[var(--cream)] text-[var(--ink)] px-8 py-3.5 rounded-full font-medium shadow-md transition-transform duration-200 hover:scale-[1.01]"
+                className="bg-white text-black px-8 py-3 rounded-full font-medium transition-transform hover:scale-[1.02]"
               >
                 Build Your Baseline
               </button>
               <button
                 onClick={() => go('/how-it-works')}
-                className="rounded-full border border-[rgba(255,255,255,0.12)] bg-transparent px-7 py-3.5 text-sm font-medium text-[var(--cream)] hover:border-[rgba(255,255,255,0.24)] hover:bg-[var(--surface-2)] transition-all"
+                className="border border-white/20 text-white/70 px-8 py-3 rounded-full hover:bg-white/5 transition-colors"
               >
                 How it works
               </button>

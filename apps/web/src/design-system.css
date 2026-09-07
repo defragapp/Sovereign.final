@@ -171,18 +171,13 @@
  */
 
 :root {
+  --serif-primary: 'Canela', 'Didot', 'Bodoni MT', serif;
+  --sans-primary: 'Suisse', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-title:
-    "Geist Sans",
-    -apple-system,
-    BlinkMacSystemFont,
-    "SF Pro Display",
-    "Segoe UI Variable Display",
-    "Segoe UI",
-    system-ui,
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    sans-serif;
+    'Canela',
+    'Didot',
+    'Bodoni MT',
+    serif;
   --font-subheading: var(--font-title);
   --font-body:
     -apple-system,
