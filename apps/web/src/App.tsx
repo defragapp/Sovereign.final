@@ -234,6 +234,9 @@ function Landing() {
 
   return (
     <div className="page-noise relative min-h-screen bg-[var(--platform-bg)] text-[var(--cream)] overflow-x-hidden">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(174,186,167,0.06),transparent_70%)]" />
+
       <Header />
 
       <main className="relative z-10 mx-auto max-w-5xl px-6 sm:px-8 pb-32 space-y-24 sm:space-y-32">
