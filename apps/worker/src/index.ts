@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Env } from './env';
 import { ThreadCoordinator } from './durable/ThreadCoordinator';
 import { requireAuth, requireSameOrigin } from './security/auth';
+import { requireProTier } from './security/tier-guard';
 import { withSecurityHeaders } from './security/headers';
 import { getEntitlements, requireFeature } from './db/entitlements';
 import { ensureThread, appendThreadEvent, listThreadMessages, listThreads, recordCorrection, setThreadCovenant, touchThread } from './db/threads';
@@ -97,6 +98,7 @@ app.post('/api/v1/auth/logout', async (context) => { requireSameOrigin(context.r
 app.post('/api/v1/auth/logout-all', async (context) => { requireSameOrigin(context.req.raw); return logout(context.req.raw, context.env, true); });
 app.get('/api/v1/auth/session', async (context) => context.json({ authenticated: true, ...(await requireAuth(context.req.raw, context.env)) }));
 
+app.post('/api/billing/webhook', (context) => handleStripeWebhook(context.req.raw, context.env));
 app.post('/api/v1/stripe/webhook', (context) => handleStripeWebhook(context.req.raw, context.env));
 
 app.get('/api/v1/account/onboarding', async (context) => {
@@ -382,6 +384,20 @@ app.post('/api/v1/billing/stripe-test-event', async (context) => {
   if (body.customerId) testEvent.customerId = body.customerId;
   const event = normalizeStripeFixtureEvent(context.env, testEvent);
   return context.json({ projection: await projectSubscriptionEvent(context.env, event) });
+});
+
+app.all('/api/v1/workspace/pro', async (context) => {
+  try {
+    const auth = await requireProTier(context.req.raw, context.env);
+    return context.json({
+      ok: true,
+      tier: 'sovereign_pro',
+      accountId: auth.accountId
+    });
+  } catch (error) {
+    if (error instanceof Response) return error;
+    throw error;
+  }
 });
 
 app.post('/api/v1/threads/:threadId/covenant', async (context) => {

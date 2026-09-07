@@ -1,6 +1,10 @@
+import React from 'react';
 import { BrandMark } from './components/ui/BrandMark';
 import { LiquidMesh } from './components/ui/LiquidMesh';
 import { PublicDemoChat } from './components/PublicDemoChat';
+import { BaselineViewFragment } from './components/fragments/BaselineViewFragment';
+import { ExpressionViewFragment } from './components/fragments/ExpressionViewFragment';
+import { SystemMapViewFragment } from './components/fragments/SystemMapViewFragment';
 
 const REAL_LIFE_QUESTIONS = [
   { scope: 'Self', text: 'How do I make decisions that actually fit me?' },
@@ -61,7 +65,7 @@ const PRICING_TIERS = [
 export function PublicLanding() {
   return (
     <main
-      className="relative min-h-screen bg-[#030712] text-gray-100 overflow-x-hidden selection:bg-white/20 selection:text-white"
+      className="relative min-h-screen bg-[#000000] text-gray-100 overflow-x-hidden selection:bg-white/20 selection:text-white"
       data-product-contract="personal-ai-v1"
     >
       {/* High-Motion Iridescent Liquid Mesh */}
@@ -73,14 +77,15 @@ export function PublicLanding() {
         aria-hidden="true"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 75%), radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.06) 0px, transparent 50%), radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.05) 0px, transparent 50%), radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.05) 0px, transparent 50%), #030712',
+            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 75%), radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.06) 0px, transparent 50%), radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.05) 0px, transparent 50%), radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.05) 0px, transparent 50%), #000000',
         }}
       />
 
       <div className="relative z-10 flex flex-col">
         <V2Navigation />
         <V2Hero />
-        <HowItWorks />
+        <ConceptualPillars />
+        <ExpansionSequence />
         <RealLifeQuestions />
         <ComparisonSection />
         <PricingSection />
@@ -93,13 +98,14 @@ export function PublicLanding() {
 
 function V2Navigation() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#030712]/80 backdrop-blur-xl transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#000000]/80 backdrop-blur-xl transition-all duration-300">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <a className="flex items-center gap-2.5 text-white font-semibold tracking-tight transition-opacity hover:opacity-80" href="/" aria-label="Sovereign.OS home">
           <BrandMark size={22} />
-          <span className="text-base font-semibold tracking-tight text-white">Sovereign</span>
+          <span className="text-base font-semibold tracking-tight text-white">Sovereign.OS</span>
         </a>
         <nav className="hidden md:flex items-center gap-8 text-sm text-neutral-400" aria-label="Public navigation">
+          <a href="#pillars" className="transition-colors hover:text-white">Pillars</a>
           <a href="#how-it-works" className="transition-colors hover:text-white">How it works</a>
           <a href="#pricing" className="transition-colors hover:text-white">Pricing</a>
           <a href="/faq" className="transition-colors hover:text-white">FAQ</a>
@@ -112,7 +118,7 @@ function V2Navigation() {
             Sign in
           </a>
           <a
-            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:-translate-y-0.5 active:translate-y-0"
+            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:-translate-y-1 active:translate-y-0"
             href="/signup"
           >
             Get started free
@@ -129,90 +135,255 @@ function V2Navigation() {
 
 function V2Hero() {
   return (
-    <section className="relative px-6 pt-16 pb-24 md:pt-24 md:pb-32" role="banner">
-      <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-        <div className="lg:col-span-7 flex flex-col items-start text-left">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1 text-xs font-medium text-neutral-300 backdrop-blur-md mb-6">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            Personal AI for your real life
-          </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.1]">
-            Understand yourself.
-            <br />
-            <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
-              Understand your people.
-            </span>
-            <br />
-            <span className="text-neutral-400">See the whole system.</span>
-          </h1>
-          <p className="mt-6 text-lg sm:text-xl text-neutral-300 max-w-2xl leading-relaxed">
-            Sovereign is a Baseline-first private AI for understanding yourself, your relationships, and the human systems around you. Build your Baseline once, then explore how you think, decide, communicate, and respond under pressure.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <a
-              className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-6 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:-translate-y-0.5 active:translate-y-0"
-              href="/signup"
-            >
-              Start free — no card required
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="13" y2="4" />
-                <polyline points="13 4 13 4 13 13 4 13" />
-              </svg>
-            </a>
-            <a
-              className="inline-flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-300 border border-white/10 px-6 py-3.5 text-base font-medium text-white hover:-translate-y-0.5 active:translate-y-0"
-              href="#how-it-works"
-            >
-              See how it works
-            </a>
-          </div>
-          <p className="mt-6 text-xs text-neutral-500">
-            Your data stays private. Your responses are never used to train AI.
-          </p>
+    <section className="relative px-6 pt-16 pb-20 md:pt-20 md:pb-28" role="banner">
+      <div className="mx-auto max-w-5xl flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-medium text-neutral-300 backdrop-blur-md mb-6">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          PERSONAL AI FOR REAL LIFE
         </div>
-        <div className="lg:col-span-5 w-full">
-          <PublicDemoChat />
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-white leading-[1.12]">
+          Understand yourself.
+          <br />
+          <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
+            Understand your people.
+          </span>
+          <br />
+          <span className="text-neutral-400">See the whole system.</span>
+        </h1>
+        <p className="mt-6 text-lg sm:text-xl text-neutral-300 max-w-3xl leading-relaxed">
+          Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <a
+            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-6 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:-translate-y-1 active:translate-y-0"
+            href="/signup"
+          >
+            Start free — no card required
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="13" y2="4" />
+              <polyline points="13 4 13 4 13 13 4 13" />
+            </svg>
+          </a>
+          <a
+            className="inline-flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-300 border border-white/10 px-6 py-3.5 text-base font-medium text-white hover:border-white/20 hover:-translate-y-1 active:translate-y-0"
+            href="#pillars"
+          >
+            See how it works
+          </a>
+        </div>
+        <p className="mt-4 text-xs text-neutral-500">
+          Start free · No card required · Review, correct, or reject any interpretation
+        </p>
+
+        {/* Above-the-fold Hero Stage Preview: Compact BaselineViewFragment & PublicDemoChat */}
+        <div className="mt-12 w-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-start text-left">
+          <div className="lg:col-span-6 w-full flex justify-center">
+            <BaselineViewFragment compact={true} />
+          </div>
+          <div className="lg:col-span-6 w-full">
+            <PublicDemoChat />
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function HowItWorks() {
+function ConceptualPillars() {
   return (
-    <section className="py-20 px-6" id="how-it-works">
-      <div className="mx-auto max-w-7xl">
+    <section className="py-20 px-6 border-t border-white/10" id="pillars">
+      <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">How Sovereign works</h2>
-          <p className="mt-3 text-base sm:text-lg text-neutral-400">Three steps from your first question to understanding.</p>
+          <div className="inline-block rounded-full bg-white/5 border border-white/10 px-3 py-1 font-mono text-xs uppercase tracking-wider text-neutral-400 mb-3">
+            Core Architecture
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Three conceptual pillars</h2>
+          <p className="mt-3 text-base sm:text-lg text-neutral-400">
+            A unified intelligence model that expands naturally from the individual outward.
+          </p>
         </header>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 flex flex-col items-start transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 border border-white/15 text-sm font-bold text-white mb-6">
-              1
+          {/* Card 1: SELF — Your Baseline */}
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8 flex flex-col justify-between transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div>
+              <div className="font-mono text-xs font-semibold uppercase tracking-wider text-emerald-400 mb-4">
+                SELF — Your Baseline
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 leading-snug">
+                Explore how you think, decide, communicate, create, connect, and grow.
+              </h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                Your Baseline gives Sovereign a consistent reference for how you process, evaluate tradeoffs, and respond under pressure—without reducing you to a score or type.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">You share what matters</h3>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              Tell Sovereign about a decision, a relationship, or a moment that's confusing. The more context you give, the better.
-            </p>
+            <div className="mt-6 pt-4 border-t border-white/10 text-xs font-mono text-neutral-500">
+              01 · Private Reference
+            </div>
           </div>
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 flex flex-col items-start transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 border border-white/15 text-sm font-bold text-white mb-6">
-              2
+
+          {/* Card 2: BETWEEN — Your Relationships */}
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8 flex flex-col justify-between transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div>
+              <div className="font-mono text-xs font-semibold uppercase tracking-wider text-blue-400 mb-4">
+                BETWEEN — Your Relationships
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 leading-snug">
+                See why the same moment lands differently—and how to bridge the gap.
+              </h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                With mutual permission, Sovereign examines both people’s Baselines while keeping each person distinct. Understand where timing, pacing, and coping styles differ when they meet.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">Sovereign grounds in your patterns</h3>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              Instead of generic advice, Sovereign returns to how you actually think, decide, and relate. It shows you the reasoning so you can accept, correct, or reject it.
-            </p>
+            <div className="mt-6 pt-4 border-t border-white/10 text-xs font-mono text-neutral-500">
+              02 · Mutual Permission
+            </div>
           </div>
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 flex flex-col items-start transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 border border-white/15 text-sm font-bold text-white mb-6">
-              3
+
+          {/* Card 3: WHOLE — Your Systems */}
+          <div className="bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8 flex flex-col justify-between transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div>
+              <div className="font-mono text-xs font-semibold uppercase tracking-wider text-purple-400 mb-4">
+                WHOLE — Your Systems
+              </div>
+              <h3 className="text-xl font-bold text-white mb-3 leading-snug">
+                See the whole system.
+              </h3>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                Move from 1:1 interactions to families, teams, and groups. Map how pressure travels through the network, why familiar roles return, and what changes when one person responds differently.
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">You understand more clearly</h3>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              You get answers rooted in your situation. Not guesses. Not one-size-fits-all wisdom. Clarity about what's actually happening and what matters to you.
+            <div className="mt-6 pt-4 border-t border-white/10 text-xs font-mono text-neutral-500">
+              03 · Network Dynamics
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ExpansionSequence() {
+  return (
+    <section className="py-24 px-6 border-t border-white/10 bg-black/30" id="how-it-works">
+      <div className="mx-auto max-w-5xl">
+        <header className="mb-16 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1 text-xs font-mono uppercase tracking-wider text-neutral-400 mb-4">
+            Vertical Scroll Expansion Sequence
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
+            YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS
+          </h2>
+          <p className="mt-4 text-base sm:text-lg text-neutral-300">
+            From your quiet internal reference to multi-party relationship vectors.
+          </p>
+        </header>
+
+        {/* Step Progression Visual Track */}
+        <div className="space-y-16">
+          {/* 01 · YOU */}
+          <div className="relative rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-8 transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+              <div>
+                <span className="font-mono text-xs text-neutral-400 uppercase tracking-widest block">01 / 05</span>
+                <h3 className="text-2xl font-bold text-white mt-1">YOU · Self-Exploration</h3>
+              </div>
+              <span className="text-xs font-mono text-neutral-400 bg-white/5 border border-white/10 px-3 py-1 rounded-full self-start md:self-auto">
+                First Turn
+              </span>
+            </div>
+            <p className="text-base text-neutral-300 leading-relaxed max-w-3xl">
+              Explore how you think, decide, communicate, create, connect, and grow. Sovereign provides room for genuine self-reflection—examining decision-making, pressure response, Shadow, Gift, and Alignment without reducing you to a static profile.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <span className="text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-neutral-300">Decision Rhythm</span>
+              <span className="text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-neutral-300">Cognitive Framing</span>
+              <span className="text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-neutral-300">Pressure Equilibrium</span>
+              <span className="text-xs font-mono bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-neutral-300">Alignment</span>
+            </div>
+          </div>
+
+          {/* 02 · BASELINE */}
+          <div className="relative rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-8 transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+              <div>
+                <span className="font-mono text-xs text-emerald-400 uppercase tracking-widest block">02 / 05</span>
+                <h3 className="text-2xl font-bold text-white mt-1">BASELINE · Quiet Reference</h3>
+              </div>
+              <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full self-start md:self-auto">
+                Grounding Layer
+              </span>
+            </div>
+            <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-8">
+              Your Baseline gives Sovereign a consistent reference across every turn. A private reference built around you, so Sovereign can begin with more than the current prompt alone.
+            </p>
+            <div className="flex justify-center">
+              <BaselineViewFragment compact={false} />
+            </div>
+          </div>
+
+          {/* 03 · EXPRESSION */}
+          <div className="relative rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-8 transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+              <div>
+                <span className="font-mono text-xs text-blue-400 uppercase tracking-widest block">03 / 05</span>
+                <h3 className="text-2xl font-bold text-white mt-1">EXPRESSION · Grounded Synthesis</h3>
+              </div>
+              <span className="text-xs font-mono text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full self-start md:self-auto">
+                Contextual Breakdown
+              </span>
+            </div>
+            <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-8">
+              Distinguish what is steady from what changes under pressure, through current conditions, or the actual situation. Ground raw inquiries into structural understanding.
+            </p>
+            <div className="flex justify-center">
+              <ExpressionViewFragment />
+            </div>
+          </div>
+
+          {/* 04 · PEOPLE */}
+          <div className="relative rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-8 transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+              <div>
+                <span className="font-mono text-xs text-purple-400 uppercase tracking-widest block">04 / 05</span>
+                <h3 className="text-2xl font-bold text-white mt-1">PEOPLE · Relational Intelligence</h3>
+              </div>
+              <span className="text-xs font-mono text-purple-400 bg-purple-500/10 border border-purple-500/20 px-3 py-1 rounded-full self-start md:self-auto">
+                Mutual Consent
+              </span>
+            </div>
+            <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-6">
+              See why the same moment lands differently—and how to bridge the gap. With mutual permission, Sovereign examines both people’s Baselines while keeping each person distinct. Understand where timing, communication, pressure, or decision styles differ when they meet.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="rounded-xl border border-white/10 bg-black/40 p-5 space-y-2">
+                <span className="text-xs font-mono text-neutral-400 uppercase tracking-wider block">Person A · Processing Style</span>
+                <p className="text-sm text-neutral-200">Reflective synthesis before verbal articulation. Needs space to formulate nuanced response under friction.</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-black/40 p-5 space-y-2">
+                <span className="text-xs font-mono text-neutral-400 uppercase tracking-wider block">Person B · Processing Style</span>
+                <p className="text-sm text-neutral-200">Immediate verbal iteration to resolve tension. Seeks real-time feedback to confirm relational safety.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* 05 · SYSTEMS */}
+          <div className="relative rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-8 transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+              <div>
+                <span className="font-mono text-xs text-amber-400 uppercase tracking-widest block">05 / 05</span>
+                <h3 className="text-2xl font-bold text-white mt-1">SYSTEMS · Multi-Party Dynamics</h3>
+              </div>
+              <span className="text-xs font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full self-start md:self-auto">
+                System Equilibrium
+              </span>
+            </div>
+            <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-8">
+              Move from 1:1 interactions to families, teams, and groups. Map how pressure travels through the network, why familiar roles return, and what changes when one person responds differently.
+            </p>
+            <div className="flex justify-center">
+              <SystemMapViewFragment />
+            </div>
           </div>
         </div>
       </div>
@@ -222,8 +393,8 @@ function HowItWorks() {
 
 function RealLifeQuestions() {
   return (
-    <section className="py-20 px-6">
-      <div className="mx-auto max-w-7xl">
+    <section className="py-20 px-6 border-t border-white/10">
+      <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Real questions people ask Sovereign</h2>
           <p className="mt-3 text-base sm:text-lg text-neutral-400">Start with what's on your mind right now.</p>
@@ -232,7 +403,8 @@ function RealLifeQuestions() {
           {REAL_LIFE_QUESTIONS.map((q) => (
             <button
               key={q.text}
-              className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-6 text-left flex flex-col justify-between group transition-all duration-300 hover:border-white/25 hover:bg-white/[0.08] hover:-translate-y-1 cursor-pointer"
+              type="button"
+              className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-6 text-left flex flex-col justify-between group transition-all duration-300 hover:border-white/20 hover:bg-white/[0.08] hover:-translate-y-1 cursor-pointer"
               onClick={() => {
                 sessionStorage.setItem('sovereign:prefill-prompt', q.text);
                 window.location.href = '/signup';
@@ -260,8 +432,8 @@ function RealLifeQuestions() {
 
 function ComparisonSection() {
   return (
-    <section className="py-20 px-6">
-      <div className="mx-auto max-w-7xl">
+    <section className="py-20 px-6 border-t border-white/10">
+      <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
           <p className="text-xs font-semibold tracking-widest text-purple-400 uppercase mb-2">The Difference</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Most AI starts fresh every time.</h2>
@@ -269,7 +441,7 @@ function ComparisonSection() {
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Generic AI */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 transition-all duration-300 hover:border-white/20">
+          <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
             <h3 className="text-xl font-bold text-neutral-400 mb-6 flex items-center gap-2">
               <span className="text-red-400">✕</span> Generic ChatGPT-style AI
             </h3>
@@ -284,10 +456,10 @@ function ComparisonSection() {
           </div>
 
           {/* Sovereign */}
-          <div className="bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 relative overflow-hidden transition-all duration-300 hover:border-purple-500/40">
+          <div className="bg-white/5 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl p-8 relative overflow-hidden transition-all duration-300 hover:border-white/30 hover:-translate-y-1">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-500/15 to-transparent rounded-bl-full pointer-events-none" />
             <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <span className="text-emerald-400">✓</span> Sovereign
+              <span className="text-emerald-400">✓</span> Sovereign.OS
             </h3>
             <ul className="space-y-4">
               {COMPARISON.sovereign.map((item) => (
@@ -306,8 +478,8 @@ function ComparisonSection() {
 
 function PricingSection() {
   return (
-    <section className="py-20 px-6" id="pricing">
-      <div className="mx-auto max-w-7xl">
+    <section className="py-20 px-6 border-t border-white/10" id="pricing">
+      <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Simple, transparent pricing</h2>
           <p className="mt-3 text-base sm:text-lg text-neutral-400">Start free. Upgrade anytime if you need more.</p>
@@ -317,8 +489,8 @@ function PricingSection() {
             <div
               key={tier.name}
               className={`bg-white/5 backdrop-blur-md border ${
-                tier.highlighted ? 'border-white/25 ring-1 ring-white/15' : 'border-white/10'
-              } rounded-2xl shadow-2xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-white/30`}
+                tier.highlighted ? 'border-white/20 ring-1 ring-white/10' : 'border-white/10'
+              } rounded-2xl shadow-2xl p-8 sm:p-10 flex flex-col justify-between transition-all duration-300 hover:border-white/30 hover:-translate-y-1`}
             >
               <div>
                 <div className="flex items-center justify-between">
@@ -349,7 +521,7 @@ function PricingSection() {
                   className={`w-full inline-flex items-center justify-center rounded-xl py-3.5 text-sm font-semibold transition-all duration-300 cursor-pointer ${
                     tier.highlighted
                       ? 'bg-white text-black hover:bg-neutral-200 hover:shadow-[0_0_24px_rgba(255,255,255,0.25)] hover:-translate-y-0.5 active:translate-y-0'
-                      : 'bg-white/10 hover:bg-white/20 border border-white/10 text-white hover:-translate-y-0.5 active:translate-y-0'
+                      : 'bg-white/10 hover:bg-white/20 border border-white/10 text-white hover:border-white/20 hover:-translate-y-0.5 active:translate-y-0'
                   }`}
                   href={tier.ctaHref}
                 >
@@ -366,18 +538,18 @@ function PricingSection() {
 
 function FinalCallToAction() {
   return (
-    <section className="py-20 px-6">
+    <section className="py-20 px-6 border-t border-white/10">
       <div className="mx-auto max-w-5xl">
-        <div className="bg-white/5 backdrop-blur-md border border-white/15 rounded-2xl shadow-2xl p-10 sm:p-14 text-center relative overflow-hidden transition-all duration-300 hover:border-white/25">
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-10 sm:p-14 text-center relative overflow-hidden transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
           <div className="absolute inset-0 pointer-events-none bg-radial-gradient from-purple-500/10 to-transparent" />
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
-            Ready to understand yourself better?
+            Know yourself. Understand your people. See the whole system.
           </h2>
           <p className="text-base sm:text-lg text-neutral-300 max-w-2xl mx-auto mb-8">
-            Start a free conversation with Sovereign. No card required. Your data stays completely private.
+            Start free with Sovereign.OS. Build your Baseline, then explore what you want to understand next.
           </p>
           <a
-            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-8 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:-translate-y-0.5 active:translate-y-0"
+            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-8 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:-translate-y-1 active:translate-y-0"
             href="/signup"
           >
             Get started free
@@ -394,17 +566,18 @@ function FinalCallToAction() {
 
 function V2Footer() {
   return (
-    <footer className="border-t border-white/10 bg-[#030712]/80 backdrop-blur-md mt-20">
+    <footer className="border-t border-white/10 bg-[#000000]/80 backdrop-blur-md mt-20">
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div>
             <a href="/" className="flex items-center gap-2.5" aria-label="Sovereign.OS home">
               <BrandMark size={22} />
-              <span className="text-base font-semibold tracking-tight text-white">Sovereign</span>
+              <span className="text-base font-semibold tracking-tight text-white">Sovereign.OS</span>
             </a>
             <p className="mt-2 text-xs text-neutral-400">Personal AI for your real life.</p>
           </div>
           <nav className="flex flex-wrap gap-8 text-sm text-neutral-400">
+            <a href="#pillars" className="hover:text-white transition-colors">Pillars</a>
             <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
             <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
             <a href="/faq" className="hover:text-white transition-colors">FAQ</a>

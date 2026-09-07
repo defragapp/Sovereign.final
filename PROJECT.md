@@ -1,51 +1,105 @@
-# Project: Sovereign.OS Landing Page Experience & React Production Parity
+# Project: Sovereign.OS Five Workstreams Extension & Production Release
 
 ## Architecture
-- **Framer Presentation Tier**: Visual design, high-contrast industrial aesthetic, typography hierarchy (Inter & JetBrains Mono), responsive layout, published at `https://nice-pluto-305324.framer.app` via `@framer/agent` (Session 2).
-- **React Frontend Tier (`apps/web`)**: Client-side history router in `apps/web/src/App.tsx`, Tailwind CSS v4 styling in `src/styles.css`, Google Fonts web font imports (Inter, JetBrains Mono) in `index.html`, source-owned UI components (`RelationalInquiryDemo.tsx`, `SystemDynamicDemo.tsx`, `Accordion.tsx`).
-- **Backend & Verification Tier (`apps/sovereign-worker`, `apps/worker`, `scripts`)**: Foundation verification script `scripts/verify-foundation.mjs`, Vitest suite (`pnpm test`), and full typecheck (`pnpm typecheck`).
+- **Presentation & Landing Tier (`apps/web`)**:
+  - Hero section in `PublicLanding.v2.tsx`: Scaled by ~25% with `leading-[1.12]`, hosted in `max-w-5xl mx-auto`.
+  - Three Conceptual Pillars (`ConceptualPillars`): SELF — Your Baseline, BETWEEN — Your Relationships, WHOLE — Your Systems.
+  - Vertical Scroll Expansion Sequence (`YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS`): Step progression indicator hosting high-fidelity product UI fragments.
+  - Product UI Fragments (`apps/web/src/components/fragments/`):
+    - `BaselineViewFragment.tsx`: Context vectors with weighting percentages, visible above the fold.
+    - `ExpressionViewFragment.tsx`: Textual differentiation between raw query input and Sovereign contextual breakdown panel.
+    - `SystemMapViewFragment.tsx`: Compact SVG/CSS multi-party relationship vector network diagram.
+  - Shared Static Styling (`apps/web/public/`): Shared `tokens.css` unified across `pricing.html`, `faq.html`, `how-it-works.html`, `consent.html`, and `404.html` preserving donation support contracts.
+- **Conversational Chat & Auth Tier (`apps/web/src/components/chat`)**:
+  - `SovereignThread.tsx`: Auto-resizing textarea composer (44px–200px scrollHeight clamping), three-block message rendering (User prompt, Sovereign Answer with exploration cards, collapsible "Sources" drawer strictly avoiding "Basis"), and sage passkey verification badge in the header.
+  - SSE Streaming Client: Connects to `/api/v1/threads/{threadId}/messages` with required `x-idempotency-key: turn_${crypto.randomUUID()}` header.
+- **Backend Billing & Security Tier (`apps/worker`)**:
+  - Stripe Billing Webhook: Canonical handler at `/api/billing/webhook` and `/api/v1/stripe/webhook` handling 5 lifecycle events (`checkout.session.completed`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.updated`, `customer.subscription.deleted`).
+  - Missing Signature Check: Returns HTTP 400 `Invalid signature` when `stripe-signature` header is omitted or invalid.
+  - 402 Payment Required Middleware: `requireProTier` guards protected workspace routes (`/api/v1/workspace/pro`), enforcing HTTP 402 `Payment Required` for accounts not on `sovereign_pro` tier.
+  - Zero New Migrations: Existing schema from migrations `0004` and `0009` fully covers all billing state; migration target strictly maintained at immutable `0019_deprecate_manual_capacity.sql`.
+- **Gate Testing & Release Tier (`scripts/`, `apps/`)**:
+  - Full gate validation: `pnpm typecheck`, `pnpm build`, `pnpm test`, `pnpm verify:foundation`, `pnpm verify:migrations`, `pnpm scan:secrets`, and `pnpm verify:cloudflare-build`.
+  - Production deployment via `pnpm production:release:text` verified live at `https://sovereign.defrag.app/ready` (SHA: `ead8cbfcd9410440f3cf1c46f7b7f69f97c43f0d`).
 
-## Code Layout
-- `apps/web/index.html`: Web font links for Inter (sans) and JetBrains Mono (mono).
-- `apps/web/src/styles.css`: CSS root variables, font families, industrial monochromatic colors (`#000000`, `#050505`, subtle borders `rgba(255,255,255,0.08)`, restrained sage `#9fbaa1`).
-- `apps/web/src/App.tsx`: `Landing()` public route, navigation, hero, three-layer scope progression, Sovereign Answer v2 demo preview, pricing/FAQ hooks, footer.
-- `apps/web/src/components/`: Modular presentation components for intake preview, relational triad, and system dynamics.
-- `apps/web/src/PublicSupport.test.ts`: Voluntary donation link tests (must remain 100% green).
-- `scripts/verify-foundation.mjs`: Core file checks (must remain 100% green).
+## Code Layout & File Ownership
+- **Milestone 1 Owner**:
+  - `apps/web/src/components/fragments/BaselineViewFragment.tsx` (exclusively owned)
+  - `apps/web/src/components/fragments/ExpressionViewFragment.tsx` (exclusively owned)
+  - `apps/web/src/components/fragments/SystemMapViewFragment.tsx` (exclusively owned)
+  - `apps/web/src/PublicLanding.v2.tsx` (exclusively owned)
+  - `apps/web/public/tokens.css` (exclusively owned)
+  - `apps/web/public/pricing.html`, `faq.html`, `how-it-works.html`, `consent.html`, `404.html` (exclusively owned)
+- **Milestone 2 Owner**:
+  - `apps/web/src/components/chat/SovereignThread.tsx` (exclusively owned)
+  - `apps/web/src/components/chat/SovereignThread.test.ts` (exclusively owned)
+  - `apps/web/src/SovereignChatWorkspace.v2.tsx` (exclusively owned)
+- **Milestone 3 Owner**:
+  - `apps/worker/src/index.ts` (exclusively owned)
+  - `apps/worker/src/routes/stripe.ts` (exclusively owned)
+  - `apps/worker/src/billing/stripe.ts` (exclusively owned)
+  - `apps/worker/src/security/tier-guard.ts` (exclusively owned)
+  - `apps/worker/src/billing/stripe-webhook-route-r4.test.ts` (exclusively owned)
+- **Shared / Protected Files**:
+  - `apps/web/src/App.tsx`: Protected file — contains zero `backdrop-blur` (preserves `LandingParity.test.ts`).
+  - `apps/worker/migrations/`: Immutable sequence ending at `0019_deprecate_manual_capacity.sql`. Zero new migration files.
 
 ## Feature Inventory
 | # | Feature | Description | Milestone | Source |
 |---|---------|-------------|-----------|--------|
-| 1 | Founder Hero Design | Kicker "PERSONAL AI FOR REAL LIFE", headline "Healing isn’t optional. Holding onto the pain is.", 2-sentence description of private personal AI, trust line. | M1, M2 | survey / ORIGINAL_REQUEST §R1 |
-| 2 | Three-Layer Scope Hierarchy | Explicit progression: `01 · YOU (Explore yourself)`, `02 · YOU + YOUR PEOPLE (Relational intelligence)`, `03 · FROM 1:1 TO THE WHOLE SYSTEM (System dynamics)`. | M1, M2 | survey / ORIGINAL_REQUEST §R1 |
-| 3 | Sovereign Answer v2 Demo | Authentic chat/terminal intake preview with question "Why does the same conversation feel urgent to me and pressuring to them?", button "Ask Sovereign", relational triad ("WHAT YOU MAY BE BRINGING", "WHAT THEY MAY BE BRINGING", "WHAT HAPPENS BETWEEN YOU"), and quiet Sources disclosure drawer (never Basis). | M1, M2 | survey / ORIGINAL_REQUEST §R1 |
-| 4 | Industrial Monochromatic Visual Design | Near-black foundation (#000000/#050505), sharp 1px borders (rgba(255,255,255,0.08)), Inter & JetBrains Mono typography, restrained sage accent (#9fbaa1), zero AI decorative clutter. | M1, M2 | survey / ORIGINAL_REQUEST §R1 |
-| 5 | Language & Terms Governance | 100% compliant copy grounded in `docs/product-language-system.md`; zero exposure of internal terms (Basis, model context, provider names, `sovereign-answer.v2`). | M1, M2, M3 | survey / AGENTS.md / docs |
-| 6 | Framer Canvas Restructuring & Publishing | Restructure breakpoint `WQLkyLRf1`, integrate dark theme, navigation, hero, 3-layer scope, demo preview, publish to `https://nice-pluto-305324.framer.app` and verify live page. | M1 | survey / ORIGINAL_REQUEST §R1 |
-| 7 | Web Font Integration | Add Google Fonts links for Inter and JetBrains Mono in `apps/web/index.html` and wire font variables in `styles.css`. | M2 | survey / Explorer 2 report |
-| 8 | React Landing Page Production Parity | Update `apps/web/src/App.tsx` and subcomponents to reflect Framer visual design, typography, layout hierarchy, and copy. | M2 | survey / ORIGINAL_REQUEST §R2 |
-| 9 | Foundation & Test Suite Gate | Ensure `pnpm test` (all workspace tests) and `pnpm verify:foundation` pass with 0 errors. | M3 | survey / ORIGINAL_REQUEST §Acceptance Criteria |
-| 10 | Independent Adversarial & Integrity Audit | Challenge responsiveness, copy compliance, and run Forensic Integrity Audit (`teamwork_preview_auditor`). | M3 | survey / AGENTS.md & Orchestrator Pattern |
+| 1 | Atmospheric Glass Borders | Replace stark borders with semi-transparent atmospheric glass borders (`border-white/10`) | M1 | ORIGINAL_REQUEST §R1 |
+| 2 | Hero Scale & max-w-5xl | Increase hero headline scale by ~25% with expanded line-height in `max-w-5xl` container | M1 | ORIGINAL_REQUEST §R1 |
+| 3 | Three Conceptual Pillars | Replace generic 1-2-3 steps with SELF — Your Baseline, BETWEEN — Your Relationships, WHOLE — Your Systems | M1 | ORIGINAL_REQUEST §R1 |
+| 4 | Vertical Scroll Expansion Sequence | Implement sequence: `YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS` | M1 | ORIGINAL_REQUEST §R1 |
+| 5 | Static HTML Design System Unification | Ensure all 5 static HTML pages share `tokens.css` while preserving donation anchors | M1 | ORIGINAL_REQUEST §R1 |
+| 6 | Baseline View UI Fragment | Mock context vectors with percentage weights and descriptors, visible above the fold | M1 | ORIGINAL_REQUEST §R2 |
+| 7 | Expression View UI Fragment | Textual contrast between raw query input and Sovereign contextual breakdown | M1 | ORIGINAL_REQUEST §R2 |
+| 8 | System Map View UI Fragment | Compact SVG/CSS multi-party relationship vector node diagram without errors | M1 | ORIGINAL_REQUEST §R2 |
+| 9 | Auto-Resize Textarea Composer | Clamped scrollHeight expansion (44px–200px) with Enter/Shift+Enter handling | M2 | ORIGINAL_REQUEST §R3 |
+| 10 | Three-Block Message Rendering | Separate User block, Sovereign Answer block (with exploration cards), and Sources drawer | M2 | ORIGINAL_REQUEST §R3 |
+| 11 | Compliant Collapsible Sources Drawer | Collapsible drawer strictly labeled "Sources" / "Source details" (NEVER "Basis") | M2 | ORIGINAL_REQUEST §R3 |
+| 12 | Passkey Header Badge | Conditionally rendered sage passkey badge based on session state | M2 | ORIGINAL_REQUEST §R3 |
+| 13 | Thread SSE & Idempotency Key | Stream messages from `/api/v1/threads/{id}/messages` with required `x-idempotency-key` | M2 | ORIGINAL_REQUEST §R3 |
+| 14 | Webhook Route & Missing Signature Check | POST to `/api/billing/webhook` returns 400 for missing/invalid `stripe-signature` header | M3 | ORIGINAL_REQUEST §R4 |
+| 15 | Five Stripe Webhook Events | Handle `checkout.session.completed`, `invoice.payment_succeeded`, `invoice.payment_failed`, `customer.subscription.updated`, `customer.subscription.deleted` | M3 | ORIGINAL_REQUEST §R4 |
+| 16 | 402 Payment Required Middleware | Require `sovereign_pro` tier on protected workspace route, returning HTTP 402 | M3 | ORIGINAL_REQUEST §R4 |
+| 17 | Zero Hardcoded Stripe Secrets | Read secrets solely from worker environment bindings; pass `scan:secrets` | M3 | ORIGINAL_REQUEST §R4 |
+| 18 | D1 Migration Target Immutability | Strictly maintain canonical target at `0019_deprecate_manual_capacity.sql`; zero new migrations | M3 | ORIGINAL_REQUEST §Key Context |
+| 19 | Monorepo Gate Suite | Zero errors across `pnpm typecheck`, `pnpm build`, `pnpm test`, `pnpm verify:foundation` | M4 | ORIGINAL_REQUEST §R5 |
+| 20 | Deployment Verification & Evidence | Deploy via `pnpm production:release:text` and document release commit SHA | M4 | ORIGINAL_REQUEST §R5 |
 
 ## Milestones
 | # | Name | Scope | Dependencies | Status |
 |---|------|-------|-------------|--------|
-| M1 | Framer Visual Design Exploration & Alignment | Restructure canvas, insert 3-layer scope, wire hero and demo triad, publish to `nice-pluto-305324.framer.app`, and verify live site. | None | DONE |
-| M2 | React Codebase Production Parity | Integrate Inter & JetBrains Mono fonts, update `apps/web/src/App.tsx` and components to match Framer visual hierarchy and copy. | M1 | DONE |
-| M3 | Verification, Adversarial Challenge & Forensic Audit Gate | Run full test suite, foundation verification, build, typecheck, multi-reviewer review, challenger stress-testing, and forensic audit. | M2 | DONE |
+| M1 | Frontend Design System & UI Fragments (R1 & R2) | Hero scale, glass borders, Conceptual Pillars, Expansion Sequence, Baseline/Expression/System Map UI fragments, static HTML unification | Survey | DONE |
+| M2 | Chat Thread Component Polish & Passkey (R3) | `SovereignThread.tsx`, auto-resize textarea, 3 message blocks, Sources drawer, passkey badge, SSE integration, unit tests | Survey | DONE |
+| M3 | Stripe Billing Webhook & 402 Middleware (R4) | `/api/billing/webhook` route, missing-signature 400, 5 events, `requireProTier` 402 middleware, zero new migrations, unit tests | Survey | DONE |
+| M4 | Gate Verification, Forensic Audit & Deployment (R5) | Monorepo gate testing, independent Reviewer & Challenger verification, Forensic Integrity Audit, and deployment execution | M1, M2, M3 | DONE |
 
 ## Interface Contracts
-### Framer ↔ React UI Alignment
-- **Foundational Color Tokens**:
-  - Background: `#000000` (canvas) / `#050505` (surface) / `#0c0c0e` (cards)
-  - Borders: `1px solid rgba(255, 255, 255, 0.08)`
-  - Text: `#f4f0e8` (cream primary), `#a3a099` (muted secondary), `#686660` (subtle captions)
-  - Accent: `#9fbaa1` (restrained sage, badges / active states)
-- **Typography Matrix**:
-  - Sans: `Inter`, system fallbacks (headings, body, actions)
-  - Mono: `JetBrains Mono`, monospace fallbacks (kickers, numbering, badges, terminal labels)
-- **Relational Triad Labels**:
-  - Section 1: `WHAT YOU MAY BE BRINGING`
-  - Section 2: `WHAT THEY MAY BE BRINGING`
-  - Section 3: `WHAT HAPPENS BETWEEN YOU`
-  - Attribution: `Sources` / `See source details` (NEVER `Basis`)
+### UI Fragment Integration Contract
+- `BaselineViewFragment`: Exports `BaselineViewFragment({ compact?: boolean })`. Purely presentational, zero API calls, renders context vectors.
+- `ExpressionViewFragment`: Exports `ExpressionViewFragment()`. Purely presentational, zero API calls.
+- `SystemMapViewFragment`: Exports `SystemMapViewFragment()`. Purely presentational, zero API calls, renders SVG network.
+- `PublicLanding.v2.tsx`: Renders `BaselineViewFragment` above the fold in the Hero stage, and embeds all three fragments in the `YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS` expansion sequence.
+
+### Chat Thread Contract
+- `SovereignThread`:
+  - Props: `{ threadId?: string, session?: AuthSession | null, hasVerifiedPasskey?: boolean, surface?: string, initialMessages?: ChatMessage[], onTurnComplete?: (msg: ChatMessage) => void }`
+  - Textarea: auto-resizes via `scrollHeight` clamped between 44px and 200px.
+  - Message Blocks: User inquiry, Sovereign Answer, Collapsible Sources drawer.
+  - Language Law: Never renders "Basis", "sovereign-answer.v2", or "model-safe context".
+  - SSE Request: Includes `'x-idempotency-key': 'turn_' + crypto.randomUUID()`.
+
+### Billing & Security Contract
+- Route: `POST /api/billing/webhook` and `POST /api/v1/stripe/webhook`
+- Missing Signature Header: Returns HTTP 400 with text `'Invalid signature'`.
+- Events Handled:
+  1. `checkout.session.completed` -> upserts `stripe_customers`
+  2. `invoice.payment_succeeded` -> reconciles active subscription
+  3. `invoice.payment_failed` -> updates subscription to `past_due`, sets entitlement to `free`, triggers `payment_attention` notification
+  4. `customer.subscription.updated` -> projects subscription status
+  5. `customer.subscription.deleted` -> projects subscription cancellation
+- Protected Pro Route:
+  - `GET /api/v1/workspace/pro` -> returns HTTP 402 `{ error: 'payment_required', requiredTier: 'sovereign_pro' }` when account plan is not `sovereign_pro`.
+- Secrets: strictly read from `env.STRIPE_WEBHOOK_SECRET` and `env.STRIPE_SECRET_KEY`.

@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import type { FormEvent, ReactNode } from 'react';
+import { SovereignThread } from './components/chat/SovereignThread';
+import type { AuthSession } from './lib/api';
 
 type TurnState = 'idle' | 'streaming' | 'complete' | 'error';
 
@@ -14,8 +16,13 @@ interface ChatTurn {
   };
 }
 
-interface SovereignChatWorkspaceProps {
+export interface SovereignChatWorkspaceProps {
   threadId?: string;
+  session?: (AuthSession & { hasPasskey?: boolean; passkeyVerified?: boolean }) | null;
+  hasVerifiedPasskey?: boolean;
+  surface?: 'Today' | 'Explore' | 'People' | 'Systems' | string;
+  useModernThread?: boolean;
+  className?: string;
 }
 
 const SUGGESTED_INQUIRIES = [
@@ -25,7 +32,26 @@ const SUGGESTED_INQUIRIES = [
   'How should I approach this decision?'
 ];
 
-export function SovereignChatWorkspace({ threadId: initialThreadId }: SovereignChatWorkspaceProps) {
+export function SovereignChatWorkspace({
+  threadId: initialThreadId,
+  session,
+  hasVerifiedPasskey,
+  surface = 'Today',
+  useModernThread = true,
+  className = ''
+}: SovereignChatWorkspaceProps) {
+  if (useModernThread) {
+    return (
+      <SovereignThread
+        threadId={initialThreadId}
+        session={session}
+        hasVerifiedPasskey={hasVerifiedPasskey}
+        surface={surface}
+        className={className}
+      />
+    );
+  }
+
   const [threadId, setThreadId] = useState(initialThreadId || `thread-${Date.now()}`);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
   const [draft, setDraft] = useState('');
@@ -78,11 +104,13 @@ export function SovereignChatWorkspace({ threadId: initialThreadId }: SovereignC
     setTurns((prev) => [...prev, sovereignTurn]);
 
     try {
+      const idempotencyKey = `turn_${crypto.randomUUID()}`;
       const response = await fetch(`/api/v1/threads/${encodeURIComponent(threadId)}/messages`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          'accept': 'text/event-stream'
+          'accept': 'text/event-stream',
+          'x-idempotency-key': idempotencyKey
         },
         body: JSON.stringify({ message: inquiry })
       });
@@ -226,7 +254,7 @@ export function SovereignChatWorkspace({ threadId: initialThreadId }: SovereignC
                     {turn.metadata?.groundingSources && (
                       <div className="turn-sources">
                         <small>
-                          <strong>Grounded in:</strong> {turn.metadata.groundingSources.join(' • ')}
+                          <strong>Sources:</strong> {turn.metadata.groundingSources.join(' • ')}
                         </small>
                       </div>
                     )}
@@ -285,3 +313,7 @@ export function SovereignChatWorkspace({ threadId: initialThreadId }: SovereignC
     </div>
   );
 }
+
+export { SovereignThread };
+export type { ChatMessage } from './components/chat/SovereignThread';
+

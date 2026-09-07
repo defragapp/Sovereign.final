@@ -1,7 +1,7 @@
 import type { Env } from '../env';
 import { FEATURE_KEYS } from '../db/product';
 
-export type PlanKey = 'free' | 'sovereign_plus';
+export type PlanKey = 'free' | 'sovereign_plus' | 'sovereign_pro';
 export type BillingInterval = 'monthly' | 'annual';
 export interface CheckoutResult { url: string; sessionId: string; plan: 'sovereign_plus'; interval: BillingInterval; }
 export interface PortalResult { url: string; sessionId: string; }
@@ -120,7 +120,8 @@ function testBillingUrl(kind: 'checkout' | 'portal', sessionId: string): string 
 
 const PLAN_FEATURES: Record<PlanKey, string[]> = {
   free: ['baseline.today', 'baseline.explore'],
-  sovereign_plus: [...FEATURE_KEYS]
+  sovereign_plus: [...FEATURE_KEYS],
+  sovereign_pro: [...FEATURE_KEYS]
 };
 
 export function resolveFeatureSet(plan: PlanKey) {
@@ -136,10 +137,21 @@ export function priceToSubscription(env: Env, priceId?: string): { plan: PlanKey
   if (!priceId) return { plan: 'free' };
   if (priceId === env.STRIPE_PRICE_SOVEREIGN_PLUS_MONTHLY) return { plan: 'sovereign_plus', interval: 'monthly' };
   if (priceId === env.STRIPE_PRICE_SOVEREIGN_PLUS_ANNUAL) return { plan: 'sovereign_plus', interval: 'annual' };
+  const envAny = env as unknown as Record<string, string | undefined>;
+  if (envAny.STRIPE_PRICE_SOVEREIGN_PRO_MONTHLY && priceId === envAny.STRIPE_PRICE_SOVEREIGN_PRO_MONTHLY) {
+    return { plan: 'sovereign_pro', interval: 'monthly' };
+  }
+  if (envAny.STRIPE_PRICE_SOVEREIGN_PRO_ANNUAL && priceId === envAny.STRIPE_PRICE_SOVEREIGN_PRO_ANNUAL) {
+    return { plan: 'sovereign_pro', interval: 'annual' };
+  }
   const testMonthly = ['price', 'test', 'sovereign', 'monthly'].join('_');
   const testAnnual = ['price', 'test', 'sovereign', 'annual'].join('_');
+  const testProMonthly = ['price', 'test', 'sovereign', 'pro', 'monthly'].join('_');
+  const testProAnnual = ['price', 'test', 'sovereign', 'pro', 'annual'].join('_');
   if (allowTestBilling(env) && priceId === testMonthly) return { plan: 'sovereign_plus', interval: 'monthly' };
   if (allowTestBilling(env) && priceId === testAnnual) return { plan: 'sovereign_plus', interval: 'annual' };
+  if (allowTestBilling(env) && priceId === testProMonthly) return { plan: 'sovereign_pro', interval: 'monthly' };
+  if (allowTestBilling(env) && priceId === testProAnnual) return { plan: 'sovereign_pro', interval: 'annual' };
   throw new Response('Unknown Stripe price', { status: 400 });
 }
 
@@ -159,7 +171,7 @@ async function checkoutIntegrationIdentifier(idempotencyKey: string): Promise<st
 
 async function activeSubscription(env: Env, accountId: string) {
   return env.DB.prepare(`SELECT id, status FROM stripe_subscriptions
-    WHERE account_id = ? AND plan_key = 'sovereign_plus' AND status IN ('active','trialing')
+    WHERE account_id = ? AND plan_key IN ('sovereign_plus', 'sovereign_pro') AND status IN ('active','trialing')
     ORDER BY updated_at DESC LIMIT 1`)
     .bind(accountId)
     .first<{ id: string; status: string }>();
@@ -366,8 +378,8 @@ export async function projectSubscriptionEvent(env: Env, event: NormalizedStripe
   const applied = (result.meta?.changes ?? 0) > 0;
   if (!applied) return { applied: false, stale: true };
 
-  const effectivePlan: PlanKey = event.plan === 'sovereign_plus' && ACTIVE_SUBSCRIPTION_STATUSES.has(event.status)
-    ? 'sovereign_plus'
+  const effectivePlan: PlanKey = (event.plan === 'sovereign_plus' || event.plan === 'sovereign_pro') && ACTIVE_SUBSCRIPTION_STATUSES.has(event.status)
+    ? event.plan
     : 'free';
   await env.DB.prepare(`INSERT INTO entitlement_cache (account_id, plan, features_json, as_of, source_event_id, updated_at)
     VALUES (?, ?, ?, datetime('now'), ?, datetime('now'))

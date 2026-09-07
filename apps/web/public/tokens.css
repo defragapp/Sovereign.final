@@ -1,0 +1,82 @@
+/* ==========================================================================
+   Sovereign.OS — Authoritative Design Tokens (Unified Static HTML Pages)
+   Monochrome base tokens, atmospheric glass variables, Inter/JetBrains Mono,
+   and compatibility mappings for static HTML routes.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* ── Monochrome Foundations ── */
+  --platform-bg: #000000;
+  --sov-page: #000000;
+  --sov-page-soft: #050507;
+  --sov-panel: #0d0d10;
+  --sov-panel-raised: #141418;
+  --sov-surface: #0a0a0d;
+  --sov-surface-raised: #121216;
+
+  /* ── Typography Colors ── */
+  --sov-ink: #ffffff;
+  --sov-ink-soft: #f4f4f6;
+  --sov-muted: #94949e;
+  --sov-faint: #63636e;
+  --sov-paper: #ffffff;
+  --sov-paper-ink: #000000;
+
+  /* ── Glassmorphism Primitives ── */
+  --sov-glass-bg: rgba(255, 255, 255, 0.035);
+  --sov-glass-bg-hover: rgba(255, 255, 255, 0.07);
+  --sov-glass-border: rgba(255, 255, 255, 0.10);
+  --sov-glass-border-hover: rgba(255, 255, 255, 0.22);
+  --sov-glass-blur: blur(16px);
+  --sov-glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* ── Lines & Dividers ── */
+  --sov-line: rgba(255, 255, 255, 0.08);
+  --sov-line-soft: rgba(255, 255, 255, 0.05);
+  --sov-line-strong: rgba(255, 255, 255, 0.18);
+
+  /* ── Accents & Brand Fallbacks ── */
+  --sov-sage: #9fbaa1;
+  --sov-sage-soft: rgba(159, 186, 161, 0.12);
+  --sov-sage-border: rgba(159, 186, 161, 0.28);
+  --sov-clay: #dda273;
+  --sov-danger: #ef4444;
+
+  /* ── Typography Stacks ── */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* ── Radii & Motion ── */
+  --sov-radius-container: 16px;
+  --sov-radius-panel: 14px;
+  --sov-radius-card: 14px;
+  --sov-radius-input: 12px;
+  --sov-radius-btn: 8px;
+  --sov-motion-timing: 220ms;
+  --sov-ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ── Compatibility Aliases for Legacy Static CSS ── */
+  --v0-page: var(--sov-page);
+  --v0-panel: var(--sov-panel);
+  --v0-cream: var(--sov-ink-soft);
+  --v0-muted: var(--sov-muted);
+  --v0-line: var(--sov-line);
+  --v0-line-strong: var(--sov-line-strong);
+  --v0-blue: var(--sov-ink-soft);
+  --sov-bg-0: var(--sov-page);
+  --sov-bg-1: var(--sov-panel);
+  --sov-cream: var(--sov-ink-soft);
+  --bronze-accent: var(--sov-sage);
+}
+
+body.launch-page,
+body.consent-page,
+body.not-found-page,
+body.pricing-page,
+body.faq-page,
+body.how-page {
+  background-color: var(--sov-page) !important;
+  color: var(--sov-ink) !important;
+}

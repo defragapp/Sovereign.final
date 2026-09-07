@@ -1,5 +1,5 @@
 import type { Env } from '../env';
-import { priceToSubscription, projectSubscriptionEvent, type NormalizedStripeEvent } from '../billing/stripe';
+import { enabledFeatureKeys, priceToSubscription, projectSubscriptionEvent, type NormalizedStripeEvent, type PlanKey } from '../billing/stripe';
 import { notifyBillingLifecycle, type BillingNotificationKind } from '../billing/notifications';
 import { verifyStripeSignature } from '../security/stripe-signature';
 
@@ -113,13 +113,170 @@ export async function handleStripeWebhook(request: Request, env: Env): Promise<R
     if (existing?.processed_at) return Response.json({ received: true, duplicate: true, processed: true });
   }
 
-  if (!SUBSCRIPTION_EVENTS.has(event.type)) {
+  const HANDLED_EVENTS = new Set([
+    'checkout.session.completed',
+    'invoice.payment_succeeded',
+    'invoice.payment_failed',
+    ...SUBSCRIPTION_EVENTS
+  ]);
+
+  if (!HANDLED_EVENTS.has(event.type)) {
     await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now'), error_code = NULL
       WHERE provider = 'stripe' AND event_id = ?`).bind(event.id).run();
     return Response.json({ received: true, projected: false });
   }
 
   try {
+    if (event.type === 'checkout.session.completed') {
+      const object = event.data.object;
+      const customerId = stringValue(object.customer);
+      const accountId = metadataValue(object, 'account_id') ?? stringValue(object.client_reference_id);
+      const email = typeof (object.customer_details as { email?: unknown })?.email === 'string'
+        ? ((object.customer_details as { email: string }).email).trim().toLowerCase()
+        : undefined;
+
+      if (!accountId || !customerId) {
+        throw new Error('checkout_session_identity_unresolved');
+      }
+
+      await env.DB.prepare(`INSERT INTO stripe_customers (account_id, stripe_customer_id, email_normalized, updated_at)
+        VALUES (?, ?, ?, datetime('now'))
+        ON CONFLICT(account_id) DO UPDATE SET
+          stripe_customer_id = excluded.stripe_customer_id,
+          email_normalized = COALESCE(excluded.email_normalized, stripe_customers.email_normalized),
+          updated_at = datetime('now')`)
+        .bind(accountId, customerId, email ?? null)
+        .run();
+
+      await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now'), error_code = NULL
+        WHERE provider = 'stripe' AND event_id = ?`).bind(event.id).run();
+
+      return Response.json({
+        received: true,
+        projected: true,
+        customerLinked: true,
+        accountId,
+        customerId
+      });
+    }
+
+    if (event.type === 'invoice.payment_succeeded') {
+      const object = event.data.object;
+      const subscriptionId = stringValue(object.subscription);
+      const customerId = stringValue(object.customer);
+      let accountId = metadataValue(object, 'account_id');
+
+      if (!accountId && subscriptionId) {
+        const subRow = await env.DB.prepare('SELECT account_id FROM stripe_subscriptions WHERE stripe_subscription_id = ?')
+          .bind(subscriptionId)
+          .first<{ account_id: string }>();
+        if (subRow) accountId = subRow.account_id;
+      }
+      if (!accountId && customerId) {
+        const custRow = await env.DB.prepare('SELECT account_id FROM stripe_customers WHERE stripe_customer_id = ?')
+          .bind(customerId)
+          .first<{ account_id: string }>();
+        if (custRow) accountId = custRow.account_id;
+      }
+
+      if (subscriptionId) {
+        await env.DB.prepare(`UPDATE stripe_subscriptions
+          SET status = 'active', updated_at = datetime('now')
+          WHERE stripe_subscription_id = ?`)
+          .bind(subscriptionId)
+          .run();
+      }
+
+      if (accountId && subscriptionId) {
+        const subRow = await env.DB.prepare('SELECT plan_key FROM stripe_subscriptions WHERE stripe_subscription_id = ?')
+          .bind(subscriptionId)
+          .first<{ plan_key: string }>();
+        if (subRow && (subRow.plan_key === 'sovereign_plus' || subRow.plan_key === 'sovereign_pro')) {
+          const plan = subRow.plan_key as PlanKey;
+          await env.DB.prepare(`INSERT INTO entitlement_cache (account_id, plan, features_json, as_of, source_event_id, updated_at)
+            VALUES (?, ?, ?, datetime('now'), ?, datetime('now'))
+            ON CONFLICT(account_id) DO UPDATE SET
+              plan = excluded.plan,
+              features_json = excluded.features_json,
+              as_of = excluded.as_of,
+              source_event_id = excluded.source_event_id,
+              updated_at = excluded.updated_at`)
+            .bind(accountId, plan, JSON.stringify(enabledFeatureKeys(plan)), event.id)
+            .run();
+        }
+      }
+
+      await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now'), error_code = NULL
+        WHERE provider = 'stripe' AND event_id = ?`).bind(event.id).run();
+
+      return Response.json({
+        received: true,
+        processed: true,
+        subscriptionConfirmed: true,
+        subscriptionId: subscriptionId ?? null,
+        accountId: accountId ?? null
+      });
+    }
+
+    if (event.type === 'invoice.payment_failed') {
+      const object = event.data.object;
+      const subscriptionId = stringValue(object.subscription);
+      const customerId = stringValue(object.customer);
+      let accountId = metadataValue(object, 'account_id');
+
+      if (!accountId && subscriptionId) {
+        const subRow = await env.DB.prepare('SELECT account_id FROM stripe_subscriptions WHERE stripe_subscription_id = ?')
+          .bind(subscriptionId)
+          .first<{ account_id: string }>();
+        if (subRow) accountId = subRow.account_id;
+      }
+      if (!accountId && customerId) {
+        const custRow = await env.DB.prepare('SELECT account_id FROM stripe_customers WHERE stripe_customer_id = ?')
+          .bind(customerId)
+          .first<{ account_id: string }>();
+        if (custRow) accountId = custRow.account_id;
+      }
+
+      if (subscriptionId) {
+        await env.DB.prepare(`UPDATE stripe_subscriptions
+          SET status = 'past_due', updated_at = datetime('now')
+          WHERE stripe_subscription_id = ?`)
+          .bind(subscriptionId)
+          .run();
+      }
+
+      if (accountId) {
+        await env.DB.prepare(`INSERT INTO entitlement_cache (account_id, plan, features_json, as_of, source_event_id, updated_at)
+          VALUES (?, 'free', ?, datetime('now'), ?, datetime('now'))
+          ON CONFLICT(account_id) DO UPDATE SET
+            plan = 'free',
+            features_json = excluded.features_json,
+            as_of = excluded.as_of,
+            source_event_id = excluded.source_event_id,
+            updated_at = excluded.updated_at`)
+          .bind(accountId, JSON.stringify(enabledFeatureKeys('free')), event.id)
+          .run();
+
+        await notifyBillingLifecycle(env, {
+          eventId: event.id,
+          accountId,
+          kind: 'payment_attention',
+          status: 'past_due',
+          effectivePlan: 'free'
+        });
+      }
+
+      await env.DB.prepare(`UPDATE webhook_events SET processed_at = datetime('now'), error_code = NULL
+        WHERE provider = 'stripe' AND event_id = ?`).bind(event.id).run();
+
+      return Response.json({
+        received: true,
+        processed: true,
+        paymentFailed: true,
+        subscriptionId: subscriptionId ?? null,
+        accountId: accountId ?? null
+      });
+    }
     const normalized = await normalizeSubscriptionEvent(env, event);
     const projection = await projectSubscriptionEvent(env, normalized);
     const kind = projection.applied ? notificationKind(normalized) : undefined;
