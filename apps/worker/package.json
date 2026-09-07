@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "wrangler dev --local --inspector-port=9320 --port=8789",
     "build": "wrangler deploy --dry-run --config wrangler.jsonc --outdir dist",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",

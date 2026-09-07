@@ -18,6 +18,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useInView } from '@/hooks/useInView';
+import { Accordion, type AccordionItem } from '@/components/Accordion';
 import {
   checkSession,
   requestSignup,
@@ -154,18 +156,23 @@ export function App() {
 /* =========================================================================
    PUBLIC HEADER
    ========================================================================= */
+/* =========================================================================
+   PUBLIC HEADER
+   ========================================================================= */
 function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[var(--ink)]/80 backdrop-blur-md">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6 md:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-[rgba(255,255,255,0.08)] bg-[var(--ink)]/85 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-8">
         <button aria-label="Sovereign home" onClick={() => go('/')} className="flex items-center gap-2.5 group shrink-0">
           <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
-          <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign</span>
+          <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign.OS</span>
         </button>
-        <nav className="hidden items-center gap-8 md:flex">
-  <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">How it works</button>
-</nav>
-        <div className="flex items-center gap-3 shrink-0">
+        <nav className="hidden items-center gap-12 md:flex">
+          <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">How it works</button>
+          <button onClick={() => go('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">Pricing</button>
+          <button onClick={() => go('/faq')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">FAQ</button>
+        </nav>
+        <div className="flex items-center gap-4 shrink-0">
           <button
             onClick={() => go('/login')}
             className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] px-2.5 py-1.5 transition-colors whitespace-nowrap"
@@ -174,9 +181,9 @@ function Header() {
           </button>
           <button
             onClick={() => go('/signup')}
-            className="rounded-full bg-[var(--cream)] px-3.5 py-1.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm"
+            className="rounded-full bg-[var(--cream)] px-4 py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm"
           >
-            Get started
+            Build Your Baseline
           </button>
         </div>
       </div>
@@ -188,47 +195,75 @@ function Header() {
    PUBLIC LANDING PAGE — SOVEREIGN.OS NARRATIVE PROGRESSION
    ========================================================================= */
 function Landing() {
-  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const heroView = useInView({ threshold: 0.1 });
+  const previewView = useInView({ threshold: 0.1 });
+  const engineView = useInView({ threshold: 0.1 });
+  const selfView = useInView({ threshold: 0.1 });
+  const peopleView = useInView({ threshold: 0.1 });
+  const systemsView = useInView({ threshold: 0.1 });
+  const pricingView = useInView({ threshold: 0.1 });
+  const finalView = useInView({ threshold: 0.1 });
 
-  const sampleQuestions = [
-    "Why do I keep overthinking what to say when I feel misunderstood?",
-    "How can I set a clear boundary without causing avoidable tension?"
+  const baselineAccordionItems: AccordionItem[] = [
+    {
+      id: 'overthinking',
+      question: 'Why do I keep overthinking what to say when I feel misunderstood?',
+      observation: 'Your Baseline requires reflective processing before articulation. When you feel misunderstood, you instinctively draft multiple speech variants in real time to prevent incorrect perceptions.',
+      pattern: 'Over-refinement is an attempt to manage the other party\'s internal reaction before they have finished processing.',
+      shift: 'Separate the observation from the resolution. Name the disconnect cleanly, pause the conversation, and return only when your internal clarity stabilizes.'
+    },
+    {
+      id: 'boundaries',
+      question: 'How can I set a clear boundary without causing avoidable tension?',
+      observation: 'Your communication tendency defaults to softening statements under relational pressure, which can obscure the boundary line.',
+      pattern: 'Conflating clarity with aggression leads you to overexplain your reasons, inviting debate on the condition rather than securing the boundary.',
+      shift: 'State the boundary in one declarative sentence. Allow the silence after the statement without rushing to reassure.'
+    },
+    {
+      id: 'pressure',
+      question: 'Why do I take on full responsibility when group expectations collapse?',
+      observation: 'Under group stress, your Baseline activates early overfunctioning as an internal stabilizer.',
+      pattern: 'Absorbing unassigned responsibility protects the team pace short-term but creates structural resentment long-term.',
+      shift: 'Pause before stepping into vacant execution roles. Distinguish between your commitment and the group\'s system mechanics.'
+    }
   ];
 
   return (
-    <div className="page-noise min-h-screen bg-[var(--ink)] text-[var(--cream)]">
+    <div className="page-noise min-h-screen bg-[var(--platform-bg)] text-[var(--cream)] overflow-x-hidden">
       <Header />
 
-      <main className="mx-auto max-w-4xl px-4 sm:px-6 pb-24 md:px-8 space-y-20 sm:space-y-28">
+      <main className="mx-auto max-w-5xl px-6 sm:px-8 pb-32 space-y-24 sm:space-y-32">
         {/* 1. HERO */}
-        <section className="pt-16 sm:pt-24 text-center">
-          <div className="max-w-3xl mx-auto flex flex-col items-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface)] px-3.5 py-1 text-[11px] font-medium text-[var(--muted)] mb-8 tracking-wide">
+        <section
+          ref={heroView.ref}
+          data-visible={heroView.isInView}
+          className="landing-hero pt-20 sm:pt-28 text-center animate-fade-up"
+        >
+          <div className="max-w-3xl mx-auto flex flex-col items-center relative z-10">
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[var(--surface)] px-4 py-1.5 text-[11px] font-medium text-[var(--muted)] mb-10 tracking-wide">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
-              <span>PERSONAL AI FOR REAL LIFE</span>
+              <span>PRIVATE PERSONAL AI</span>
             </div>
 
-            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-tight text-[var(--cream)] leading-[1.06]">
-              Understand yourself.<br />
-              Understand your people.<br />
-              See the whole system.
+            <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-[0.02em] text-[var(--cream)] leading-[1.08]">
+              Know how you operate.<br />
+              Read the room.
             </h1>
 
-            <p className="mt-6 max-w-xl font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
-              Private AI that builds a personal reference from your Baseline, helping you see yourself, your relationships, and the systems you belong to.
-
+            <p className="mt-8 max-w-2xl font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
+              Sovereign is private AI built on your Baseline. It does not give generic advice. It uses your unique mechanics to decode decisions, navigate relationship friction, and expose unseen dynamics in groups.
             </p>
 
-            <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
+            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
               <button
                 onClick={() => go('/signup')}
-                className="rounded-full bg-[var(--cream)] px-7 py-3 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-md hover:scale-[1.01]"
+                className="bg-[var(--cream)] text-[var(--ink)] px-8 py-3.5 rounded-full font-medium shadow-md transition-transform duration-200 hover:scale-[1.01]"
               >
-                Get started
+                Build Your Baseline
               </button>
               <button
                 onClick={() => go('/how-it-works')}
-                className="rounded-full border border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-sm font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-all"
+                className="rounded-full border border-[rgba(255,255,255,0.12)] bg-transparent px-7 py-3.5 text-sm font-medium text-[var(--cream)] hover:border-[rgba(255,255,255,0.24)] hover:bg-[var(--surface-2)] transition-all"
               >
                 How it works
               </button>
@@ -236,45 +271,190 @@ function Landing() {
           </div>
         </section>
 
-        
+        {/* 2. DEMONSTRATION UI OUTPUT (WORKSPACE CARD) */}
+        <section
+          ref={previewView.ref}
+          data-visible={previewView.isInView}
+          className="mt-24 py-8 animate-fade-up"
+        >
+          <div className="rounded-3xl border border-[rgba(255,255,255,0.08)] bg-[#0e1011] p-6 sm:p-10 shadow-2xl space-y-6">
+            {/* Inquiry Header */}
+            <div className="flex items-start justify-between border-b border-[rgba(255,255,255,0.06)] pb-6">
+              <div className="space-y-1">
+                <span className="font-utility text-[10px] text-[var(--subtle)]">INQUIRY</span>
+                <p className="font-statement text-base sm:text-xl text-[var(--cream)] font-medium">
+                  &ldquo;Why do I keep overthinking what to say when I feel misunderstood?&rdquo;
+                </p>
+              </div>
+              <span className="rounded-full border border-[rgba(255,255,255,0.08)] bg-[var(--surface)] px-3 py-1 text-[10px] font-utility text-[var(--sage)] shrink-0 hidden sm:inline-block">
+                BASELINE GROUNDED
+              </span>
+            </div>
 
-        {/* 5. WHY THIS AI IS DIFFERENT */}
-        <section className="border-t border-[var(--line)] pt-16 sm:pt-20 text-center">
-          <div className="max-w-2xl mx-auto space-y-4">
-            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">WHY THIS AI IS DIFFERENT</span>
-            <h2 className="font-statement text-2xl sm:text-4xl text-[var(--cream)] font-medium">
-              Most AI starts with the prompt.<br />
-              Sovereign starts with you.
+            {/* Structured Sovereign Answer v2 */}
+            <div className="space-y-6 pt-2">
+              <div className="space-y-2">
+                <span className="font-utility text-[10px] text-[var(--sage)]">GROUNDED OBSERVATION</span>
+                <p className="font-explanation text-sm sm:text-base text-[var(--cream)]/90 leading-relaxed">
+                  Your Baseline requires reflective processing before articulation. When you feel misunderstood, you instinctively draft multiple speech variants in real time to prevent incorrect perceptions.
+                </p>
+              </div>
+
+              <div className="space-y-2 border-t border-[rgba(255,255,255,0.05)] pt-5">
+                <span className="font-utility text-[10px] text-[var(--sage)]">THE STRUCTURAL PATTERN</span>
+                <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+                  Over-refinement is an attempt to manage the other party&apos;s internal reaction before they have finished processing.
+                </p>
+              </div>
+
+              <div className="space-y-2 border-t border-[rgba(255,255,255,0.05)] pt-5">
+                <span className="font-utility text-[10px] text-[var(--sage)]">THE SHIFT</span>
+                <p className="font-explanation text-sm sm:text-base text-[var(--cream)] font-medium leading-relaxed">
+                  Separate the observation from the resolution. Name the disconnect cleanly, pause the conversation, and return only when your internal clarity stabilizes.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. THE ENGINE (THE BASELINE PITCH) */}
+        <section
+          ref={engineView.ref}
+          data-visible={engineView.isInView}
+          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 text-center animate-fade-up"
+        >
+          <div className="max-w-2xl mx-auto space-y-6">
+            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">THE BASELINE ENGINE</span>
+            <h2 className="font-display text-3xl sm:text-5xl text-[var(--cream)] leading-tight">
+              Context that doesn&apos;t reset.
             </h2>
-            <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-              Generic chatbots start blank every time you ask a question. Sovereign maintains your private Baseline so every answer understands your patterns, communication style, and values without requiring you to re-explain yourself.
+            <p className="font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
+              Most AI starts from zero every time you open a tab. Sovereign doesn&apos;t. Your Baseline is a secure, living reference of how you process pressure, communicate under stress, and make decisions. Every inquiry is grounded in your exact mechanics.
             </p>
           </div>
         </section>
 
-        {/* 6. ACCESS & PRICING */}
-        <section className="border-t border-[var(--line)] pt-16 sm:pt-20">
+        {/* 4. THREE-TIER NARRATIVE ARCHITECTURE */}
+        <div className="space-y-20 sm:space-y-24">
+          {/* 01 / SELF */}
+          <section
+            ref={selfView.ref}
+            data-visible={selfView.isInView}
+            className="border-t border-[rgba(255,255,255,0.08)] pt-16 sm:pt-20 animate-fade-up"
+          >
+            <div className="grid md:grid-cols-12 gap-8 items-start">
+              <div className="md:col-span-5 space-y-4">
+                <span className="font-utility text-xs text-[var(--sage)]">01 / SELF</span>
+                <h3 className="font-display text-2xl sm:text-4xl text-[var(--cream)]">
+                  Personal Baseline
+                </h3>
+                <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+                  <em className="text-[var(--cream)] not-italic font-medium">Clarity on your own mechanics.</em> Stop second-guessing your instincts. See your blind spots, trace your decision loops, and understand why you hit recurring walls.
+                </p>
+              </div>
+
+              <div className="md:col-span-7">
+                <Accordion items={baselineAccordionItems} />
+              </div>
+            </div>
+          </section>
+
+          {/* 02 / PEOPLE */}
+          <section
+            ref={peopleView.ref}
+            data-visible={peopleView.isInView}
+            className="border-t border-[rgba(255,255,255,0.08)] pt-16 sm:pt-20 animate-fade-up"
+          >
+            <div className="grid md:grid-cols-12 gap-8 items-center">
+              <div className="md:col-span-5 space-y-4">
+                <span className="font-utility text-xs text-[var(--sage)]">02 / PEOPLE</span>
+                <h3 className="font-display text-2xl sm:text-4xl text-[var(--cream)]">
+                  Relational Inquiry
+                </h3>
+                <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+                  <em className="text-[var(--cream)] not-italic font-medium">Map the friction.</em> Compare your Baseline against a partner, colleague, or collaborator. Expose the structural root of recurring miscommunications without assigning blame.
+                </p>
+              </div>
+
+              <div className="md:col-span-7 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface)] p-6 sm:p-8 space-y-4">
+                <div className="flex items-center justify-between text-xs font-utility text-[var(--subtle)] border-b border-[rgba(255,255,255,0.06)] pb-3">
+                  <span>RELATIONAL OVERLAY</span>
+                  <span>PAIR MECHANICS</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="text-sm font-statement text-[var(--cream)]">
+                    Direct Speech vs. Reflective Processing
+                  </div>
+                  <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+                    When Partner A demands immediate resolution during tension, Partner B&apos;s Baseline shifts into withdrawal to process. This sequence creates an escalating pursuit loop unrelated to love or commitment.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 03 / SYSTEMS */}
+          <section
+            ref={systemsView.ref}
+            data-visible={systemsView.isInView}
+            className="border-t border-[rgba(255,255,255,0.08)] pt-16 sm:pt-20 animate-fade-up"
+          >
+            <div className="grid md:grid-cols-12 gap-8 items-center">
+              <div className="md:col-span-5 space-y-4">
+                <span className="font-utility text-xs text-[var(--sage)]">03 / SYSTEMS</span>
+                <h3 className="font-display text-2xl sm:text-4xl text-[var(--cream)]">
+                  System Dynamics
+                </h3>
+                <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+                  <em className="text-[var(--cream)] not-italic font-medium">Expose the invisible tension.</em> Map group dynamics across teams, families, and co-founders. Understand who drives, who absorbs pressure, and where execution breaks down.
+                </p>
+              </div>
+
+              <div className="md:col-span-7 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface)] p-6 sm:p-8 space-y-4">
+                <div className="flex items-center justify-between text-xs font-utility text-[var(--subtle)] border-b border-[rgba(255,255,255,0.06)] pb-3">
+                  <span>SYSTEM MAP</span>
+                  <span>EXECUTIVE TEAM</span>
+                </div>
+                <div className="space-y-3">
+                  <div className="text-sm font-statement text-[var(--cream)]">
+                    Unassigned Pressure Concentration
+                  </div>
+                  <p className="font-explanation text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+                    When strategic goals are ambiguous, systemic pressure concentrates on team members with high responsibility baselines, causing bottlenecking before operational milestones are missed.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* 5. ACCESS & PRICING */}
+        <section
+          ref={pricingView.ref}
+          data-visible={pricingView.isInView}
+          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 animate-fade-up"
+        >
           <div className="max-w-xl">
-            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">Access & Pricing</span>
-            <h2 className="mt-2 font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
+            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">ACCESS & PRICING</span>
+            <h2 className="mt-3 font-display text-3xl sm:text-4xl text-[var(--cream)]">
               Simple, transparent access.
             </h2>
-            <p className="mt-2 font-explanation text-sm text-[var(--muted)]">
+            <p className="mt-3 font-explanation text-sm sm:text-base text-[var(--muted)]">
               Start with your private Baseline at no cost. Add depth when you are ready to examine relationships and whole systems.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 flex flex-col justify-between space-y-6">
-              <div className="space-y-3">
+          <div className="mt-10 grid gap-6 md:grid-cols-2">
+            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface)] p-7 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
                 <div>
                   <span className="font-utility text-xs text-[var(--muted)]">STANDARD</span>
-                  <div className="mt-1 font-statement text-2xl text-[var(--cream)]">Free ($0)</div>
+                  <div className="mt-2 font-display text-3xl text-[var(--cream)]">Free ($0)</div>
                 </div>
-                <p className="font-explanation text-xs text-[var(--muted)]">
+                <p className="font-explanation text-xs sm:text-sm text-[var(--muted)]">
                   A private Baseline and a quiet way to begin asking questions.
                 </p>
-                <div className="space-y-1.5 font-explanation text-xs text-[var(--cream)]/90 pt-1">
+                <div className="space-y-2 font-explanation text-xs text-[var(--cream)]/90 pt-2 border-t border-[rgba(255,255,255,0.05)]">
                   <div>— Private personal Baseline</div>
                   <div>— Today thinking environment</div>
                   <div>— 10 AI turns per month</div>
@@ -282,25 +462,25 @@ function Landing() {
               </div>
               <button
                 onClick={() => go('/signup')}
-                className="w-full rounded-lg border border-[var(--line)] py-2 text-xs font-medium text-[var(--cream)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-2)] transition-colors"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.12)] py-3 text-xs font-medium text-[var(--cream)] hover:border-[rgba(255,255,255,0.24)] hover:bg-[var(--surface-2)] transition-colors"
               >
                 Start Free
               </button>
             </div>
 
-            <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-6 flex flex-col justify-between space-y-6">
-              <div className="space-y-3">
+            <div className="rounded-2xl border border-[rgba(255,255,255,0.16)] bg-[var(--surface-2)] p-7 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
                     <span className="font-utility text-xs text-[var(--sage)]">SOVEREIGN+</span>
-                    <div className="mt-1 font-statement text-2xl text-[var(--cream)]">$20 / mo</div>
+                    <div className="mt-2 font-display text-3xl text-[var(--cream)]">$20 / mo</div>
                   </div>
-                  <Sparkles className="h-4 w-4 text-[var(--sage)]" />
+                  <Sparkles className="h-5 w-5 text-[var(--sage)]" />
                 </div>
-                <p className="font-explanation text-xs text-[var(--muted)]">
+                <p className="font-explanation text-xs sm:text-sm text-[var(--muted)]">
                   Room for deeper personal exploration, relational intelligence, and systems.
                 </p>
-                <div className="space-y-1.5 font-explanation text-xs text-[var(--cream)]/90 pt-1">
+                <div className="space-y-2 font-explanation text-xs text-[var(--cream)]/90 pt-2 border-t border-[rgba(255,255,255,0.05)]">
                   <div>— Everything in Free</div>
                   <div>— 300 AI turns per month</div>
                   <div>— Relational inquiry & system dynamics</div>
@@ -308,7 +488,7 @@ function Landing() {
               </div>
               <button
                 onClick={() => go('/signup')}
-                className="w-full rounded-lg bg-[var(--cream)] py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors"
+                className="w-full rounded-xl bg-[var(--cream)] py-3 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors"
               >
                 Start Sovereign+
               </button>
@@ -316,44 +496,47 @@ function Landing() {
           </div>
         </section>
 
-        {/* 7. FINAL ACTION */}
-        <section className="border-t border-[var(--line)] pt-20 text-center">
-          <div className="max-w-xl mx-auto space-y-6">
-            <SovereignMark size={28} className="mx-auto text-[var(--cream)]" />
-            <h2 className="font-statement text-3xl sm:text-5xl text-[var(--cream)] font-medium leading-tight">
-              Know yourself.<br />
-              Understand your people.<br />
-              See the whole system.
+        {/* 6. FINAL ACTION */}
+        <section
+          ref={finalView.ref}
+          data-visible={finalView.isInView}
+          className="border-t border-[rgba(255,255,255,0.08)] pt-24 text-center animate-fade-up"
+        >
+          <div className="max-w-xl mx-auto space-y-8">
+            <SovereignMark size={32} className="mx-auto text-[var(--cream)]" />
+            <h2 className="font-display text-3xl sm:text-5xl text-[var(--cream)] leading-tight">
+              Know how you operate.<br />
+              Read the room.
             </h2>
-            <p className="font-explanation text-sm sm:text-base text-[var(--muted)]">
+            <p className="font-explanation text-base text-[var(--muted)] max-w-md mx-auto">
               Establish your private reference in under two minutes.
             </p>
             <div className="pt-2">
               <button
                 onClick={() => go('/signup')}
-                className="rounded-full bg-[var(--cream)] px-7 py-3 text-sm font-medium text-[var(--ink)] hover:bg-white transition-all shadow-lg hover:scale-[1.01]"
+                className="bg-[var(--cream)] text-[var(--ink)] px-8 py-3.5 rounded-full font-medium shadow-lg hover:bg-white transition-all hover:scale-[1.01]"
               >
-                Get started
+                Build Your Baseline
               </button>
             </div>
           </div>
         </section>
       </main>
 
-      {/* 7. MINIMAL FOOTER */}
-      <footer className="border-t border-[var(--line)] py-8 text-xs text-[var(--subtle)]">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 md:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* FOOTER */}
+      <footer className="border-t border-[rgba(255,255,255,0.08)] py-10 text-xs text-[var(--subtle)]">
+        <div className="mx-auto max-w-5xl px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <SovereignMark size={14} />
-            <span>Sovereign.OS</span>
+            <span className="font-medium text-[var(--muted)]">Sovereign.OS</span>
           </div>
-          <div className="flex gap-6">
+          <div className="flex gap-6 font-utility text-[10px]">
             <button onClick={() => go('/terms')} className="hover:text-[var(--cream)] transition-colors">Terms</button>
             <button onClick={() => go('/privacy')} className="hover:text-[var(--cream)] transition-colors">Privacy</button>
             <button onClick={() => go('/pricing')} className="hover:text-[var(--cream)] transition-colors">Pricing</button>
             <button onClick={() => go('/faq')} className="hover:text-[var(--cream)] transition-colors">FAQ</button>
           </div>
-          <div>© {new Date().getFullYear()} Sovereign.OS. Private personal AI.</div>
+          <div className="font-explanation">© {new Date().getFullYear()} Sovereign.OS. Private personal AI.</div>
         </div>
       </footer>
     </div>
