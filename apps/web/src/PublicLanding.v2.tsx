@@ -443,7 +443,7 @@ function ComparisonSection() {
           {/* Generic AI */}
           <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8 transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
             <h3 className="text-xl font-bold text-neutral-400 mb-6 flex items-center gap-2">
-              <span className="text-red-400">✕</span> Generic ChatGPT-style AI
+              <span className="text-red-400">✕</span> Generic AI assistant
             </h3>
             <ul className="space-y-4">
               {COMPARISON.blank.map((item) => (
