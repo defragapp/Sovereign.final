@@ -28,6 +28,28 @@ const DEMO_CONVERSATION: DemoTurn[] = [
   }
 ];
 
+function renderFormattedContent(text: string) {
+  const paragraphs = text.split(/\n\n+/);
+  return paragraphs.map((para, pIdx) => {
+    const parts = para.split(/(\*\*.*?\*\*)/g);
+    return (
+      <p key={pIdx} className="leading-relaxed">
+        {parts.map((part, partIdx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            const boldText = part.slice(2, -2);
+            return (
+              <strong key={partIdx} className="font-semibold text-white">
+                {boldText}
+              </strong>
+            );
+          }
+          return part;
+        })}
+      </p>
+    );
+  });
+}
+
 export function PublicDemoChat() {
   const [displayedTurns, setDisplayedTurns] = useState<DemoTurn[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -49,7 +71,7 @@ export function PublicDemoChat() {
 
   return (
     <div
-      className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5 text-gray-100"
+      className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5 text-gray-100 transition-all duration-300 hover:border-white/20"
       aria-live="polite"
       aria-label="Demo conversation with Sovereign"
     >
@@ -67,13 +89,15 @@ export function PublicDemoChat() {
                 className={`flex flex-col ${turn.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 {turn.role === 'user' && (
-                  <div className="max-w-[90%] rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-sm text-white">
+                  <div className="max-w-[90%] rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-3 text-sm text-white shadow-md">
                     <p>{turn.content}</p>
                   </div>
                 )}
                 {turn.role === 'sovereign' && (
-                  <div className="max-w-full rounded-2xl bg-black/60 border border-white/15 p-5 text-sm text-gray-200 leading-relaxed space-y-3">
-                    <p className="whitespace-pre-line">{turn.content}</p>
+                  <div className="max-w-full rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 p-5 text-sm text-gray-200 leading-relaxed shadow-xl space-y-3">
+                    <div className="space-y-3">
+                      {renderFormattedContent(turn.content)}
+                    </div>
                     {turn.metadata?.groundingSources && (
                       <div className="border-t border-white/10 pt-2.5 text-xs text-neutral-400">
                         <strong className="text-neutral-300">Grounded in:</strong> {turn.metadata.groundingSources.join(' • ')}
@@ -90,7 +114,7 @@ export function PublicDemoChat() {
         <p className="text-xs text-neutral-400">This is how Sovereign understands you.</p>
         <a
           href="/signup"
-          className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-xs font-semibold transition-all duration-300 hover:bg-neutral-200"
+          className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-xs font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:-translate-y-0.5"
         >
           Try it yourself
           <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

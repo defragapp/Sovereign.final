@@ -61,7 +61,7 @@ const PRICING_TIERS = [
 export function PublicLanding() {
   return (
     <main
-      className="relative min-h-screen bg-black text-gray-100 overflow-x-hidden selection:bg-white/20 selection:text-white"
+      className="relative min-h-screen bg-[#030712] text-gray-100 overflow-x-hidden selection:bg-white/20 selection:text-white"
       data-product-contract="personal-ai-v1"
     >
       {/* High-Motion Iridescent Liquid Mesh */}
@@ -73,7 +73,7 @@ export function PublicLanding() {
         aria-hidden="true"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 75%), radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.18) 0px, transparent 50%), radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.16) 0px, transparent 50%), radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.14) 0px, transparent 50%), #000000',
+            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 75%), radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.06) 0px, transparent 50%), radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.05) 0px, transparent 50%), radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.05) 0px, transparent 50%), #030712',
         }}
       />
 
@@ -93,7 +93,7 @@ export function PublicLanding() {
 
 function V2Navigation() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-black/70 backdrop-blur-xl transition-all duration-300">
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#030712]/80 backdrop-blur-xl transition-all duration-300">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <a className="flex items-center gap-2.5 text-white font-semibold tracking-tight transition-opacity hover:opacity-80" href="/" aria-label="Sovereign.OS home">
           <BrandMark size={22} />
@@ -112,7 +112,7 @@ function V2Navigation() {
             Sign in
           </a>
           <a
-            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-sm font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:-translate-y-0.5 active:translate-y-0"
             href="/signup"
           >
             Get started free
@@ -150,7 +150,7 @@ function V2Hero() {
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <a
-              className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-6 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]"
+              className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-6 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:-translate-y-0.5 active:translate-y-0"
               href="/signup"
             >
               Start free — no card required
@@ -160,7 +160,7 @@ function V2Hero() {
               </svg>
             </a>
             <a
-              className="inline-flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-300 border border-white/10 px-6 py-3.5 text-base font-medium text-white"
+              className="inline-flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-300 border border-white/10 px-6 py-3.5 text-base font-medium text-white hover:-translate-y-0.5 active:translate-y-0"
               href="#how-it-works"
             >
               See how it works
@@ -348,8 +348,8 @@ function PricingSection() {
                 <a
                   className={`w-full inline-flex items-center justify-center rounded-xl py-3.5 text-sm font-semibold transition-all duration-300 cursor-pointer ${
                     tier.highlighted
-                      ? 'bg-white text-black hover:bg-neutral-200 hover:shadow-[0_0_24px_rgba(255,255,255,0.25)]'
-                      : 'bg-white/10 hover:bg-white/20 border border-white/10 text-white'
+                      ? 'bg-white text-black hover:bg-neutral-200 hover:shadow-[0_0_24px_rgba(255,255,255,0.25)] hover:-translate-y-0.5 active:translate-y-0'
+                      : 'bg-white/10 hover:bg-white/20 border border-white/10 text-white hover:-translate-y-0.5 active:translate-y-0'
                   }`}
                   href={tier.ctaHref}
                 >
@@ -368,7 +368,7 @@ function FinalCallToAction() {
   return (
     <section className="py-20 px-6">
       <div className="mx-auto max-w-5xl">
-        <div className="bg-white/5 backdrop-blur-md border border-white/15 rounded-2xl shadow-2xl p-10 sm:p-14 text-center relative overflow-hidden">
+        <div className="bg-white/5 backdrop-blur-md border border-white/15 rounded-2xl shadow-2xl p-10 sm:p-14 text-center relative overflow-hidden transition-all duration-300 hover:border-white/25">
           <div className="absolute inset-0 pointer-events-none bg-radial-gradient from-purple-500/10 to-transparent" />
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
             Ready to understand yourself better?
@@ -377,7 +377,7 @@ function FinalCallToAction() {
             Start a free conversation with Sovereign. No card required. Your data stays completely private.
           </p>
           <a
-            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-8 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)]"
+            className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-8 py-3.5 text-base font-semibold transition-all duration-300 hover:bg-neutral-200 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:-translate-y-0.5 active:translate-y-0"
             href="/signup"
           >
             Get started free
@@ -394,7 +394,7 @@ function FinalCallToAction() {
 
 function V2Footer() {
   return (
-    <footer className="border-t border-white/10 bg-black/40 backdrop-blur-md mt-20">
+    <footer className="border-t border-white/10 bg-[#030712]/80 backdrop-blur-md mt-20">
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
           <div>

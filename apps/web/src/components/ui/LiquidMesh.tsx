@@ -23,7 +23,7 @@ export const LiquidMesh = () => {
         zIndex: -1,
         pointerEvents: "none",
         overflow: "hidden",
-        backgroundColor: "#000000",
+        backgroundColor: "#030712",
       }}
     >
       {/* Dark Stage Spotlight base */}
@@ -36,7 +36,7 @@ export const LiquidMesh = () => {
           width: "120vw",
           height: "75vh",
           background:
-            "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.08) 40%, transparent 75%)",
+            "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 75%)",
         }}
       />
 
@@ -49,8 +49,8 @@ export const LiquidMesh = () => {
           scale,
           opacity,
           background:
-            "radial-gradient(at 15% 25%, rgba(168, 85, 247, 0.15) 0px, transparent 45%), radial-gradient(at 85% 20%, rgba(59, 130, 246, 0.14) 0px, transparent 45%), radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.12) 0px, transparent 50%), radial-gradient(at 75% 75%, rgba(16, 185, 129, 0.10) 0px, transparent 45%)",
-          filter: "blur(60px)",
+            "radial-gradient(at 15% 25%, rgba(168, 85, 247, 0.08) 0px, transparent 45%), radial-gradient(at 85% 20%, rgba(59, 130, 246, 0.07) 0px, transparent 45%), radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.06) 0px, transparent 50%), radial-gradient(at 75% 75%, rgba(16, 185, 129, 0.05) 0px, transparent 45%)",
+          filter: "blur(70px)",
         }}
       />
     </div>
