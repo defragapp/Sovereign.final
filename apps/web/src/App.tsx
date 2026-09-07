@@ -163,10 +163,8 @@ function Header() {
           <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign</span>
         </button>
         <nav className="hidden items-center gap-8 md:flex">
-          <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">How it works</button>
-          <button onClick={() => go('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">Pricing</button>
-          <button onClick={() => go('/faq')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">FAQ</button>
-        </nav>
+  <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">How it works</button>
+</nav>
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => go('/login')}
@@ -194,9 +192,7 @@ function Landing() {
 
   const sampleQuestions = [
     "Why do I keep overthinking what to say when I feel misunderstood?",
-    "How can I set a clear boundary without causing avoidable tension?",
-    "What pattern repeats when our team feels under intense pressure?",
-    "Why does my response under stress feel so different from my intent?"
+    "How can I set a clear boundary without causing avoidable tension?"
   ];
 
   return (
@@ -213,12 +209,14 @@ function Landing() {
             </div>
 
             <h1 className="font-display text-4xl sm:text-6xl md:text-7xl tracking-tight text-[var(--cream)] leading-[1.06]">
-              Healing isn’t optional.<br />
-              <span className="text-[var(--cream)]/85">Holding onto the pain is.</span>
+              Understand yourself.<br />
+              Understand your people.<br />
+              See the whole system.
             </h1>
 
             <p className="mt-6 max-w-xl font-explanation text-base sm:text-lg text-[var(--muted)] leading-relaxed">
-              Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you.
+              Private AI that builds a personal reference from your Baseline, helping you see yourself, your relationships, and the systems you belong to.
+
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
@@ -238,136 +236,7 @@ function Landing() {
           </div>
         </section>
 
-        {/* 2. 01 · YOU (SELF EXPLORATION DEMONSTRATION) */}
-        <section className="border-t border-[var(--line)] pt-16 sm:pt-20 space-y-6">
-          <div>
-            <span className="font-utility text-[10px] text-[var(--subtle)]">01 · YOU</span>
-            <h2 className="mt-1 font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
-              Personal Baseline & Self Exploration
-            </h2>
-            <p className="mt-2 font-explanation text-sm text-[var(--muted)] max-w-xl leading-relaxed">
-              Explore how you think, decide, communicate, create, connect, respond under pressure, and grow. Sovereign starts with your private Baseline rather than a blank prompt.
-            </p>
-          </div>
-
-          {/* Interactive Question Selector */}
-          <div className="flex flex-wrap gap-2 pt-1">
-            {sampleQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveQuestionIndex(idx)}
-                className={`rounded-full px-3.5 py-1.5 text-xs transition-colors border ${
-                  activeQuestionIndex === idx
-                    ? 'border-[var(--cream)] bg-[var(--cream)] text-[var(--ink)] font-medium'
-                    : 'border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--cream)]'
-                }`}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-
-          {/* Clean Conversation Demonstration */}
-          <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface)] p-6 sm:p-8 space-y-6 shadow-xl">
-            {/* User Question */}
-            <div className="flex justify-end">
-              <div className="max-w-[90%] sm:max-w-[80%] rounded-2xl rounded-br-sm border border-[var(--line-strong)] bg-[var(--surface-2)] px-4 py-3 text-sm text-[var(--cream)] leading-relaxed shadow-sm">
-                {sampleQuestions[activeQuestionIndex]}
-              </div>
-            </div>
-
-            {/* Sovereign Answer */}
-            <div className="space-y-4 max-w-2xl">
-              <h3 className="font-statement text-xl sm:text-2xl text-[var(--cream)] font-medium leading-snug">
-                Separate the immediate observation from the pressure to solve their perception all at once.
-              </h3>
-
-              <p className="font-explanation text-sm text-[var(--cream)]/90 leading-relaxed">
-                When communication feels misunderstood, speech often pauses to draft multiple alternative formulations before responding. Refining words repeatedly can become an attempt to avoid being misunderstood—even before you know whether the other person is actually questioning your intent.
-              </p>
-
-              <div className="rounded-xl border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1.5">
-                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">Suggested Next Step</span>
-                <p className="font-explanation text-xs sm:text-[13px] text-[var(--muted)] leading-relaxed">
-                  State your central point clearly in one sentence, then pause and allow room for them to respond before clarifying further.
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-2 text-xs text-[var(--subtle)] border-t border-[var(--line)]">
-                <span>Based on your Baseline</span>
-                <button onClick={() => go('/signup')} className="text-[var(--muted)] hover:text-[var(--cream)] underline underline-offset-4 transition-colors">See source details →</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 3. 02 · YOU + YOUR PEOPLE (RELATIONSHIP INTELLIGENCE) */}
-        <section className="border-t border-[var(--line)] pt-16 sm:pt-20">
-          <div className="grid gap-8 md:grid-cols-2 items-center">
-            <div className="space-y-4">
-              <span className="font-utility text-[10px] text-[var(--subtle)]">02 · YOU + YOUR PEOPLE</span>
-              <h2 className="font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
-                See why the same moment lands differently—and how to bridge the gap.
-              </h2>
-              <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                Shared relationship intelligence begins through a private invitation. When both people permit access, Sovereign examines how each person's Baseline shapes how the same situation is experienced—without mind-reading, scoring compatibility, or taking sides.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-[var(--line)] pb-3 text-xs text-[var(--muted)]">
-                <span>Relational Context</span>
-                <span className="text-[var(--sage)] font-utility text-[10px]">2 SHARED BASELINES</span>
-              </div>
-              <div className="space-y-3 text-xs text-[var(--cream)]/90 leading-relaxed">
-                <div className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
-                  <div className="font-medium text-[var(--cream)]">Your perspective</div>
-                  <div className="text-[var(--muted)]">Seeks early clarity and structural closure before moving forward.</div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
-                  <div className="font-medium text-[var(--cream)]">Their perspective</div>
-                  <div className="text-[var(--muted)]">Requires open space to process possibilities before committing to a decision.</div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-3)] space-y-1">
-                  <div className="font-medium text-[var(--sage)]">The Bridge</div>
-                  <div className="text-[var(--cream)]">Agree on the decision criteria first, then set a specific time to resume choices.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 4. 03 · FROM 1:1 TO THE WHOLE SYSTEM */}
-        <section className="border-t border-[var(--line)] pt-16 sm:pt-20">
-          <div className="grid gap-8 md:grid-cols-2 items-center">
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface-2)] p-6 space-y-4 order-2 md:order-1">
-              <div className="flex items-center justify-between border-b border-[var(--line)] pb-3 text-xs text-[var(--muted)]">
-                <span>System Dynamics</span>
-                <span className="text-[var(--sage)] font-utility text-[10px]">FAMILY & TEAM MAPPING</span>
-              </div>
-              <div className="space-y-3 text-xs text-[var(--cream)]/90 leading-relaxed">
-                <div className="p-3.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] space-y-1">
-                  <div className="font-medium text-[var(--cream)]">System Observation</div>
-                  <div className="text-[var(--muted)]">Responsibility concentrates around the person with highest initial initiative, causing others to step back.</div>
-                </div>
-                <div className="p-3.5 rounded-xl border border-[var(--line-strong)] bg-[var(--surface-3)] space-y-1">
-                  <div className="font-medium text-[var(--sage)]">System Shift</div>
-                  <div className="text-[var(--cream)]">Explicitly assign ownership boundaries rather than waiting for voluntary pickup under pressure.</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 order-1 md:order-2">
-              <span className="font-utility text-[10px] text-[var(--subtle)]">03 · FROM 1:1 TO THE WHOLE SYSTEM</span>
-              <h2 className="font-statement text-2xl sm:text-3xl text-[var(--cream)] font-medium">
-                Understand how the whole system functions.
-              </h2>
-              <p className="font-explanation text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-                Expand from individual and 1:1 relationships to families, workplace teams, and groups. Sovereign keeps each participant distinct, mapping roles, pressure points, and communication dynamics in clean, ordinary language.
-              </p>
-            </div>
-          </div>
-        </section>
+        
 
         {/* 5. WHY THIS AI IS DIFFERENT */}
         <section className="border-t border-[var(--line)] pt-16 sm:pt-20 text-center">

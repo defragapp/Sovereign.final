@@ -8,6 +8,24 @@
    One hierarchy across public product, account, onboarding, policy, consent, workspace, and error surfaces. */
 
 :root {
+  /* Font assets */
+  @font-face {
+    font-family: 'SovereignDisplay';
+    src: url('/fonts/sovereign-display.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'SovereignSans';
+    src: url('/fonts/sovereign-sans.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  --display-serif: 'SovereignDisplay', serif;
+  --body-sans: 'SovereignSans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  /* Existing variables */
   --sov-reading: 68ch;
   --sov-content: 960px;
   --sov-wide: 1180px;
@@ -26,6 +44,25 @@
   --platform-radius: 22px;
   --platform-radius-lg: 30px;
   --platform-shadow: 0 32px 90px rgba(0, 0, 0, .34);
+}
+/* Animation utilities */
+@keyframes heroEntrance {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes sectionReveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-entrance {
+  animation: heroEntrance 0.5s ease-out forwards;
+}
+.section-reveal {
+  animation: sectionReveal 0.45s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-entrance, .section-reveal { animation: none; }
+}
 }
 
 :where(.sovereign-landing, .account-shell, .plan-onboarding, .sovereign-policy, .public-not-found, .intelligence-workspace) {
