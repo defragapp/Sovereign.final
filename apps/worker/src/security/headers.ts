@@ -15,7 +15,7 @@ export const securityHeaders = {
 
 export const documentSecurityHeaders = {
   ...sharedSecurityHeaders,
-  'content-security-policy': "default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
+  'content-security-policy': "default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com https://fonts.googleapis.com https://fonts.gstatic.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'",
   'referrer-policy': 'strict-origin-when-cross-origin',
   'permissions-policy': 'camera=(), microphone=(), geolocation=(self)'
 } as const;

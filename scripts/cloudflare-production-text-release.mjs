@@ -13,7 +13,20 @@ for (const label of requiredChecks) {
   }
 }
 
-const apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
+let apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
+if (!apiToken) {
+  try {
+    const { spawnSync } = await import('node:child_process');
+    const authResult = spawnSync('pnpm', ['--filter', './apps/worker', 'exec', 'wrangler', 'auth', 'token', '--json'], { encoding: 'utf8' });
+    if (authResult.status === 0 && authResult.stdout) {
+      const parsed = JSON.parse(authResult.stdout);
+      if (parsed?.token) {
+        apiToken = parsed.token;
+        process.env.CLOUDFLARE_API_TOKEN = apiToken;
+      }
+    }
+  } catch {}
+}
 if (!apiToken) throw new Error('Text-first production release failed: CLOUDFLARE_API_TOKEN is required');
 
 const result = await orchestrateRelease({
