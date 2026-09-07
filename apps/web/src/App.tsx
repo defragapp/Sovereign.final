@@ -150,6 +150,13 @@ export function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isAppDomain = hostname.includes('app.defrag.app');
+
+  if (isAppDomain && route === '/') {
+    return <Auth mode="login" />;
+  }
+
   if (route === '/app') return <SovereignIntelligenceWorkspace />;
   if (route === '/onboarding') return <Onboarding />;
   if (route === '/auth/redeem') return <Redeem />;
@@ -159,6 +166,11 @@ export function App() {
   if (route === '/faq') return <FAQ onBack={() => go('/')} />;
   if (route === '/terms') return <LegalPage title="Terms of Service" onBack={() => go('/')} />;
   if (route === '/privacy') return <LegalPage title="Privacy Policy" onBack={() => go('/')} />;
+
+  if (isAppDomain) {
+    return <Auth mode="login" />;
+  }
+
   return <PublicLanding />;
 }
 
