@@ -1,14 +1,14 @@
 .sovereign-landing.v2-landing-unified {
-  --color-base: #030712;
-  --color-elevated: #0b0f19;
-  --color-card: #111827;
-  --color-border: #1f2937;
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #9ca3af;
-  --color-text-meta: #6b7280;
-  --color-accent-cyan: #06b6d4;
-  --color-accent-emerald: #10b981;
-  --color-accent-amber: #f59e0b;
+  --color-base: var(--sov-page, #000000);
+  --color-elevated: var(--sov-panel, #101114);
+  --color-card: var(--sov-surface, #0a0b0e);
+  --color-border: var(--sov-line, rgba(255, 255, 255, 0.08));
+  --color-text-primary: var(--sov-ink, #f4f0e8);
+  --color-text-secondary: var(--sov-muted, #a3a099);
+  --color-text-meta: var(--sov-faint, #686660);
+  --color-accent-cyan: var(--sov-sage, #9fbaa1);
+  --color-accent-emerald: var(--sov-sage, #9fbaa1);
+  --color-accent-amber: var(--sov-clay, #c4aba1);
 }
 
 /* NAVIGATION */
@@ -16,9 +16,8 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(3, 7, 18, 0.8);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: #000000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .v2-nav-inner {
@@ -204,10 +203,9 @@
 
 /* DEMO CHAT */
 .public-demo-chat {
-  background: rgba(17, 24, 39, 0.6);
+  background: #0c0c0e;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  backdrop-filter: blur(16px);
+  border-radius: 22px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -624,12 +622,11 @@
 .v2-cta-card {
   max-width: 700px;
   margin: 0 auto;
-  background: rgba(17, 24, 39, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  background: #0c0c0e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
   padding: 48px;
   text-align: center;
-  backdrop-filter: blur(16px);
 }
 
 .v2-cta-content h2 {

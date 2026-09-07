@@ -1,8 +1,6 @@
-import { motion } from 'framer-motion';
-
 /**
- * GlassCard – a translucent frosted glass panel with subtle tilt on hover.
- * Use by wrapping any content: <GlassCard>{children}</GlassCard>
+ * QuietSurface (formerly GlassCard) – restrained, typography-first panel
+ * conforming to UI_UX_CONTRACT.md (20-28px radius, low-contrast 1px border, no 3D tilt).
  */
 export const GlassCard = ({
   children,
@@ -11,10 +9,9 @@ export const GlassCard = ({
   children: React.ReactNode;
   className?: string;
 }) => (
-  <motion.div
-    whileHover={{ rotateX: 2, rotateY: 2, scale: 1.02, transition: { duration: 0.2 } }}
-    className={`rounded-2xl border border-white/10 bg-background/60 p-6 shadow-xl ${className}`}
+  <div
+    className={`rounded-[22px] border border-[rgba(255,255,255,0.08)] bg-[#0c0c0e] p-6 transition-colors duration-200 hover:border-[rgba(255,255,255,0.14)] ${className}`}
   >
     {children}
-  </motion.div>
+  </div>
 );

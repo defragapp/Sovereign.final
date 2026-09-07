@@ -38,6 +38,7 @@
     "production:deploy:v3": "node scripts/cloudflare-production-deploy-v3.mjs"
   },
   "devDependencies": {
+    "playwright": "^1.63.0",
     "tsx": "^4.23.13"
   }
 }

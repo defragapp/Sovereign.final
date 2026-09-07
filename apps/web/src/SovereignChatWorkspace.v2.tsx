@@ -18,31 +18,11 @@ interface SovereignChatWorkspaceProps {
   threadId?: string;
 }
 
-const EMPTY_STATE_PROMPTS = [
-  {
-    category: 'Explore Yourself',
-    prompts: [
-      'Why do I avoid difficult conversations?',
-      'What does my stress response look like?',
-      'How do I know when I\'m overextending?'
-    ]
-  },
-  {
-    category: 'Understand Your People',
-    prompts: [
-      'Why does my partner do that?',
-      'How do I talk to my child about disappointment?',
-      'What\'s really going on in this dynamic?'
-    ]
-  },
-  {
-    category: 'See Your Whole System',
-    prompts: [
-      'How does tension move through my family?',
-      'What patterns keep repeating at work?',
-      'What am I responsible for here?'
-    ]
-  }
+const SUGGESTED_INQUIRIES = [
+  'Why do I keep overthinking what to say?',
+  'Why does this conversation keep going the same way?',
+  'What am I missing about what is happening between us?',
+  'How should I approach this decision?'
 ];
 
 export function SovereignChatWorkspace({ threadId: initialThreadId }: SovereignChatWorkspaceProps) {
@@ -196,33 +176,26 @@ export function SovereignChatWorkspace({ threadId: initialThreadId }: SovereignC
         {turns.length === 0 ? (
           <div className="chat-empty-state">
             <div className="empty-state-content">
-              <h1>What would you like to explore?</h1>
-              <p>Ask Sovereign about yourself, your relationships, or the systems around you.</p>
+              <span className="empty-state-badge">TODAY</span>
+              <h1>What is happening in your life right now?</h1>
+              <p>Ask in ordinary language. Sovereign answers from your private Baseline, surfaces active dynamics, and keeps unknowns explicit.</p>
 
-              <div className="empty-state-prompts">
-                {EMPTY_STATE_PROMPTS.map((section) => (
-                  <div key={section.category} className="prompt-category">
-                    <h3>{section.category}</h3>
-                    <div className="prompt-list">
-                      {section.prompts.map((prompt) => (
-                        <button
-                          key={prompt}
-                          className="prompt-button"
-                          onClick={() => {
-                            setDraft(prompt);
-                            textareaRef.current?.focus();
-                          }}
-                        >
-                          {prompt}
-                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <line x1="5" y1="12" x2="13" y2="4" />
-                            <polyline points="13 4 13 4 13 13 4 13" />
-                          </svg>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="empty-state-inquiries">
+                <span className="inquiries-label">OR START WITH A SITUATION:</span>
+                <div className="inquiries-list">
+                  {SUGGESTED_INQUIRIES.map((prompt) => (
+                    <button
+                      key={prompt}
+                      className="inquiry-pill"
+                      onClick={() => {
+                        setDraft(prompt);
+                        textareaRef.current?.focus();
+                      }}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -242,8 +215,8 @@ export function SovereignChatWorkspace({ threadId: initialThreadId }: SovereignC
                         <p>{turn.content}</p>
                       ) : (
                         <div className="turn-loading" role="status">
-                          <div className="loading-spinner" aria-hidden="true" />
-                          <span>Sovereign is thinking...</span>
+                          <span className="loading-pulse-indicator" aria-hidden="true" />
+                          <span>Sovereign is synthesizing your Baseline…</span>
                         </div>
                       )}
                     </div>

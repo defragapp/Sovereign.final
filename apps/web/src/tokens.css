@@ -1,0 +1,57 @@
+/* ==========================================================================
+   Sovereign.OS — Authoritative Design Tokens
+   Enforces UI_UX_CONTRACT.md: near-black foundation, warm cream text,
+   muted gray secondary, restrained sage accent, and quiet whitespace.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* Foundations */
+  --sov-page: #000000;
+  --sov-page-soft: #080a0d;
+  --sov-panel: #101114;
+  --sov-panel-raised: #16181d;
+  --sov-surface: #0a0b0e;
+  --sov-surface-raised: #121418;
+
+  /* Typography Colors */
+  --sov-ink: #f4f0e8;           /* Warm cream primary */
+  --sov-muted: #a3a099;         /* Muted gray secondary */
+  --sov-faint: #686660;         /* Low-contrast meta */
+  --sov-paper: #eee8df;
+  --sov-paper-ink: #25211e;
+
+  /* Accents */
+  --sov-sage: #9fbaa1;          /* Restrained sage */
+  --sov-sage-soft: rgba(159, 186, 161, 0.12);
+  --sov-sage-border: rgba(159, 186, 161, 0.28);
+  --sov-clay: #c4aba1;
+  --sov-danger: #d19a9a;
+
+  /* Dividers & Borders */
+  --sov-line: rgba(255, 255, 255, 0.08);
+  --sov-line-soft: rgba(255, 255, 255, 0.05);
+  --sov-line-strong: rgba(255, 255, 255, 0.16);
+
+  /* Geometry & Radii */
+  --sov-radius-sm: 12px;
+  --sov-radius: 20px;
+  --sov-radius-lg: 28px;
+  --sov-reading: 68ch;
+  --sov-content: 960px;
+  --sov-wide: 1180px;
+
+  /* Normalized Aliases */
+  --color-base: var(--sov-page);
+  --color-elevated: var(--sov-panel);
+  --color-card: var(--sov-surface);
+  --color-border: var(--sov-line);
+  --color-border-subtle: var(--sov-line-soft);
+  --color-text-primary: var(--sov-ink);
+  --color-text-secondary: var(--sov-muted);
+  --color-text-meta: var(--sov-faint);
+  --color-accent-cyan: var(--sov-sage);
+  --color-accent-emerald: var(--sov-sage);
+  --color-accent-amber: var(--sov-clay);
+}
