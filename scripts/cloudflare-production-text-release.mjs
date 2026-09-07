@@ -13,6 +13,13 @@ for (const label of requiredChecks) {
   }
 }
 
+const defaultAccountId = '8b1954d216d65077c6480d62583fe2c2';
+if (!process.env.CLOUDFLARE_ACCOUNT_ID && !process.env.CF_ACCOUNT_ID) {
+  process.env.CLOUDFLARE_ACCOUNT_ID = defaultAccountId;
+  process.env.CF_ACCOUNT_ID = defaultAccountId;
+}
+process.env.VITE_TURNSTILE_SITE_KEY = process.env.VITE_TURNSTILE_SITE_KEY || '0x4AAAAAADhGIF8-iOLIg8MU';
+
 let apiToken = String(process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || '').trim();
 if (!apiToken) {
   try {
