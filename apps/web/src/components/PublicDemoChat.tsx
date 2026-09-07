@@ -48,36 +48,35 @@ export function PublicDemoChat() {
   }, [currentIndex, isAutoPlaying]);
 
   return (
-    <div className="public-demo-chat" aria-live="polite" aria-label="Demo conversation with Sovereign">
-      <div className="demo-chat-frame">
+    <div
+      className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5 text-gray-100"
+      aria-live="polite"
+      aria-label="Demo conversation with Sovereign"
+    >
+      <div className="min-h-[260px] flex flex-col justify-center">
         {displayedTurns.length === 0 ? (
-          <div className="demo-loading" role="status">
-            <div className="demo-spinner" aria-hidden="true" />
-            <p>Starting conversation...</p>
+          <div className="flex flex-col items-center justify-center gap-3 py-10 text-neutral-400" role="status">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-white" aria-hidden="true" />
+            <p className="text-xs">Starting conversation...</p>
           </div>
         ) : (
-          <div className="demo-turns">
+          <div className="flex flex-col gap-4">
             {displayedTurns.map((turn, idx) => (
               <div
                 key={idx}
-                className={`demo-turn demo-turn-${turn.role}`}
-                style={{
-                  animation: `slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards`
-                }}
+                className={`flex flex-col ${turn.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 {turn.role === 'user' && (
-                  <div className="turn-user-content">
+                  <div className="max-w-[90%] rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-sm text-white">
                     <p>{turn.content}</p>
                   </div>
                 )}
                 {turn.role === 'sovereign' && (
-                  <div className="turn-sovereign-content">
-                    <p>{turn.content}</p>
+                  <div className="max-w-full rounded-2xl bg-black/60 border border-white/15 p-5 text-sm text-gray-200 leading-relaxed space-y-3">
+                    <p className="whitespace-pre-line">{turn.content}</p>
                     {turn.metadata?.groundingSources && (
-                      <div className="turn-sources">
-                        <small>
-                          <strong>Grounded in:</strong> {turn.metadata.groundingSources.join(' • ')}
-                        </small>
+                      <div className="border-t border-white/10 pt-2.5 text-xs text-neutral-400">
+                        <strong className="text-neutral-300">Grounded in:</strong> {turn.metadata.groundingSources.join(' • ')}
                       </div>
                     )}
                   </div>
@@ -87,11 +86,14 @@ export function PublicDemoChat() {
           </div>
         )}
       </div>
-      <div className="demo-actions">
-        <p className="demo-tagline">This is how Sovereign understands you.</p>
-        <a href="/signup" className="button-primary">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-white/10">
+        <p className="text-xs text-neutral-400">This is how Sovereign understands you.</p>
+        <a
+          href="/signup"
+          className="inline-flex items-center gap-2 rounded-xl bg-white text-black px-4 py-2 text-xs font-semibold transition-all duration-300 hover:bg-neutral-200"
+        >
           Try it yourself
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="5" y1="12" x2="13" y2="4" />
             <polyline points="13 4 13 4 13 13 4 13" />
           </svg>
