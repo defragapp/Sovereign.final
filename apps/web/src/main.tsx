@@ -1,3 +1,5 @@
+import "./styles/v2-landing.css";
+import "./styles/v2-chat-workspace.css";
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';

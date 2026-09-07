@@ -1,3 +1,6 @@
+import { PublicLanding } from "./PublicLanding.v2";
+import { SovereignChatWorkspace as SovereignIntelligenceWorkspace } from "./SovereignChatWorkspace.v2";
+
 import { useEffect, useState, type ReactNode, type FormEvent } from 'react';
 import {
   ArrowUp,
@@ -2145,3 +2148,5 @@ function PageFrame({
     </div>
   );
 }
+
+export { PublicLanding, SovereignIntelligenceWorkspace };

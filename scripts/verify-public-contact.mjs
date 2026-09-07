@@ -31,6 +31,7 @@ const operationalAllowlist = new Map([
   ['apps/web/src/AccountControlCenter.tsx', 1],
   ['apps/web/src/PublicPolicy.tsx', 3],
   ['apps/web/src/PublicLanding.tsx', 1],
+  ['apps/web/src/PublicLanding.v2.tsx', 1],
   ['apps/web/src/PublicFAQ.tsx', 1],
   ['apps/sovereign-worker/src/runtime-entry.ts', 1],
   ['apps/sovereign-worker/src/auth-passkeys.ts', 1],
