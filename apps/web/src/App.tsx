@@ -449,46 +449,55 @@ function Landing() {
 
           <div className="grid gap-8 md:grid-cols-3">
             {/* TIER 01 */}
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-6 space-y-4 flex flex-col justify-between">
+            <motion.div
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="rounded-2xl border border-white/[0.08] bg-[#121215] p-7 space-y-4 flex flex-col justify-between shadow-xl"
+            >
               <div className="space-y-3">
                 <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">01 · YOU</span>
                 <h3 className="text-xl text-[var(--cream)] font-medium">Personal Baseline</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed">
+                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
                   Establish your private Baseline. Explore your decisions, pressure responses, creative rhythms, and recurring internal loops without losing context between sessions.
                 </p>
               </div>
-              <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] text-xs text-[var(--subtle)]">
+              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)]">
                 Includes Today thinking environment & private library.
               </div>
-            </div>
+            </motion.div>
 
             {/* TIER 02 */}
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-6 space-y-4 flex flex-col justify-between">
+            <motion.div
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="rounded-2xl border border-white/[0.08] bg-[#121215] p-7 space-y-4 flex flex-col justify-between shadow-xl"
+            >
               <div className="space-y-3">
                 <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">02 · YOU + YOUR PEOPLE</span>
                 <h3 className="text-xl text-[var(--cream)] font-medium">Relational Intelligence</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed">
+                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
                   Examine 1:1 dynamics with partners, co-founders, or key colleagues. Understand why communication stalls under pressure and map structural pair mechanics.
                 </p>
               </div>
-              <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] text-xs text-[var(--subtle)]">
+              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)]">
                 Includes People workspace & pair overlay comparisons.
               </div>
-            </div>
+            </motion.div>
 
             {/* TIER 03 */}
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-6 space-y-4 flex flex-col justify-between">
+            <motion.div
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="rounded-2xl border border-white/[0.08] bg-[#121215] p-7 space-y-4 flex flex-col justify-between shadow-xl"
+            >
               <div className="space-y-3">
                 <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">03 · THE WHOLE SYSTEM</span>
                 <h3 className="text-xl text-[var(--cream)] font-medium">System Dynamics</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed">
+                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
                   Map multi-participant groups, executive teams, and family structures. Expose unassigned pressure concentrations and operational bottlenecks across teams.
                 </p>
               </div>
-              <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] text-xs text-[var(--subtle)]">
+              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)]">
                 Includes Systems map & multi-participant intelligence.
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Interactive Accordion Demo */}
@@ -564,7 +573,7 @@ function Landing() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-7 flex flex-col justify-between space-y-6">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#121215] p-8 flex flex-col justify-between space-y-6 shadow-xl">
               <div className="space-y-4">
                 <div>
                   <span className="font-utility text-xs text-[var(--muted)]">STANDARD</span>
@@ -573,21 +582,23 @@ function Landing() {
                 <p className="text-xs sm:text-sm text-[var(--muted)]">
                   A private Baseline and a quiet way to begin asking questions.
                 </p>
-                <div className="space-y-2 text-xs text-[var(--cream)]/90 pt-3 border-t border-[rgba(255,255,255,0.06)]">
+                <div className="space-y-2 text-xs text-[var(--cream)]/90 pt-4 border-t border-white/[0.06]">
                   <div>— Private personal Baseline</div>
                   <div>— Today thinking environment</div>
                   <div>— 10 AI turns per month</div>
                 </div>
               </div>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 onClick={() => go('/signup')}
-                className="w-full rounded-xl border border-[rgba(255,255,255,0.12)] py-3 text-xs font-medium text-[var(--cream)] hover:bg-[rgba(255,255,255,0.05)] transition cursor-pointer"
+                className="w-full rounded-xl border border-white/[0.12] py-3 text-xs font-medium text-[var(--cream)] hover:bg-white/[0.05] transition cursor-pointer"
               >
                 Start Free
-              </button>
+              </motion.button>
             </div>
 
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.14)] bg-[rgba(255,255,255,0.035)] p-7 flex flex-col justify-between space-y-6">
+            <div className="rounded-2xl border border-white/[0.14] bg-[#16161a] p-8 flex flex-col justify-between space-y-6 shadow-xl">
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
@@ -599,18 +610,20 @@ function Landing() {
                 <p className="text-xs sm:text-sm text-[var(--muted)]">
                   Room for deeper personal exploration, relational intelligence, and systems.
                 </p>
-                <div className="space-y-2 text-xs text-[var(--cream)]/90 pt-3 border-t border-[rgba(255,255,255,0.06)]">
+                <div className="space-y-2 text-xs text-[var(--cream)]/90 pt-4 border-t border-white/[0.06]">
                   <div>— Everything in Free</div>
                   <div>— 300 AI turns per month</div>
                   <div>— Relational inquiry & system dynamics</div>
                 </div>
               </div>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
                 onClick={() => go('/signup')}
                 className="w-full rounded-xl bg-[var(--cream)] py-3 text-xs font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer"
               >
                 Start Sovereign+
-              </button>
+              </motion.button>
             </div>
           </div>
         </section>
