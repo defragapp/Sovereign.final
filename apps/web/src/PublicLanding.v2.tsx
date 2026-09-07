@@ -141,13 +141,9 @@ function V2Hero() {
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           PERSONAL AI FOR REAL LIFE
         </div>
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-white leading-[1.12]">
-          Understand yourself.
-          <br />
-          <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-emerald-400 bg-clip-text text-transparent">
-            Understand your people.
-          </span>
-          <br />
+        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl font-normal tracking-tight text-white leading-[1.08]">
+          Understand yourself.<br />
+          Understand your people.<br />
           <span className="text-neutral-400">See the whole system.</span>
         </h1>
         <p className="mt-6 text-lg sm:text-xl text-neutral-300 max-w-3xl leading-relaxed">
@@ -197,7 +193,7 @@ function ConceptualPillars() {
           <div className="inline-block rounded-full bg-white/5 border border-white/10 px-3 py-1 font-mono text-xs uppercase tracking-wider text-neutral-400 mb-3">
             Core Architecture
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Three conceptual pillars</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-white">Three conceptual pillars</h2>
           <p className="mt-3 text-base sm:text-lg text-neutral-400">
             A unified intelligence model that expands naturally from the individual outward.
           </p>
@@ -271,7 +267,7 @@ function ExpansionSequence() {
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1 text-xs font-mono uppercase tracking-wider text-neutral-400 mb-4">
             Vertical Scroll Expansion Sequence
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
+          <h2 className="font-display text-3xl sm:text-5xl font-normal tracking-tight text-white">
             YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS
           </h2>
           <p className="mt-4 text-base sm:text-lg text-neutral-300">
@@ -396,7 +392,7 @@ function RealLifeQuestions() {
     <section className="py-20 px-6 border-t border-white/10">
       <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Real questions people ask Sovereign</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-white">Real questions people ask Sovereign</h2>
           <p className="mt-3 text-base sm:text-lg text-neutral-400">Start with what's on your mind right now.</p>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -436,7 +432,7 @@ function ComparisonSection() {
       <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
           <p className="text-xs font-semibold tracking-widest text-purple-400 uppercase mb-2">The Difference</p>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Most AI starts fresh every time.</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-white">Most AI starts fresh every time.</h2>
           <p className="mt-3 text-base sm:text-lg text-neutral-400">Sovereign starts with you.</p>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -481,7 +477,7 @@ function PricingSection() {
     <section className="py-20 px-6 border-t border-white/10" id="pricing">
       <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">Simple, transparent pricing</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-white">Simple, transparent pricing</h2>
           <p className="mt-3 text-base sm:text-lg text-neutral-400">Start free. Upgrade anytime if you need more.</p>
         </header>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -542,7 +538,7 @@ function FinalCallToAction() {
       <div className="mx-auto max-w-5xl">
         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-10 sm:p-14 text-center relative overflow-hidden transition-all duration-300 hover:border-white/20 hover:-translate-y-1">
           <div className="absolute inset-0 pointer-events-none bg-radial-gradient from-purple-500/10 to-transparent" />
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-4">
+          <h2 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-white mb-4">
             Know yourself. Understand your people. See the whole system.
           </h2>
           <p className="text-base sm:text-lg text-neutral-300 max-w-2xl mx-auto mb-8">

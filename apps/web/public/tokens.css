@@ -44,9 +44,10 @@
   --sov-clay: #dda273;
   --sov-danger: #ef4444;
 
-  /* ── Typography Stacks ── */
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist Sans", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* ── Typography Stacks (Framer-matched) ── */
+  --font-display: "Gambarino", Georgia, "Times New Roman", serif;
+  --font-sans: "Onest", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Fragment Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* ── Radii & Motion ── */
   --sov-radius-container: 16px;

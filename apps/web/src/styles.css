@@ -2,10 +2,11 @@
 @config "../tailwind.config.js";
 
 :root {
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist Sans", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: "Onest", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Fragment Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-display: "Gambarino", Georgia, "Times New Roman", serif;
   --sans-primary: var(--font-sans);
-  --serif-primary: var(--sans-primary);
+  --serif-primary: var(--font-display);
   font-family: var(--sans-primary);
   color: #f4f0e8;
   background: #000000;

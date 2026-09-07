@@ -25,7 +25,13 @@ export default {
     }
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        display: ['"Gambarino"', 'Georgia', '"Times New Roman"', 'serif'],
+        sans: ['"Onest"', '"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        mono: ['"Fragment Mono"', '"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+    },
   },
   plugins: [],
 };
