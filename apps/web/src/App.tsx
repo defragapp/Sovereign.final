@@ -162,7 +162,7 @@ export function App() {
    ========================================================================= */
 function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[rgba(255,255,255,0.08)] bg-[var(--ink)]/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-[rgba(255,255,255,0.08)] bg-[var(--ink)]">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-8">
         <button aria-label="Sovereign home" onClick={() => go('/')} className="flex items-center gap-2.5 group shrink-0">
           <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
@@ -1482,7 +1482,7 @@ function Workspace() {
 
             {/* INPUT BOX */}
             <div className="sticky bottom-4 pt-2">
-              <div className="rounded-xl border border-[var(--line-strong)] bg-[#111110]/95 p-2 backdrop-blur shadow-2xl">
+              <div className="rounded-xl border border-[var(--line-strong)] bg-[#111110] p-2 shadow-2xl">
                 <div className="flex items-end gap-2">
                   <Textarea
                     value={input}

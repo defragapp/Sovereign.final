@@ -718,7 +718,7 @@ function BaselineFormView({
 
 function BaselineBuildingView({ stage, status }: { stage: BaselineStage; status: string }) {
   return (
-    <section className="baseline-building-state flex flex-col items-center text-center p-8 bg-[#111317]/85 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl" role="status" aria-live="polite">
+    <section className="baseline-building-state flex flex-col items-center text-center p-8 bg-[#111317] border border-white/10 rounded-2xl shadow-2xl" role="status" aria-live="polite">
       <p className="eyebrow text-xs font-mono text-neutral-400 uppercase tracking-widest mb-3">BUILDING YOUR BASELINE</p>
       <h1 className="text-2xl sm:text-3xl font-medium text-white mb-2">Assembling your private Baseline reference...</h1>
       <p className="text-neutral-400 text-sm mb-6">Grounding decision patterns, communication style, and strain tendencies.</p>

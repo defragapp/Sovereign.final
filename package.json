@@ -12,6 +12,7 @@
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
     "verify:foundation": "node scripts/verify-foundation.mjs",
+    "validate:ui": "node .agents/skills/ui-contract-validator.mjs",
     "verify:migrations": "node scripts/validate-migrations.mjs && node scripts/verify-migration-upgrade.mjs",
     "scan:secrets": "node scripts/scan-secrets.mjs",
     "scan:production-fixtures": "node scripts/scan-production-fixtures.mjs",
