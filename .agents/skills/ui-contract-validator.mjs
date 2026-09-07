@@ -1,14 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 
-const FORBIDDEN_TOKENS = [
-  'backdrop-blur',
-  'bg-gradient-to-r',
-  'bg-gradient-to-l',
-  'bg-gradient-to-t',
-  'bg-gradient-to-b',
-  'animate-spin-slow',
-  'neon-glow',
+const REQUIRED_DESIGN_ELEMENTS = [
+  { name: 'backdrop-blur / glassmorphism', pattern: /(?:backdrop-blur|backdrop-filter:\s*blur)/ },
+  { name: 'mesh / iridescent gradients', pattern: /(?:--iridescent-flow|--mesh-gradient|radial-gradient)/ },
+  { name: '200-240ms fluid motion timing', pattern: /(?:200ms|220ms|240ms|0\.2s|0\.22s|0\.24s)/ },
+  { name: '4-6px movement transforms', pattern: /(?:translateY\(-?[4-6]px\)|translate\(-?[4-6]px|--sov-motion-lift)/ }
 ];
 
 const REQUIRED_CANONICAL_COPY = [
@@ -24,38 +21,44 @@ export function validateUIContract() {
     return true;
   }
 
-  let violations = [];
-
-  function scanDirectory(dir) {
+  let allContent = '';
+  function gatherContent(dir) {
     const files = fs.readdirSync(dir);
     for (const file of files) {
       const fullPath = path.join(dir, file);
       const stat = fs.statSync(fullPath);
-
       if (stat.isDirectory()) {
-        scanDirectory(fullPath);
+        gatherContent(fullPath);
       } else if (file.endsWith('.tsx') || file.endsWith('.css')) {
-        const content = fs.readFileSync(fullPath, 'utf8');
-
-        // Check for forbidden styling tokens
-        FORBIDDEN_TOKENS.forEach(token => {
-          if (content.includes(token)) {
-            violations.push(`${fullPath}: Contains forbidden token '${token}' per UI_UX_CONTRACT.md`);
-          }
-        });
+        allContent += '\n' + fs.readFileSync(fullPath, 'utf8');
       }
     }
   }
 
-  scanDirectory(webSrcDir);
+  gatherContent(webSrcDir);
 
-  if (violations.length > 0) {
-    console.error('[UI Contract Violation Found]:');
-    violations.forEach(v => console.error(` - ${v}`));
+  const missingElements = [];
+  for (const el of REQUIRED_DESIGN_ELEMENTS) {
+    if (!el.pattern.test(allContent)) {
+      missingElements.push(`Missing required design element: ${el.name}`);
+    }
+  }
+
+  const missingCopy = [];
+  for (const copy of REQUIRED_CANONICAL_COPY) {
+    if (!allContent.includes(copy)) {
+      missingCopy.push(`Missing canonical copy: "${copy}"`);
+    }
+  }
+
+  if (missingElements.length > 0 || missingCopy.length > 0) {
+    console.error('[UI Contract Validation Failure]:');
+    missingElements.forEach(err => console.error(` - ${err}`));
+    missingCopy.forEach(err => console.error(` - ${err}`));
     return false;
   }
 
-  console.log('[UI Contract Validator] All React/CSS files comply with the restrained design system.');
+  console.log('[UI Contract Validator] High-motion glassmorphic design system verified (backdrop-blur, mesh gradients, 200-240ms timing, 4-6px movement, canonical copy).');
   return true;
 }
 

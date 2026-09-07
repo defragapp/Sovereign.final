@@ -4,6 +4,7 @@ import './tokens.css';
 import './design-system.css';
 import './public.css';
 import './workspace.css';
+import './app-shell.css';
 import './styles.css';
 import './styles/v2-landing.css';
 import './styles/v2-chat-workspace.css';

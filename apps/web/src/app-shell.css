@@ -50,7 +50,6 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-entrance, .section-reveal { animation: none; }
 }
-}
 
 :where(.sovereign-landing, .account-shell, .plan-onboarding, .sovereign-policy, .public-not-found, .intelligence-workspace) {
   color-scheme: dark;
@@ -76,11 +75,6 @@
   background: rgba(11, 13, 12, .88);
   backdrop-filter: blur(22px) saturate(130%);
   padding-inline: 2rem; /* px-8 */
-}
-  min-height: 76px;
-  border-color: var(--platform-line);
-  background: rgba(11, 13, 12, .88);
-  backdrop-filter: blur(22px) saturate(130%);
 }
 
 .sovereign-landing .landing-nav nav { gap: 3rem; /* gap-12 */ }

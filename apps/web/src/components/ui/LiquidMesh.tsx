@@ -2,31 +2,57 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
 /**
- * LiquidMesh – a background layer that shifts its gradient colors based on scroll position.
- * It spans the full viewport height and sits behind the main content (z-index: -1).
+ * LiquidMesh – shader-like iridescent background layer combining monochrome b/w
+ * foundations with fluid Siri/Gemini-style flow highlights and CSS mesh gradients.
  */
 export const LiquidMesh = () => {
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref });
-  // Gradient rotation from 0deg to 360deg as user scrolls.
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
-  // Background color transitions.
-  const bg = useTransform(
-    scrollYProgress,
-    [0, 0.5, 1],
-    ["hsl(220, 30%, 5%)", "hsl(210, 25%, 7%)", "hsl(200, 20%, 5%)"]
-  );
+
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 180]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.85, 0.65, 0.85]);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.05, 1]);
 
   return (
-    <motion.div
+    <div
       ref={ref}
+      aria-hidden="true"
       style={{
         position: "fixed",
         inset: 0,
         zIndex: -1,
-        rotate,
-        background: bg,
+        pointerEvents: "none",
+        overflow: "hidden",
+        backgroundColor: "#000000",
       }}
-    />
+    >
+      {/* Dark Stage Spotlight base */}
+      <div
+        style={{
+          position: "absolute",
+          top: "-15%",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "120vw",
+          height: "75vh",
+          background:
+            "radial-gradient(ellipse 70% 50% at 50% 0%, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.08) 40%, transparent 75%)",
+        }}
+      />
+
+      {/* Iridescent Flow Highlight Mesh Layer */}
+      <motion.div
+        style={{
+          position: "absolute",
+          inset: "-20%",
+          rotate,
+          scale,
+          opacity,
+          background:
+            "radial-gradient(at 15% 25%, rgba(168, 85, 247, 0.15) 0px, transparent 45%), radial-gradient(at 85% 20%, rgba(59, 130, 246, 0.14) 0px, transparent 45%), radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.12) 0px, transparent 50%), radial-gradient(at 75% 75%, rgba(16, 185, 129, 0.10) 0px, transparent 45%)",
+          filter: "blur(60px)",
+        }}
+      />
+    </div>
   );
 };

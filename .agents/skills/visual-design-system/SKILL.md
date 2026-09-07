@@ -1,19 +1,19 @@
 ---
 name: visual-design-system
-description: Audits, modernizes, and validates the visual hierarchy and CSS authority of Sovereign.OS. Enforces UI_UX_CONTRACT.md, zero-overflow Playwright gates (1440x900 & 390x844), design token compliance, and prevents CSS cascade collisions.
+description: Enforces a premium, high-motion Framer aesthetic across Sovereign.OS. Mandates monochrome b/w base themes with iridescent Siri/Gemini-style flow highlights, WebGL/CSS mesh gradients, glass buttons, and 3D gyro/mouse tilt elements.
 ---
 
-# Visual Design System (VDS) Skill
+# High-Motion Visual Design System (VDS) Skill
 
 ## Authoritative Precedence
-1. `apps/web/src/tokens.css` (Design tokens)
-2. `apps/web/src/design-system.css` (Base primitives)
-3. `apps/web/src/public.css` (Landing)
-4. `apps/web/src/workspace.css` (Conversation workspace)
-5. `apps/web/src/app-shell.css` (Modals/Overlays)
+1. `apps/web/src/tokens.css` (Monochrome base tokens & iridescent gradient variables)
+2. `apps/web/src/design-system.css` (Glassmorphic primitives, 12-16px container radii, 10-12px inputs, 6-8px buttons)
+3. `apps/web/src/public.css` (Dark stage spotlights, gyro-tilt hero animations, 3D scroll cylinders)
+4. `apps/web/src/workspace.css` (V0-style chat workspace with fluid Siri/Gemini-style highlights)
+5. `apps/web/src/app-shell.css` (Modals/Overlays with backdrop-blur and glass treatments)
 
 ## Automated Verification Loop
 Every visual task must pass:
-1. `pnpm validate:ui`: AST/regex scan for forbidden tokens (backdrop-blur, gradients).
+1. `pnpm validate:ui`: Verify presence of `backdrop-blur`, mesh gradients, and 200-240ms fluid motion timing (4-6px movement).
 2. `pnpm typecheck && pnpm build`: Clean artifact creation.
-3. `node scripts/verify-visual-qa.mjs`: Multi-viewport (1440x900, 390x844) zero-overflow test.
+3. `node scripts/verify-visual-qa.mjs`: Multi-viewport zero-overflow test.
