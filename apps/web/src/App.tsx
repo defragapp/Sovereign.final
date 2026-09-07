@@ -150,7 +150,7 @@ export function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  if (route === '/app') return <Workspace />;
+  if (route === '/app') return <SovereignIntelligenceWorkspace />;
   if (route === '/onboarding') return <Onboarding />;
   if (route === '/auth/redeem') return <Redeem />;
   if (route === '/login' || route === '/signup') return <Auth mode={route.slice(1) as 'login' | 'signup'} />;
@@ -159,7 +159,7 @@ export function App() {
   if (route === '/faq') return <FAQ onBack={() => go('/')} />;
   if (route === '/terms') return <LegalPage title="Terms of Service" onBack={() => go('/')} />;
   if (route === '/privacy') return <LegalPage title="Privacy Policy" onBack={() => go('/')} />;
-  return <Landing />;
+  return <PublicLanding />;
 }
 
 /* =========================================================================
