@@ -8,12 +8,14 @@ import {
   Layers,
   Loader2,
   LogOut,
+  Menu,
   Plus,
   Sliders,
   Sparkles,
   User,
   Users,
-  BookOpen
+  BookOpen,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,8 +68,8 @@ interface ChatMessage {
 
 function currentRoute(): Route {
   const raw = window.location.pathname;
-  // Normalize trailing slash (e.g. /pricing/ → /pricing), but preserve root /
-  const path = raw.length > 1 ? raw.replace(/\/$/, '') : raw;
+  // Normalize trailing slashes (e.g. /pricing/ → /pricing), preserving root /
+  const path = raw.replace(/\/+$/, '') || '/';
   if (path.startsWith('/auth/redeem')) return '/auth/redeem';
   const known: Route[] = [
     '/',
@@ -161,7 +163,10 @@ export function App() {
    PUBLIC HEADER
    ========================================================================= */
 function Header() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   const scrollToLayer = (id: string) => {
+    setMobileOpen(false);
     if (window.location.pathname !== '/') {
       go('/');
       setTimeout(() => {
@@ -172,37 +177,75 @@ function Header() {
     }
   };
 
+  const nav = (path: Route) => { setMobileOpen(false); go(path); };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[rgba(255,255,255,0.08)] bg-[#000000]">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
-        <button aria-label="Sovereign home" onClick={() => go('/')} className="flex items-center gap-2.5 group shrink-0 cursor-pointer">
+        <button aria-label="Sovereign home" onClick={() => nav('/')} className="flex items-center gap-2.5 group shrink-0 cursor-pointer">
           <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
           <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign.OS</span>
         </button>
         <nav className="hidden items-center gap-8 md:flex">
-          <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">How it works</button>
+          <button onClick={() => nav('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">How it works</button>
           <button onClick={() => scrollToLayer('layer-01')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">01 · You</button>
           <button onClick={() => scrollToLayer('layer-02')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">02 · People</button>
-          <button onClick={() => go('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">Pricing</button>
+          <button onClick={() => nav('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">Pricing</button>
         </nav>
-        <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
-            onClick={() => go('/login')}
-            className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] px-2.5 py-1.5 transition-colors whitespace-nowrap cursor-pointer"
+            onClick={() => nav('/login')}
+            className="hidden sm:block text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] px-2.5 py-1.5 transition-colors whitespace-nowrap cursor-pointer"
           >
             Sign in
           </button>
           <button
-            onClick={() => go('/signup')}
+            onClick={() => nav('/signup')}
             className="rounded-full bg-[var(--cream)] px-4 py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm cursor-pointer"
           >
             Get started
           </button>
+          <button
+            type="button"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="p-1.5 text-[var(--muted)] hover:text-[var(--cream)] md:hidden transition cursor-pointer"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile navigation drawer */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-[rgba(255,255,255,0.08)] bg-[#050505] px-6 py-4 space-y-1">
+          {[
+            { label: 'How it works', action: () => nav('/how-it-works') },
+            { label: '01 · You', action: () => scrollToLayer('layer-01') },
+            { label: '02 · People', action: () => scrollToLayer('layer-02') },
+            { label: '03 · Whole System', action: () => scrollToLayer('layer-03') },
+            { label: 'Pricing', action: () => nav('/pricing') },
+            { label: 'FAQ', action: () => nav('/faq') },
+          ].map(({ label, action }) => (
+            <button
+              key={label}
+              onClick={action}
+              className="block w-full text-left py-2.5 text-sm text-[var(--muted)] hover:text-[var(--cream)] transition cursor-pointer border-b border-white/[0.04] last:border-0"
+            >
+              {label}
+            </button>
+          ))}
+          <div className="flex gap-3 pt-3">
+            <button onClick={() => nav('/login')} className="flex-1 rounded-lg border border-white/10 py-2.5 text-xs font-medium text-[var(--cream)] hover:bg-white/5 transition cursor-pointer">Sign in</button>
+            <button onClick={() => nav('/signup')} className="flex-1 rounded-lg bg-[var(--cream)] py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer">Get started</button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
+
 
 /* =========================================================================
    PUBLIC LANDING PAGE — SOVEREIGN.OS NARRATIVE PROGRESSION
@@ -366,7 +409,7 @@ function Landing() {
               id="layer-01"
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/10 bg-[#0c0c0e] p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
+              className="rounded-2xl border border-white/10 bg-[#0c0c0e] p-6 sm:p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -390,7 +433,7 @@ function Landing() {
               id="layer-02"
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
+              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 sm:p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -414,7 +457,7 @@ function Landing() {
               id="layer-03"
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
               whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
+              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 sm:p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -688,7 +731,7 @@ function Landing() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.08] bg-[#121215] p-8 flex flex-col justify-between space-y-6 shadow-xl">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#121215] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xl">
               <div className="space-y-4">
                 <div>
                   <span className="font-utility text-xs text-[var(--muted)]">STANDARD</span>
@@ -713,7 +756,7 @@ function Landing() {
               </motion.button>
             </div>
 
-            <div className="rounded-2xl border border-white/[0.14] bg-[#16161a] p-8 flex flex-col justify-between space-y-6 shadow-xl">
+            <div className="rounded-2xl border border-white/[0.14] bg-[#16161a] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xl">
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div>
@@ -1969,7 +2012,7 @@ function Pricing({ onBack }: { onBack: () => void }) {
   return (
     <PageFrame title="Pricing" onBack={onBack}>
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-8 space-y-6">
+        <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-8 space-y-6">
           <div>
             <div className="font-utility text-xs text-[var(--muted)]">STANDARD</div>
             <div className="mt-2 font-statement text-3xl text-[var(--cream)]">Free ($0)</div>
@@ -1986,7 +2029,7 @@ function Pricing({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
-        <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-8 space-y-6">
+        <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-6 sm:p-8 space-y-6">
           <div className="flex items-start justify-between">
             <div>
               <div className="font-utility text-xs text-[var(--sage)]">SOVEREIGN+</div>
