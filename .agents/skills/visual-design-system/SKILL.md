@@ -1,6 +1,6 @@
 ---
 name: visual-design-system
-description: Enforces a premium, high-motion Framer aesthetic across Sovereign.OS. Mandates monochrome b/w base themes with iridescent Siri/Gemini-style flow highlights, WebGL/CSS mesh gradients, glass buttons, and 3D gyro/mouse tilt elements.
+description: Enforces a premium, high-motion Framer aesthetic across all routes (Landing, Auth, Workspace). Mandates monochrome b/w base themes with iridescent Siri/Gemini-style flow highlights, WebGL/CSS mesh gradients, glass buttons, and 3D gyro/mouse tilt elements.
 ---
 
 # High-Motion Visual Design System (VDS) Skill
@@ -10,7 +10,7 @@ description: Enforces a premium, high-motion Framer aesthetic across Sovereign.O
 2. `apps/web/src/design-system.css` (Glassmorphic primitives, 12-16px container radii, 10-12px inputs, 6-8px buttons)
 3. `apps/web/src/public.css` (Dark stage spotlights, gyro-tilt hero animations, 3D scroll cylinders)
 4. `apps/web/src/workspace.css` (V0-style chat workspace with fluid Siri/Gemini-style highlights)
-5. `apps/web/src/app-shell.css` (Modals/Overlays with backdrop-blur and glass treatments)
+5. `apps/web/src/passkey-auth.css` (Unified auth views matching the workspace glass aesthetic)
 
 ## Automated Verification Loop
 Every visual task must pass:

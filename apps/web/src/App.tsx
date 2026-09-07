@@ -336,6 +336,7 @@ function Landing() {
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } } }}
               className="max-w-2xl mx-auto text-[var(--muted)] text-base sm:text-lg leading-relaxed mt-6"
             >
+              <strong className="block text-white font-medium mb-2">Sovereign is a Baseline-first private AI for understanding yourself, your relationships, and the human systems around you.</strong>
               Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
             </motion.p>
 

@@ -120,7 +120,7 @@ function V2Hero() {
             <span className="v2-hero-secondary">See the whole system.</span>
           </h1>
           <p className="v2-hero-lede">
-            Sovereign is a private AI for the moments that matter most. Ask about your decisions, your relationships, or what's really happening in the systems around you. Every answer is grounded in how you actually think.
+            Sovereign is a Baseline-first private AI for understanding yourself, your relationships, and the human systems around you. Build your Baseline once, then explore how you think, decide, communicate, and respond under pressure.
           </p>
           <div className="v2-hero-actions">
             <a className="button-primary" href="/signup">
