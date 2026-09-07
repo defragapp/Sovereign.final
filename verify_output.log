@@ -1,0 +1,5 @@
+
+> sovereign-final@ verify:foundation /Users/cjo/Sovereign.final
+> node scripts/verify-foundation.mjs
+
+Foundation verified: 5 required files, JSON valid, core D1 tables present.

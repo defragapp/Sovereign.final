@@ -21,6 +21,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
 import { useInView } from '@/hooks/useInView';
 import { Accordion, type AccordionItem } from '@/components/Accordion';
+import { IridescentLoader } from '@/components/IridescentLoader';
 import {
   checkSession,
   requestSignup,
@@ -64,7 +65,9 @@ interface ChatMessage {
 }
 
 function currentRoute(): Route {
-  const path = window.location.pathname;
+  const raw = window.location.pathname;
+  // Normalize trailing slash (e.g. /pricing/ → /pricing), but preserve root /
+  const path = raw.length > 1 ? raw.replace(/\/$/, '') : raw;
   if (path.startsWith('/auth/redeem')) return '/auth/redeem';
   const known: Route[] = [
     '/',
@@ -157,34 +160,43 @@ export function App() {
 /* =========================================================================
    PUBLIC HEADER
    ========================================================================= */
-/* =========================================================================
-   PUBLIC HEADER
-   ========================================================================= */
 function Header() {
+  const scrollToLayer = (id: string) => {
+    if (window.location.pathname !== '/') {
+      go('/');
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[rgba(255,255,255,0.08)] bg-[var(--ink)]">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-8">
-        <button aria-label="Sovereign home" onClick={() => go('/')} className="flex items-center gap-2.5 group shrink-0">
+    <header className="sticky top-0 z-50 w-full border-b border-[rgba(255,255,255,0.08)] bg-[#000000]">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
+        <button aria-label="Sovereign home" onClick={() => go('/')} className="flex items-center gap-2.5 group shrink-0 cursor-pointer">
           <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
           <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign.OS</span>
         </button>
-        <nav className="hidden items-center gap-12 md:flex">
-          <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">How it works</button>
-          <button onClick={() => go('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">Pricing</button>
-          <button onClick={() => go('/faq')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors">FAQ</button>
+        <nav className="hidden items-center gap-8 md:flex">
+          <button onClick={() => go('/how-it-works')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">How it works</button>
+          <button onClick={() => scrollToLayer('layer-01')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">01 · You</button>
+          <button onClick={() => scrollToLayer('layer-02')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">02 · People</button>
+          <button onClick={() => go('/pricing')} className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] transition-colors cursor-pointer">Pricing</button>
         </nav>
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
           <button
             onClick={() => go('/login')}
-            className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] px-2.5 py-1.5 transition-colors whitespace-nowrap"
+            className="text-xs font-medium text-[var(--muted)] hover:text-[var(--cream)] px-2.5 py-1.5 transition-colors whitespace-nowrap cursor-pointer"
           >
             Sign in
           </button>
           <button
             onClick={() => go('/signup')}
-            className="rounded-full bg-[var(--cream)] px-4 py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm"
+            className="rounded-full bg-[var(--cream)] px-4 py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm cursor-pointer"
           >
-            Build Your Baseline
+            Get started
           </button>
         </div>
       </div>
@@ -202,11 +214,17 @@ function Landing() {
   const pricingView = useInView({ threshold: 0.1 });
   const finalView = useInView({ threshold: 0.1 });
 
-  // Baseline intake preview widget local state
-  const [demoBirthDate, setDemoBirthDate] = useState('1992-06-15');
-  const [demoBirthplace, setDemoBirthplace] = useState('San Francisco, CA');
-  const [demoCertainty, setDemoCertainty] = useState<'exact' | 'approximate' | 'unknown'>('approximate');
-  const [demoSubmitted, setDemoSubmitted] = useState(false);
+  // Terminal intake preview state
+  const [demoQuestion, setDemoQuestion] = useState('Why does the same conversation feel urgent to me and pressuring to them?');
+  const [isAsking, setIsAsking] = useState(false);
+  const [showSources, setShowSources] = useState(false);
+
+  const handleAskSovereign = () => {
+    setIsAsking(true);
+    setTimeout(() => {
+      setIsAsking(false);
+    }, 350);
+  };
 
   const baselineAccordionItems: AccordionItem[] = [
     {
@@ -235,274 +253,371 @@ function Landing() {
   return (
     <div className="page-noise relative min-h-screen bg-[var(--platform-bg)] text-[var(--cream)] overflow-x-hidden">
       {/* Ambient background glow */}
-      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(174,186,167,0.06),transparent_70%)]" />
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(159,186,161,0.06),transparent_70%)]" />
 
       <Header />
 
       <main className="relative z-10 mx-auto max-w-5xl px-6 sm:px-8 pb-32 space-y-24 sm:space-y-32">
         {/* 1. HERO SECTION */}
-        <section
-          ref={heroView.ref}
-          data-visible={heroView.isInView}
-          className="pt-20 sm:pt-28 text-center animate-fade-up"
-        >
-          <div className="max-w-3xl mx-auto flex flex-col items-center">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.025)] px-4 py-1.5 text-[11px] font-medium text-[var(--muted)] mb-8 tracking-wider uppercase">
+        <section className="pt-20 sm:pt-28 text-center">
+          <motion.div
+            className="max-w-3xl mx-auto flex flex-col items-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.09 } }
+            }}
+          >
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } } }}
+              className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.025)] px-4 py-1.5 text-[11px] font-mono font-medium text-[var(--muted)] mb-8 tracking-wider uppercase"
+            >
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
               <span>PERSONAL AI FOR REAL LIFE</span>
-            </div>
+            </motion.div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl text-[var(--cream)] font-normal tracking-tight leading-[1.06]">
+            <motion.h1
+              variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } } }}
+              className="text-3xl sm:text-6xl md:text-7xl text-[var(--cream)] font-normal tracking-tight leading-[1.06]"
+            >
               Healing isn’t optional.<br />
               Holding onto the pain is.
-            </h1>
+            </motion.h1>
 
-            <p className="max-w-2xl mx-auto text-[var(--muted)] text-base sm:text-lg leading-relaxed mt-6">
+            <motion.p
+              variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } } }}
+              className="max-w-2xl mx-auto text-[var(--muted)] text-base sm:text-lg leading-relaxed mt-6"
+            >
               Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-              <button
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
+            >
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => go('/signup')}
                 className="rounded-xl bg-[var(--cream)] px-8 py-3.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer shadow-sm w-full sm:w-auto"
               >
                 Build your Baseline
-              </button>
-              <button
-                onClick={() => go('/how-it-works')}
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  const demoEl = document.getElementById('demo');
+                  if (demoEl) {
+                    demoEl.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    go('/how-it-works');
+                  }
+                }}
                 className="rounded-xl border border-[rgba(255,255,255,0.12)] bg-transparent px-8 py-3.5 text-sm font-medium text-[var(--cream)] hover:bg-[rgba(255,255,255,0.04)] transition cursor-pointer w-full sm:w-auto"
               >
-                How it works
-              </button>
-            </div>
+                See a Sovereign answer
+              </motion.button>
+            </motion.div>
 
-            <p className="mt-4 text-xs text-[var(--subtle)]">
+            <motion.p
+              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, delay: 0.1 } } }}
+              className="mt-4 text-xs text-[var(--subtle)]"
+            >
               Start free · No card required · Review, correct, or reject any interpretation
+            </motion.p>
+          </motion.div>
+        </section>
+
+        {/* 2. THREE-LAYER SCOPE SECTION */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 space-y-16"
+        >
+          <div className="max-w-2xl mx-auto text-center space-y-4">
+            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
+              HOW IT WORKS
+            </span>
+            <h2 className="text-3xl sm:text-5xl text-[var(--cream)] font-normal leading-tight">
+              Understanding moves outward in three clear layers.
+            </h2>
+            <p className="text-base sm:text-lg text-[var(--muted)] leading-relaxed">
+              Start with yourself. Add people with consent. See the whole picture when it matters.
             </p>
           </div>
-        </section>
 
-        {/* 2. INTERACTIVE BASELINE INTAKE PREVIEW WIDGET */}
-        <section className="animate-fade-up max-w-xl mx-auto">
-          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface-1)] p-6 sm:p-8 space-y-5 shadow-xl">
-            <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.06)] pb-4">
-              <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider uppercase">INTERACTIVE DEMONSTRATION</span>
-              <span className="text-xs text-[var(--subtle)]">Establish Private Reference</span>
-            </div>
-
-            {!demoSubmitted ? (
+          <motion.div
+            className="grid gap-8 md:grid-cols-3"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.12 } }
+            }}
+          >
+            {/* Card 1: 01 · YOU */}
+            <motion.div
+              id="layer-01"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="rounded-2xl border border-white/10 bg-[#0c0c0e] p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
+            >
               <div className="space-y-4">
-                <div>
-                  <label className="block text-xs text-[var(--muted)] mb-1.5">Birth Date</label>
-                  <Input
-                    type="date"
-                    value={demoBirthDate}
-                    onChange={(e) => setDemoBirthDate(e.target.value)}
-                    className="border-[rgba(255,255,255,0.1)] bg-[var(--surface-0)] text-sm rounded-lg"
-                  />
+                <div className="flex items-center justify-between">
+                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">01 · YOU</span>
+                  <span className="text-xs text-[var(--subtle)] font-mono">Explore yourself</span>
                 </div>
-                <div>
-                  <label className="block text-xs text-[var(--muted)] mb-1.5">Birthplace (City, State/Country)</label>
-                  <Input
-                    placeholder="e.g. San Francisco, CA"
-                    value={demoBirthplace}
-                    onChange={(e) => setDemoBirthplace(e.target.value)}
-                    className="border-[rgba(255,255,255,0.1)] bg-[var(--surface-0)] text-sm rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-[var(--muted)] mb-1.5">Time Certainty</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {(['exact', 'approximate', 'unknown'] as const).map((cert) => (
-                      <button
-                        key={cert}
-                        type="button"
-                        onClick={() => setDemoCertainty(cert)}
-                        className={`rounded-lg border py-2 text-xs capitalize transition cursor-pointer ${
-                          demoCertainty === cert
-                            ? 'border-[var(--cream)] bg-[rgba(255,255,255,0.08)] text-[var(--cream)]'
-                            : 'border-[rgba(255,255,255,0.08)] text-[var(--muted)] hover:border-[rgba(255,255,255,0.16)]'
-                        }`}
-                      >
-                        {cert}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setDemoSubmitted(true)}
-                  className="w-full mt-2 rounded-xl bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.12)] py-2.5 text-xs font-medium text-[var(--cream)] hover:bg-[rgba(255,255,255,0.1)] transition cursor-pointer"
-                >
-                  Simulate Baseline Generation
-                </button>
+                <h3 className="text-xl text-[var(--cream)] font-medium leading-snug">
+                  Explore how you think, decide, communicate, create, connect, and grow.
+                </h3>
+                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
+                  Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment—without reducing yourself to a type or score.
+                </p>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface-0)] p-4 text-xs space-y-2">
-                  <div className="flex items-center gap-2 text-[var(--sage)] font-utility text-[10px]">
-                    <Check className="h-3.5 w-3.5" />
-                    <span>DEMO BASELINE COMPUTED</span>
-                  </div>
-                  <p className="text-[var(--cream)] font-medium">
-                    Coordinates reduced into grounded personal themes for {demoBirthplace || 'San Francisco, CA'}.
-                  </p>
-                  <p className="text-[var(--muted)]">
-                    Your real Baseline is saved securely in your private account and is never shared with third-party model trainers.
-                  </p>
-                </div>
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => go('/signup')}
-                    className="flex-1 rounded-xl bg-[var(--cream)] py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer"
-                  >
-                    Build Your Real Baseline
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDemoSubmitted(false)}
-                    className="rounded-xl border border-[rgba(255,255,255,0.1)] py-2.5 px-4 text-xs text-[var(--muted)] hover:text-[var(--cream)] transition cursor-pointer"
-                  >
-                    Reset Demo
-                  </button>
-                </div>
+              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)] font-mono">
+                Individual Baseline · Today Workspace
               </div>
-            )}
-          </div>
-        </section>
+            </motion.div>
 
-        {/* 3. GROUNDED WORKSPACE DEMONSTRATION CARD (SOVEREIGN ANSWER V2) */}
+            {/* Card 2: 02 · YOU + YOUR PEOPLE */}
+            <motion.div
+              id="layer-02"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">02 · YOU + YOUR PEOPLE</span>
+                  <span className="text-xs text-[var(--subtle)] font-mono">Relational intelligence</span>
+                </div>
+                <h3 className="text-xl text-[var(--cream)] font-medium leading-snug">
+                  See why the same moment lands differently—and how to bridge the gap.
+                </h3>
+                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
+                  With permission, Sovereign can use both people’s Baselines while keeping each person distinct. See where timing, communication, pressure, or decision styles differ, what happens when they meet, and what each person can do differently.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)] font-mono">
+                Mutual Consent · Distinct Perspectives
+              </div>
+            </motion.div>
+
+            {/* Card 3: 03 · FROM 1:1 TO THE WHOLE SYSTEM */}
+            <motion.div
+              id="layer-03"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">03 · FROM 1:1 TO THE WHOLE SYSTEM</span>
+                  <span className="text-xs text-[var(--subtle)] font-mono">System dynamics</span>
+                </div>
+                <h3 className="text-xl text-[var(--cream)] font-medium leading-snug">
+                  See the whole system.
+                </h3>
+                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
+                  Move from one relationship to a family, household, team, or group. See who is involved, what each person is responsible for, where pressure builds, how people respond to one another, and what may change when one person responds differently.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)] font-mono">
+                Groups &amp; Teams · Pressure Flow
+              </div>
+            </motion.div>
+          </motion.div>
+        </motion.section>
+
+        {/* 3. SOVEREIGN ANSWER DEMONSTRATION WINDOW */}
         <section
+          id="demo"
           ref={previewView.ref}
           data-visible={previewView.isInView}
-          className="animate-fade-up"
+          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 animate-fade-up"
         >
-          <div className="rounded-2xl border border-white/[0.08] bg-[#121212] p-8 sm:p-14 space-y-6 shadow-2xl">
-            {/* Inquiry Header */}
-            <div className="flex items-start justify-between border-b border-white/[0.06] pb-6">
-              <div className="space-y-1">
-                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase">INQUIRY</span>
-                <p className="text-base sm:text-xl text-[var(--cream)] font-medium">
-                  &ldquo;Why do I keep overthinking what to say when I feel misunderstood?&rdquo;
-                </p>
+          <div className="max-w-2xl mx-auto text-center space-y-4 mb-10">
+            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
+              SEE IT IN ACTION
+            </span>
+            <h2 className="text-3xl sm:text-4xl text-[var(--cream)] font-normal">
+              A real answer, grounded in two people's context.
+            </h2>
+            <p className="text-sm sm:text-base text-[var(--muted)]">
+              This is how Sovereign works when two people share context. Each perspective stays private and distinct.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-white/[0.08] bg-[#050505] p-6 sm:p-10 space-y-6 shadow-2xl relative overflow-hidden">
+            {/* Ambient terminal glow */}
+            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(159,186,161,0.06),transparent_70%)]" />
+
+            {/* Terminal Window Header Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-4">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="h-2.5 w-2.5 rounded-full bg-white/10 shrink-0" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/10 shrink-0" />
+                <span className="h-2.5 w-2.5 rounded-full bg-white/10 shrink-0" />
+                <span className="ml-2 font-mono text-[11px] text-[var(--subtle)] truncate">sovereign.workspace</span>
               </div>
-              <div className="flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-3.5 py-1.5 shrink-0 hidden sm:flex">
+              <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1 shrink-0">
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)] animate-pulse" />
-                <span className="text-[10px] font-utility text-[var(--sage)] tracking-wider">BASELINE GROUNDED</span>
+                <span className="text-[10px] font-utility text-[var(--sage)] tracking-wider">LIVE PREVIEW</span>
               </div>
             </div>
 
-            {/* Structured Sovereign Answer v2 */}
-            <div className="space-y-6 pt-2">
-              <div className="space-y-2">
-                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-1">GROUNDED OBSERVATION</span>
-                <p className="text-base sm:text-lg text-[var(--cream)]/90 leading-relaxed font-normal">
-                  Your Baseline requires reflective processing before articulation. When you feel misunderstood, you instinctively draft multiple speech variants in real time to prevent incorrect perceptions.
-                </p>
+            {/* Question Intake Input / Prompt Box */}
+            <div className="rounded-xl border border-white/[0.08] bg-[#0c0c0e] p-4 sm:p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="font-utility text-[10px] text-[var(--muted)] tracking-wider uppercase">
+                  Your question:
+                </label>
+                <span className="text-[11px] text-[var(--subtle)] font-mono">Relational context active</span>
               </div>
-
-              <div className="space-y-2 border-t border-white/[0.06] pt-5">
-                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-1">THE STRUCTURAL PATTERN</span>
-                <p className="text-base sm:text-lg text-[var(--muted)] leading-relaxed font-normal">
-                  Over-refinement is an attempt to manage the other party&apos;s internal reaction before they have finished processing.
-                </p>
-              </div>
-
-              <div className="space-y-2 border-t border-white/[0.06] pt-5">
-                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-1">THE SHIFT</span>
-                <p className="text-base sm:text-lg text-[var(--cream)] font-medium leading-relaxed">
-                  Separate the observation from the resolution. Name the disconnect cleanly, pause the conversation, and return only when your internal clarity stabilizes.
-                </p>
-              </div>
-
-              {/* Source Details & Correction Prompt Footer */}
-              <div className="border-t border-white/[0.06] pt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[var(--subtle)]">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="text"
+                  value={demoQuestion}
+                  onChange={(e) => setDemoQuestion(e.target.value)}
+                  placeholder="Enter a relational inquiry..."
+                  className="flex-1 rounded-lg border border-white/[0.1] bg-[#050505] px-4 py-2.5 text-sm text-[var(--cream)] placeholder-[var(--subtle)] focus:outline-none focus:border-[var(--sage)] transition-colors"
+                />
                 <button
                   type="button"
-                  onClick={() => alert('Sources details: Baseline Facet 04 (Reflective Expression) & Facet 12 (Pressure Containment).')}
-                  className="font-utility text-[11px] text-[var(--muted)] hover:text-[var(--cream)] transition underline cursor-pointer"
+                  onClick={handleAskSovereign}
+                  disabled={isAsking}
+                  className="rounded-lg bg-[var(--cream)] px-6 py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors cursor-pointer shrink-0 flex items-center justify-center gap-2 shadow-sm"
                 >
-                  See source details
+                  {isAsking ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>Synthesizing...</span>
+                    </>
+                  ) : (
+                    <span>Ask Sovereign</span>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Answer Display Surface */}
+            <div className="space-y-6 pt-2">
+              <div className="border-b border-white/[0.06] pb-3 flex items-center justify-between">
+                <span className="font-utility text-[11px] text-[var(--muted)] tracking-wider uppercase">
+                  WHAT SOVEREIGN FOUND
+                </span>
+                <span className="font-mono text-[10px] text-[var(--subtle)]">Three perspectives</span>
+              </div>
+
+              {/* Triad Item 1: WHAT YOU MAY BE BRINGING */}
+              <div className="rounded-xl border border-white/[0.06] bg-[#0c0c0e]/60 p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
+                    WHAT YOU MAY BE BRINGING
+                  </span>
+                  <span className="text-[10px] text-[var(--subtle)] font-mono">Your Baseline</span>
+                </div>
+                <p className="text-sm sm:text-base text-[var(--cream)]/95 leading-relaxed font-normal">
+                  Your Baseline relies on fast processing and immediate verbal resolution to regulate tension when ambiguity arises. In hard conversations, you seek a concrete next step in order to feel settled, which can accelerate your pacing.
+                </p>
+              </div>
+
+              {/* Triad Item 2: WHAT THEY MAY BE BRINGING */}
+              <div className="rounded-xl border border-white/[0.06] bg-[#0c0c0e]/60 p-5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
+                    WHAT THEY MAY BE BRINGING
+                  </span>
+                  <span className="text-[10px] text-[var(--subtle)] font-mono">Shared Baseline</span>
+                </div>
+                <p className="text-sm sm:text-base text-[var(--cream)]/85 leading-relaxed font-normal">
+                  Their shared Baseline requires internal reflection time before responding, experiencing rapid questioning as an intrusion. Under pressure, their instinct is to pause and regulate rather than offer an immediate commitment.
+                </p>
+              </div>
+
+              {/* Triad Item 3: WHAT HAPPENS BETWEEN YOU */}
+              <div className="rounded-xl border border-[rgba(159,186,161,0.2)] bg-[#0c0c0e] p-5 space-y-2 shadow-inner">
+                <div className="flex items-center justify-between">
+                  <span className="font-utility text-[10px] text-[var(--cream)] tracking-widest uppercase">
+                    WHAT HAPPENS BETWEEN YOU
+                  </span>
+                  <span className="text-[10px] text-[var(--sage)] font-mono">Interaction Dynamic</span>
+                </div>
+                <p className="text-sm sm:text-base text-[var(--cream)] font-medium leading-relaxed">
+                  Your pursuit of immediate clarity accelerates their need for space, turning a simple timing difference into mutual defense. Urgency invites withdrawal, and withdrawal amplifies urgency. Naming a clear return time allows space without leaving the issue abandoned.
+                </p>
+              </div>
+
+              {/* Footer Controls: Sources Toggle & Guidance Note */}
+              <div className="border-t border-white/[0.06] pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[var(--subtle)]">
+                <button
+                  type="button"
+                  onClick={() => setShowSources(!showSources)}
+                  className="font-utility text-[11px] text-[var(--muted)] hover:text-[var(--cream)] transition-colors underline cursor-pointer flex items-center gap-1.5"
+                >
+                  <span>{showSources ? 'Hide source details' : 'See source details'}</span>
+                  <ChevronDown className={`h-3 w-3 transition-transform ${showSources ? 'rotate-180' : ''}`} />
                 </button>
                 <span>Correct, adjust, or reject this interpretation at any time.</span>
               </div>
+
+              {/* Clean Inline Sources Disclosure Drawer */}
+              {showSources && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="rounded-xl border border-white/[0.08] bg-[#0c0c0e] p-5 space-y-4"
+                >
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+                    <span className="font-utility text-[10px] text-[var(--cream)] tracking-wider uppercase">
+                      Source details
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowSources(false)}
+                      className="text-xs text-[var(--subtle)] hover:text-[var(--cream)] cursor-pointer"
+                    >
+                      Close
+                    </button>
+                  </div>
+                  <p className="text-xs text-[var(--muted)] leading-relaxed">
+                    These are the source values Sovereign used for this answer. They can inform reflection; they do not prove personality or current state.
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
+                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
+                      <div className="font-mono text-xs text-[var(--cream)] font-medium">HD G13.1</div>
+                      <div className="text-[10px] text-[var(--subtle)] mt-1">Listening & Direction</div>
+                    </div>
+                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
+                      <div className="font-mono text-xs text-[var(--cream)] font-medium">GK ACT13</div>
+                      <div className="text-[10px] text-[var(--subtle)] mt-1">Discernment</div>
+                    </div>
+                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
+                      <div className="font-mono text-xs text-[var(--cream)] font-medium">☉ CAN 04.2°</div>
+                      <div className="text-[10px] text-[var(--subtle)] mt-1">Relational Sensitivity</div>
+                    </div>
+                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
+                      <div className="font-mono text-xs text-[var(--cream)] font-medium">N LP1</div>
+                      <div className="text-[10px] text-[var(--subtle)] mt-1">Pacing & Autonomy</div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
-          </div>
-        </section>
-
-        {/* 4. THREE-TIER NARRATIVE ARCHITECTURE */}
-        <section
-          ref={engineView.ref}
-          data-visible={engineView.isInView}
-          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 space-y-16 animate-fade-up"
-        >
-          <div className="max-w-2xl mx-auto text-center space-y-4">
-            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">THE ARCHITECTURE OF SOVEREIGN</span>
-            <h2 className="text-3xl sm:text-5xl text-[var(--cream)] font-normal leading-tight">
-              From personal mechanics to whole systems.
-            </h2>
-            <p className="text-base sm:text-lg text-[var(--muted)] leading-relaxed">
-              Sovereign operates across three distinct surfaces of intelligence, grounded in your Baseline.
-            </p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-3">
-            {/* TIER 01 */}
-            <motion.div
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/[0.08] bg-[#121215] p-7 space-y-4 flex flex-col justify-between shadow-xl"
-            >
-              <div className="space-y-3">
-                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">01 · YOU</span>
-                <h3 className="text-xl text-[var(--cream)] font-medium">Personal Baseline</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
-                  Establish your private Baseline. Explore your decisions, pressure responses, creative rhythms, and recurring internal loops without losing context between sessions.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)]">
-                Includes Today thinking environment & private library.
-              </div>
-            </motion.div>
-
-            {/* TIER 02 */}
-            <motion.div
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/[0.08] bg-[#121215] p-7 space-y-4 flex flex-col justify-between shadow-xl"
-            >
-              <div className="space-y-3">
-                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">02 · YOU + YOUR PEOPLE</span>
-                <h3 className="text-xl text-[var(--cream)] font-medium">Relational Intelligence</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
-                  Examine 1:1 dynamics with partners, co-founders, or key colleagues. Understand why communication stalls under pressure and map structural pair mechanics.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)]">
-                Includes People workspace & pair overlay comparisons.
-              </div>
-            </motion.div>
-
-            {/* TIER 03 */}
-            <motion.div
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/[0.08] bg-[#121215] p-7 space-y-4 flex flex-col justify-between shadow-xl"
-            >
-              <div className="space-y-3">
-                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">03 · THE WHOLE SYSTEM</span>
-                <h3 className="text-xl text-[var(--cream)] font-medium">System Dynamics</h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
-                  Map multi-participant groups, executive teams, and family structures. Expose unassigned pressure concentrations and operational bottlenecks across teams.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)]">
-                Includes Systems map & multi-participant intelligence.
-              </div>
-            </motion.div>
           </div>
 
           {/* Interactive Accordion Demo */}
-          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-8 space-y-4">
-            <span className="font-utility text-[10px] text-[var(--subtle)] tracking-wider uppercase block">EXPLORE CANONICAL INQUIRIES</span>
+          <div className="mt-12 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#0c0c0e] p-6 sm:p-8 space-y-4">
+            <span className="font-utility text-[10px] text-[var(--subtle)] tracking-wider uppercase block">
+              EXPLORE CANONICAL INQUIRIES
+            </span>
             <Accordion items={baselineAccordionItems} />
           </div>
         </section>
@@ -545,7 +660,7 @@ function Landing() {
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-[var(--sage)] shrink-0 mt-0.5" />
-                  <span>Delivers structured Sovereign Answer v2 observations.</span>
+                  <span>Delivers structured, grounded relational observations.</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <Check className="h-4 w-4 text-[var(--sage)] shrink-0 mt-0.5" />
@@ -664,6 +779,7 @@ function Landing() {
             <span className="font-medium text-[var(--muted)]">Sovereign.OS</span>
           </div>
           <div className="flex gap-6 font-utility text-[10px]">
+            <button onClick={() => go('/how-it-works')} className="hover:text-[var(--cream)] transition cursor-pointer">How it works</button>
             <button onClick={() => go('/terms')} className="hover:text-[var(--cream)] transition cursor-pointer">Terms</button>
             <button onClick={() => go('/privacy')} className="hover:text-[var(--cream)] transition cursor-pointer">Privacy</button>
             <button onClick={() => go('/pricing')} className="hover:text-[var(--cream)] transition cursor-pointer">Pricing</button>
@@ -723,7 +839,12 @@ function Auth({ mode }: { mode: 'login' | 'signup' }) {
 
   return (
     <div className="page-noise flex min-h-screen items-center justify-center px-6 py-12 bg-[var(--ink)] text-[var(--cream)]">
-      <div className="w-full max-w-md">
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
         <button onClick={() => go('/')} className="mx-auto mb-8 flex items-center gap-2.5 group">
           <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
           <span className="text-sm font-medium tracking-tight">Sovereign</span>
@@ -838,8 +959,22 @@ function Auth({ mode }: { mode: 'login' | 'signup' }) {
           <div className="mt-7 border-t border-[var(--line)] pt-4 text-xs font-explanation text-center text-[var(--subtle)]">
             Your account stays private. Sovereign uses the context you choose to provide to build your personal reference.
           </div>
+
+          <div className="mt-4 text-center text-xs text-[var(--subtle)]">
+            {isSignup ? (
+              <>
+                Already have an account?{' '}
+                <button type="button" onClick={() => go('/login')} className="text-[var(--cream)] hover:underline cursor-pointer">Sign in</button>
+              </>
+            ) : (
+              <>
+                Don't have an account?{' '}
+                <button type="button" onClick={() => go('/signup')} className="text-[var(--cream)] hover:underline cursor-pointer">Get started free</button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -1289,7 +1424,7 @@ function Workspace() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--ink)] text-[var(--cream)] flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[var(--ink)] text-[var(--cream)] flex flex-col md:flex-row overflow-x-hidden">
       {/* NAVIGATION RAIL */}
       <aside className="w-full md:w-60 shrink-0 border-b md:border-b-0 md:border-r border-[var(--line)] bg-[var(--surface)] flex flex-row md:flex-col justify-between p-4 md:p-6 z-20">
         <div className="space-y-6 w-full">
@@ -1303,7 +1438,7 @@ function Workspace() {
             </span>
           </div>
 
-          <nav className="flex md:flex-col gap-1 overflow-x-auto">
+          <nav className="flex md:flex-col gap-1 overflow-x-auto scrollbar-hide">
             {[
               { id: 'today', label: 'Today', icon: Compass },
               { id: 'explore', label: 'Explore', icon: Sliders },
@@ -1318,7 +1453,7 @@ function Workspace() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as WorkspaceTab)}
-                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs transition ${
+                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs transition shrink-0 ${
                     isActive
                       ? 'bg-[var(--surface-2)] text-[var(--cream)] font-medium border border-[var(--line)]'
                       : 'text-[var(--muted)] hover:text-[var(--cream)] hover:bg-[var(--surface-2)]/50'
@@ -1330,6 +1465,16 @@ function Workspace() {
               );
             })}
           </nav>
+
+          {/* Mobile sign-out (visible only on small screens) */}
+          <button
+            className="md:hidden ml-auto flex items-center gap-1.5 text-[var(--subtle)] hover:text-[var(--cream)] transition shrink-0 px-2 py-1"
+            onClick={async () => { await logout(); go('/'); }}
+            title="Sign out"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            <span className="text-[10px] font-utility">Sign out</span>
+          </button>
         </div>
 
         <div className="hidden md:block pt-6 border-t border-[var(--line)] space-y-3">
@@ -1359,7 +1504,7 @@ function Workspace() {
       </aside>
 
       {/* MAIN WORKSPACE CONTENT AREA */}
-      <main className="flex-1 flex flex-col min-h-[calc(100svh-60px)] md:min-h-screen bg-[var(--ink)]">
+      <main className="flex-1 flex flex-col min-h-[calc(100svh-60px)] md:min-h-screen bg-[var(--ink)] overflow-x-hidden">
         {errorBanner && (
           <div className="mx-6 mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">
             {errorBanner}
@@ -1368,15 +1513,15 @@ function Workspace() {
 
         {/* TODAY VIEW (Primary conversation & thinking surface) */}
         {activeTab === 'today' && (
-          <div className="flex-1 flex flex-col max-w-3xl mx-auto w-full px-6 py-8">
+          <div className="sov-tab-content flex-1 flex flex-col max-w-3xl mx-auto w-full px-6 py-8">
             <div className="flex-1">
               {messages.length === 0 ? (
-                <div className="flex min-h-[55vh] flex-col justify-center relative">
+                <div className="flex min-h-[55vh] flex-col justify-center relative overflow-hidden">
                   <ReferenceField className="absolute -right-20 -top-10 w-96 h-64 opacity-20" />
                   <div className="relative z-10 space-y-3">
                     <p className="font-utility text-[var(--sage)]">TODAY</p>
                     <h1 className="font-statement text-3xl md:text-5xl text-[var(--cream)] max-w-lg">
-                      What would you like to understand?
+                      What is active for you now?
                     </h1>
                     <p className="font-explanation text-sm max-w-lg">
                       Ask in ordinary language. Sovereign answers from your private Baseline, surfaces active dynamics, and keeps unknowns explicit.
@@ -1408,14 +1553,23 @@ function Workspace() {
                 <div className="space-y-6 pb-36">
                   {messages.map((message) =>
                     message.role === 'user' ? (
-                      <div
+                      <motion.div
                         key={message.id}
+                        initial={{ opacity: 0, x: 8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         className="ml-auto max-w-[85%] rounded-xl bg-[var(--surface-2)] border border-[var(--line)] px-4 py-3 text-sm leading-relaxed text-[var(--cream)]"
                       >
                         {message.text}
-                      </div>
+                      </motion.div>
                     ) : (
-                      <article key={message.id} className="space-y-4">
+                      <motion.article
+                        key={message.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                        className="space-y-4"
+                      >
                         {message.answer ? (
                           <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8 space-y-5">
                             <div className="flex items-center justify-between font-utility text-[10px] text-[var(--subtle)]">
@@ -1430,17 +1584,23 @@ function Workspace() {
                               {message.answer.headline}
                             </h2>
 
-                            <div className="font-explanation text-sm md:text-[15px] leading-relaxed">
+                            <div className="answer-direct answer-prose">
                               <p>{message.answer.direct_answer}</p>
                             </div>
 
                             {message.answer.sections && message.answer.sections.length > 0 && (
                               <div className="space-y-2.5 border-t border-[var(--line)] pt-4">
                                 {message.answer.sections.map((sec) => (
-                                  <div key={sec.id} className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1">
+                                  <motion.div
+                                    key={sec.id}
+                                    initial={{ opacity: 0, y: 6 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                                    className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1"
+                                  >
                                     <div className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">{sec.label}</div>
                                     <div className="font-explanation text-xs leading-relaxed text-[var(--cream)]">{sec.body}</div>
-                                  </div>
+                                  </motion.div>
                                 ))}
                               </div>
                             )}
@@ -1480,14 +1640,13 @@ function Workspace() {
                             {message.text}
                           </div>
                         )}
-                      </article>
+                      </motion.article>
                     )
                   )}
 
                   {sending && (
-                    <div className="flex items-center gap-2 text-xs text-[var(--subtle)] pt-2">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      <span>Sovereign is synthesizing your answer...</span>
+                    <div className="pt-4 pb-2">
+                      <IridescentLoader label="Sovereign is synthesizing your answer" />
                     </div>
                   )}
                 </div>
@@ -1507,7 +1666,7 @@ function Workspace() {
                         send();
                       }
                     }}
-                    placeholder="Ask Sovereign about your life..."
+                    placeholder="Ask Sovereign…"
                     className="min-h-12 border-0 bg-transparent px-2 py-2 shadow-none focus:ring-0 text-sm text-[var(--cream)]"
                     disabled={sending}
                   />
@@ -1517,7 +1676,7 @@ function Workspace() {
                 </div>
               </div>
               <div className="mt-2 text-center font-utility text-[10px] text-[var(--subtle)]">
-                Private by default · Model context is restricted to consenting data
+                Private by default · Sovereign uses only consented data
               </div>
             </div>
           </div>
@@ -1525,7 +1684,7 @@ function Workspace() {
 
         {/* PEOPLE VIEW */}
         {activeTab === 'people' && (
-          <div className="max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
+          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
             <div>
               <p className="font-utility text-[var(--sage)] mb-2">PEOPLE</p>
               <h1 className="font-statement text-3xl text-[var(--cream)]">
@@ -1599,7 +1758,7 @@ function Workspace() {
 
         {/* SYSTEMS VIEW */}
         {activeTab === 'systems' && (
-          <div className="max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
+          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
             <div>
               <p className="font-utility text-[var(--sage)] mb-2">SYSTEMS</p>
               <h1 className="font-statement text-3xl text-[var(--cream)]">
@@ -1614,7 +1773,7 @@ function Workspace() {
               <ReferenceField className="mx-auto w-80 h-48 opacity-30" />
               <div className="font-statement text-lg text-[var(--cream)]">Interconnected Relational Dynamics</div>
               <p className="font-explanation text-xs max-w-md mx-auto">
-                When three or more people interact, the dynamic shifts from pairwise communication into systemic equilibrium. Sovereign maps who holds tension, how authority flows, and where recurring loops repeat.
+                When three or more people interact, the dynamic shifts from pairwise communication into systemic equilibrium. Sovereign maps who holds tension, how pressure moves, and where recurring loops repeat.
               </p>
               <button
                 onClick={() => {
@@ -1632,7 +1791,7 @@ function Workspace() {
 
         {/* EXPLORE VIEW */}
         {activeTab === 'explore' && (
-          <div className="max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
+          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
             <div>
               <p className="font-utility text-[var(--sage)] mb-2">EXPLORE</p>
               <h1 className="font-statement text-3xl text-[var(--cream)]">
@@ -1670,7 +1829,7 @@ function Workspace() {
 
         {/* LIBRARY VIEW */}
         {activeTab === 'library' && (
-          <div className="max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
+          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
             <div>
               <p className="font-utility text-[var(--sage)] mb-2">LIBRARY</p>
               <h1 className="font-statement text-3xl text-[var(--cream)]">
@@ -1698,7 +1857,7 @@ function Workspace() {
 
         {/* YOU / BASELINE VIEW */}
         {activeTab === 'you' && (
-          <div className="max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
+          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
             <div>
               <p className="font-utility text-[var(--sage)] mb-2">YOU</p>
               <h1 className="font-statement text-3xl text-[var(--cream)]">
@@ -1780,10 +1939,6 @@ function InfoPage({ onBack }: { onBack: () => void }) {
           <p className="font-explanation text-xs text-[var(--muted)]">
             Separate from subscriptions. Support is voluntary and does not change Free or Sovereign+ access. Contributions use a secure one-time amount from $1.
           </p>
-          <div className="flex gap-4 text-xs text-[var(--subtle)]">
-            <span>$10 suggested</span>
-            <span>$25 suggested</span>
-          </div>
           <a
             href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02"
             target="_blank"
@@ -1935,7 +2090,7 @@ function PageFrame({
   children: ReactNode;
 }) {
   return (
-    <div className="page-noise min-h-screen bg-[var(--ink)] text-[var(--cream)]">
+    <div className="page-noise min-h-screen bg-[var(--ink)] text-[var(--cream)] overflow-x-hidden">
       <Header />
       <main className="mx-auto max-w-4xl px-6 pb-24 pt-10 md:px-8 md:pt-16">
         <button onClick={onBack} className="mb-8 font-utility text-xs text-[var(--muted)] hover:text-[var(--cream)] transition">

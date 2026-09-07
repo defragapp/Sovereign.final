@@ -1,0 +1,42 @@
+{
+  "auditTimestamp": "2026-09-07T03:58:45Z",
+  "commitSha": "e0cfc2075b2f8a751835e51da1958c2792521cf5",
+  "migrationVersion": "0019_deprecate_manual_capacity",
+  "bundleInspection": {
+    "legacyStylesheetsPurged": true,
+    "legacyStylesheets": [
+      "public.css",
+      "workspace.css",
+      "design-system.css"
+    ],
+    "cssPayloadVerified": true,
+    "utilityClassesVerified": [
+      "sov-shimmer-bar",
+      "sov-typing-dot",
+      "sov-pulse-ring",
+      "sov-tab-content",
+      "answer-direct"
+    ]
+  },
+  "endpoints": {
+    "sovereignDefragApp": {
+      "url": "https://sovereign.defrag.app/ready",
+      "status": 200,
+      "ready": true,
+      "parity": "current"
+    },
+    "appDefragApp": {
+      "url": "https://app.defrag.app/ready",
+      "status": 200,
+      "ready": true,
+      "parity": "current"
+    }
+  },
+  "visualAudit": {
+    "colorPalette": "near-black monochrome slate (#000000 / #050505 / #0c0c0e)",
+    "typography": "Inter & JetBrains Mono",
+    "framerMotionTransitions": "active",
+    "glassmorphismProhibition": "enforced (zero backdrop-blur in app bundle)",
+    "bronzeOverridePurge": "verified"
+  }
+}

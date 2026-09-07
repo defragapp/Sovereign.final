@@ -1,29 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --sans-primary: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist Sans", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Geist Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --sans-primary: var(--font-sans);
   --serif-primary: var(--sans-primary);
   font-family: var(--sans-primary);
   color: #f4f0e8;
-  background: #09090b;
+  background: #000000;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --platform-bg: #09090b;
-  --ink: #09090b;
+  --platform-bg: #000000;
+  --ink: #000000;
   --cream: #f4f0e8;
   --muted: #a3a099;
   --subtle: #686660;
-  --surface-0: #0c0c0e;
-  --surface-1: #121215;
-  --surface-2: #18181c;
-  --surface-3: #202026;
+  --surface: #050505;
+  --surface-0: #050505;
+  --surface-1: #0c0c0e;
+  --surface-2: #121215;
+  --surface-3: #18181c;
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.16);
   --line-glow: rgba(255, 255, 255, 0.12);
   --ring: rgba(244, 240, 232, 0.7);
   --ring-soft: rgba(244, 240, 232, 0.08);
-  --sage: #aebaa7;
-  --sage-muted: rgba(174, 186, 167, 0.14);
+  --sage: #9fbaa1;
+  --sage-muted: rgba(159, 186, 161, 0.14);
   --clay: #c4aba1;
 }
 
@@ -33,6 +36,14 @@ body { margin: 0; min-width: 320px; background: var(--ink); color: var(--cream);
 button, input, textarea { font: inherit; }
 ::selection { background: rgba(244, 240, 232, 0.18); }
 
+/* ── Focus Visible ── */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Page Noise Overlay ── */
 .page-noise::before {
   content: "";
   position: fixed;
@@ -42,7 +53,7 @@ button, input, textarea { font: inherit; }
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
 }
 
-/* Hero ambient radial glow */
+/* ── Hero ambient radial glow ── */
 .landing-hero {
   position: relative;
 }
@@ -59,7 +70,7 @@ button, input, textarea { font: inherit; }
   z-index: 0;
 }
 
-/* Scroll animation */
+/* ── Legacy CSS-only scroll animation (fallback) ── */
 .animate-fade-up {
   opacity: 0;
   transform: translateY(14px);
@@ -71,7 +82,16 @@ button, input, textarea { font: inherit; }
   transform: translateY(0);
 }
 
-/* Sovereign Mark */
+/* ── Scrollbar Hide Utility ── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Sovereign Mark ── */
 .sovereign-mark {
   width: 22px;
   height: 22px;
@@ -92,7 +112,7 @@ button, input, textarea { font: inherit; }
   opacity: 0.85;
 }
 
-/* Typographic Hierarchy */
+/* ── Typographic Hierarchy ── */
 h1, h2, .font-display, .font-statement, .landing-hero h1, .text-editorial {
   font-family: var(--serif-primary) !important;
 }
@@ -118,15 +138,18 @@ h1, h2, .font-display, .font-statement, .landing-hero h1, .text-editorial {
   color: var(--muted);
 }
 .font-utility {
-  font-family: var(--sans-primary);
+  font-family: var(--font-mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 11px;
   font-weight: 500;
   color: var(--subtle);
 }
+.font-mono {
+  font-family: var(--font-mono) !important;
+}
 
-/* Quiet Surface Cards */
+/* ── Quiet Surface Cards ── */
 .sovereign-card {
   background: var(--surface);
   border: 1px solid var(--line);
@@ -137,10 +160,80 @@ h1, h2, .font-display, .font-statement, .landing-hero h1, .text-editorial {
   border-color: var(--line-strong);
 }
 
+/* ── Answer Prose ── */
 .answer-prose p { margin: 0; }
 .answer-prose p + p { margin-top: 1rem; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+.answer-direct {
+  font-size: 1rem;
+  line-height: 1.72;
+  color: var(--cream);
+  font-weight: 400;
+}
+@media (min-width: 768px) {
+  .answer-direct { font-size: 1.0625rem; }
 }
 
+/* ── Iridescent AI Loading Keyframes ── */
+@keyframes sov-shimmer {
+  0%   { background-position: -200% 50%; }
+  100% { background-position: 200% 50%; }
+}
+@keyframes sov-pulse-ring {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.06); }
+}
+@keyframes sov-dot-fade {
+  0%, 80%, 100% { opacity: 0.2; transform: translateY(0); }
+  40%           { opacity: 1;   transform: translateY(-3px); }
+}
+
+/* Iridescent shimmer bar */
+.sov-shimmer-bar {
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(159, 186, 161, 0.18) 20%,
+    rgba(244, 240, 232, 0.55) 50%,
+    rgba(196, 171, 161, 0.18) 80%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: sov-shimmer 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Typing dots for AI generation state */
+.sov-typing-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--sage);
+  display: inline-block;
+  animation: sov-dot-fade 1.4s ease-in-out infinite;
+}
+.sov-typing-dot:nth-child(2) { animation-delay: 0.16s; }
+.sov-typing-dot:nth-child(3) { animation-delay: 0.32s; }
+
+/* Sage pulse ring for status indicators */
+.sov-pulse-ring {
+  animation: sov-pulse-ring 2s ease-in-out infinite;
+}
+
+/* ── Tab Transition ── */
+.sov-tab-content {
+  animation: sov-fade-in 0.18s ease-out both;
+}
+@keyframes sov-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}

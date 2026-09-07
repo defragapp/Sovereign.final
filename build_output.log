@@ -1,0 +1,72 @@
+
+> sovereign-final@ build /Users/cjo/Sovereign.final
+> pnpm --filter @sovereign/web build && pnpm --filter @sovereign/worker build
+
+
+> @sovereign/web@0.1.0 build /Users/cjo/Sovereign.final/apps/web
+> tsc -b && vite build
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 2250 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.85 kB │ gzip:   0.45 kB
+dist/assets/index-PD_xT8Qr.css  699.19 kB │ gzip: 114.88 kB
+dist/assets/index-Bjtx3wA5.js   422.52 kB │ gzip: 126.36 kB
+
+✓ built in 442ms
+Scope: 2 of 6 workspace projects
+apps/sovereign-worker build$ wrangler deploy --dry-run --config wrangler.jsonc --outdir dist
+apps/worker build$ wrangler deploy --dry-run --config wrangler.jsonc --outdir dist
+apps/sovereign-worker build:  ⛅️ wrangler 4.118.0 (update available 4.129.0)
+apps/sovereign-worker build: ───────────────────────────────────────────────
+apps/worker build:  ⛅️ wrangler 4.118.0 (update available 4.129.0)
+apps/worker build: ───────────────────────────────────────────────
+apps/sovereign-worker build: [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mMultiple environments are defined in the Wrangler configuration file, but no target environment was specified for the deploy command.[0m
+apps/sovereign-worker build:   To avoid unintentional changes to the wrong environment, it is recommended to explicitly specify the target environment using the `-e|--env` flag or CLOUDFLARE_ENV env variable.
+apps/sovereign-worker build:   If your intention is to use the top-level environment of your configuration simply pass an empty string to the flag to target such environment. For example `--env=""`.
+apps/worker build: [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mMultiple environments are defined in the Wrangler configuration file, but no target environment was specified for the deploy command.[0m
+apps/worker build:   To avoid unintentional changes to the wrong environment, it is recommended to explicitly specify the target environment using the `-e|--env` flag or CLOUDFLARE_ENV env variable.
+apps/worker build:   If your intention is to use the top-level environment of your configuration simply pass an empty string to the flag to target such environment. For example `--env=""`.
+apps/worker build: ✨ Read 52 files from the assets directory /Users/cjo/Sovereign.final/apps/web/dist
+apps/sovereign-worker build: ✨ Read 52 files from the assets directory /Users/cjo/Sovereign.final/apps/web/dist
+apps/worker build: Total Upload: 1221.02 KiB / gzip: 236.51 KiB
+apps/worker build: Your Worker has access to the following bindings:
+apps/worker build: Binding                                                                               Resource                  
+apps/worker build: env.THREADS (ThreadCoordinator)                                                       Durable Object            
+apps/worker build: env.DB                                                                                D1 Database               
+apps/worker build: env.AI                                                                                AI                        
+apps/worker build: env.ASSETS                                                                            Assets                    
+apps/worker build: env.APP_ENV ("development")                                                           Environment Variable      
+apps/worker build: env.APP_VERSION ("0.0.1-dev")                                                         Environment Variable      
+apps/worker build: env.AI_PROVIDER ("cloudflare-gateway")                                                Environment Variable      
+apps/worker build: env.AI_MODEL ("@cf/zai-org/glm-4.7-flash")                                            Environment Variable      
+apps/worker build: env.AI_GATEWAY_ID ("sovereign-ai-gateway")                                            Environment Variable      
+apps/worker build: env.AI_FREE_MONTHLY_TURNS ("10")                                                      Environment Variable      
+apps/worker build: env.AI_SOVEREIGN_PLUS_MONTHLY_TURNS ("300")                                           Environment Variable      
+apps/worker build: env.THREAD_RETENTION_DAYS ("30")                                                      Environment Variable      
+apps/worker build: env.AUDIT_RETENTION_DAYS ("90")                                                       Environment Variable      
+apps/worker build: env.BASELINE_HORIZONS_URL ("https://ssd.jpl.nasa.gov/api/horizons...")                Environment Variable      
+apps/worker build: env.BASELINE_PROVIDER_TIMEOUT_MS ("8000")                                             Environment Variable      
+apps/worker build: --dry-run: exiting now.
+apps/sovereign-worker build: Total Upload: 1221.02 KiB / gzip: 236.51 KiB
+apps/sovereign-worker build: Your Worker has access to the following bindings:
+apps/sovereign-worker build: Binding                                                                               Resource                  
+apps/sovereign-worker build: env.THREADS (ThreadCoordinator)                                                       Durable Object            
+apps/sovereign-worker build: env.DB                                                                                D1 Database               
+apps/sovereign-worker build: env.AI                                                                                AI                        
+apps/sovereign-worker build: env.ASSETS                                                                            Assets                    
+apps/sovereign-worker build: env.APP_ENV ("development")                                                           Environment Variable      
+apps/sovereign-worker build: env.APP_VERSION ("0.0.1-dev")                                                         Environment Variable      
+apps/sovereign-worker build: env.AI_PROVIDER ("cloudflare-gateway")                                                Environment Variable      
+apps/sovereign-worker build: env.AI_MODEL ("@cf/zai-org/glm-4.7-flash")                                            Environment Variable      
+apps/sovereign-worker build: env.AI_GATEWAY_ID ("sovereign-ai-gateway")                                            Environment Variable      
+apps/sovereign-worker build: env.AI_FREE_MONTHLY_TURNS ("10")                                                      Environment Variable      
+apps/sovereign-worker build: env.AI_SOVEREIGN_PLUS_MONTHLY_TURNS ("300")                                           Environment Variable      
+apps/sovereign-worker build: env.THREAD_RETENTION_DAYS ("30")                                                      Environment Variable      
+apps/sovereign-worker build: env.AUDIT_RETENTION_DAYS ("90")                                                       Environment Variable      
+apps/sovereign-worker build: env.BASELINE_HORIZONS_URL ("https://ssd.jpl.nasa.gov/api/horizons...")                Environment Variable      
+apps/sovereign-worker build: env.BASELINE_PROVIDER_TIMEOUT_MS ("8000")                                             Environment Variable      
+apps/sovereign-worker build: --dry-run: exiting now.
+apps/worker build: Done
+apps/sovereign-worker build: Done
