@@ -7,16 +7,18 @@ const stylesCss = read('./styles.css');
 const appTsx = read('./App.tsx');
 
 describe('React Codebase Production Parity (Milestone 2)', () => {
-  it('integrates Google Fonts for Inter and JetBrains Mono in index.html', () => {
+  it('integrates Google Fonts and Fontshare for Framer-matched typography in index.html', () => {
     expect(indexHtml).toContain('https://fonts.googleapis.com');
     expect(indexHtml).toContain('https://fonts.gstatic.com');
-    expect(indexHtml).toContain('family=Inter:wght@400;500;600;700');
-    expect(indexHtml).toContain('family=JetBrains+Mono:wght@400;500;600');
+    expect(indexHtml).toContain('family=Fragment+Mono');
+    expect(indexHtml).toContain('family=Onest:wght@400;500;600;700');
+    expect(indexHtml).toContain('font-family: "Gambarino"');
   });
 
-  it('prioritizes Inter and JetBrains Mono in styles.css', () => {
-    expect(stylesCss).toContain('--font-sans: "Inter"');
-    expect(stylesCss).toContain('--font-mono: "JetBrains Mono"');
+  it('prioritizes Onest, Fragment Mono, and Gambarino in styles.css', () => {
+    expect(stylesCss).toContain('--font-sans: "Onest"');
+    expect(stylesCss).toContain('--font-mono: "Fragment Mono"');
+    expect(stylesCss).toContain('--font-display: "Gambarino"');
     expect(stylesCss).toContain('--sans-primary: var(--font-sans)');
     expect(stylesCss).toContain('--platform-bg: #000000');
     expect(stylesCss).toContain('--sage: #9fbaa1');
