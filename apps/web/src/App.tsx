@@ -378,45 +378,46 @@ function Landing() {
           data-visible={previewView.isInView}
           className="animate-fade-up"
         >
-          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface-1)] p-6 sm:p-10 space-y-6 shadow-2xl">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#121212] p-8 sm:p-14 space-y-6 shadow-2xl">
             {/* Inquiry Header */}
-            <div className="flex items-start justify-between border-b border-[rgba(255,255,255,0.06)] pb-6">
+            <div className="flex items-start justify-between border-b border-white/[0.06] pb-6">
               <div className="space-y-1">
-                <span className="font-utility text-[10px] text-[var(--subtle)] tracking-wider">INQUIRY</span>
+                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase">INQUIRY</span>
                 <p className="text-base sm:text-xl text-[var(--cream)] font-medium">
                   &ldquo;Why do I keep overthinking what to say when I feel misunderstood?&rdquo;
                 </p>
               </div>
-              <span className="rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.03)] px-3 py-1 text-[10px] font-utility text-[var(--sage)] shrink-0 hidden sm:inline-block">
-                BASELINE GROUNDED
-              </span>
+              <div className="flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-3.5 py-1.5 shrink-0 hidden sm:flex">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)] animate-pulse" />
+                <span className="text-[10px] font-utility text-[var(--sage)] tracking-wider">BASELINE GROUNDED</span>
+              </div>
             </div>
 
             {/* Structured Sovereign Answer v2 */}
             <div className="space-y-6 pt-2">
               <div className="space-y-2">
-                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">GROUNDED OBSERVATION</span>
-                <p className="text-sm sm:text-base text-[var(--cream)]/90 leading-relaxed">
+                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-1">GROUNDED OBSERVATION</span>
+                <p className="text-base sm:text-lg text-[var(--cream)]/90 leading-relaxed font-normal">
                   Your Baseline requires reflective processing before articulation. When you feel misunderstood, you instinctively draft multiple speech variants in real time to prevent incorrect perceptions.
                 </p>
               </div>
 
-              <div className="space-y-2 border-t border-[rgba(255,255,255,0.06)] pt-5">
-                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">THE STRUCTURAL PATTERN</span>
-                <p className="text-sm sm:text-base text-[var(--muted)] leading-relaxed">
+              <div className="space-y-2 border-t border-white/[0.06] pt-5">
+                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-1">THE STRUCTURAL PATTERN</span>
+                <p className="text-base sm:text-lg text-[var(--muted)] leading-relaxed font-normal">
                   Over-refinement is an attempt to manage the other party&apos;s internal reaction before they have finished processing.
                 </p>
               </div>
 
-              <div className="space-y-2 border-t border-[rgba(255,255,255,0.06)] pt-5">
-                <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">THE SHIFT</span>
-                <p className="text-sm sm:text-base text-[var(--cream)] font-medium leading-relaxed">
+              <div className="space-y-2 border-t border-white/[0.06] pt-5">
+                <span className="font-utility text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-1">THE SHIFT</span>
+                <p className="text-base sm:text-lg text-[var(--cream)] font-medium leading-relaxed">
                   Separate the observation from the resolution. Name the disconnect cleanly, pause the conversation, and return only when your internal clarity stabilizes.
                 </p>
               </div>
 
               {/* Source Details & Correction Prompt Footer */}
-              <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[var(--subtle)]">
+              <div className="border-t border-white/[0.06] pt-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[var(--subtle)]">
                 <button
                   type="button"
                   onClick={() => alert('Sources details: Baseline Facet 04 (Reflective Expression) & Facet 12 (Pressure Containment).')}
