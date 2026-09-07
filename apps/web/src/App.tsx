@@ -244,15 +244,14 @@ function Landing() {
           className="pt-20 sm:pt-28 text-center animate-fade-up"
         >
           <div className="max-w-3xl mx-auto flex flex-col items-center">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] px-4 py-1.5 text-[11px] font-medium text-[var(--muted)] mb-8 tracking-wide">
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.025)] px-4 py-1.5 text-[11px] font-medium text-[var(--muted)] mb-8 tracking-wider uppercase">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
-              <span>SOVEREIGN.OS · PRIVATE PERSONAL AI</span>
+              <span>PERSONAL AI FOR REAL LIFE</span>
             </div>
 
             <h1 className="text-4xl sm:text-6xl md:text-7xl text-[var(--cream)] font-normal tracking-tight leading-[1.06]">
-              Know yourself.<br />
-              Understand your people.<br />
-              See the whole system.
+              Healing isn’t optional.<br />
+              Holding onto the pain is.
             </h1>
 
             <p className="max-w-2xl mx-auto text-[var(--muted)] text-base sm:text-lg leading-relaxed mt-6">
@@ -282,7 +281,7 @@ function Landing() {
 
         {/* 2. INTERACTIVE BASELINE INTAKE PREVIEW WIDGET */}
         <section className="animate-fade-up max-w-xl mx-auto">
-          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-8 space-y-5">
+          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface-1)] p-6 sm:p-8 space-y-5 shadow-xl">
             <div className="flex items-center justify-between border-b border-[rgba(255,255,255,0.06)] pb-4">
               <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider uppercase">INTERACTIVE DEMONSTRATION</span>
               <span className="text-xs text-[var(--subtle)]">Establish Private Reference</span>
@@ -296,7 +295,7 @@ function Landing() {
                     type="date"
                     value={demoBirthDate}
                     onChange={(e) => setDemoBirthDate(e.target.value)}
-                    className="border-[rgba(255,255,255,0.1)] bg-[rgba(0,0,0,0.4)] text-sm rounded-lg"
+                    className="border-[rgba(255,255,255,0.1)] bg-[var(--surface-0)] text-sm rounded-lg"
                   />
                 </div>
                 <div>
@@ -305,7 +304,7 @@ function Landing() {
                     placeholder="e.g. San Francisco, CA"
                     value={demoBirthplace}
                     onChange={(e) => setDemoBirthplace(e.target.value)}
-                    className="border-[rgba(255,255,255,0.1)] bg-[rgba(0,0,0,0.4)] text-sm rounded-lg"
+                    className="border-[rgba(255,255,255,0.1)] bg-[var(--surface-0)] text-sm rounded-lg"
                   />
                 </div>
                 <div>
@@ -316,7 +315,7 @@ function Landing() {
                         key={cert}
                         type="button"
                         onClick={() => setDemoCertainty(cert)}
-                        className={`rounded-lg border py-2 text-xs capitalize transition ${
+                        className={`rounded-lg border py-2 text-xs capitalize transition cursor-pointer ${
                           demoCertainty === cert
                             ? 'border-[var(--cream)] bg-[rgba(255,255,255,0.08)] text-[var(--cream)]'
                             : 'border-[rgba(255,255,255,0.08)] text-[var(--muted)] hover:border-[rgba(255,255,255,0.16)]'
@@ -337,7 +336,7 @@ function Landing() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[rgba(0,0,0,0.3)] p-4 text-xs space-y-2">
+                <div className="rounded-xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface-0)] p-4 text-xs space-y-2">
                   <div className="flex items-center gap-2 text-[var(--sage)] font-utility text-[10px]">
                     <Check className="h-3.5 w-3.5" />
                     <span>DEMO BASELINE COMPUTED</span>
@@ -376,7 +375,7 @@ function Landing() {
           data-visible={previewView.isInView}
           className="animate-fade-up"
         >
-          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-6 sm:p-10 space-y-6">
+          <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[var(--surface-1)] p-6 sm:p-10 space-y-6 shadow-2xl">
             {/* Inquiry Header */}
             <div className="flex items-start justify-between border-b border-[rgba(255,255,255,0.06)] pb-6">
               <div className="space-y-1">
@@ -411,6 +410,18 @@ function Landing() {
                 <p className="text-sm sm:text-base text-[var(--cream)] font-medium leading-relaxed">
                   Separate the observation from the resolution. Name the disconnect cleanly, pause the conversation, and return only when your internal clarity stabilizes.
                 </p>
+              </div>
+
+              {/* Source Details & Correction Prompt Footer */}
+              <div className="border-t border-[rgba(255,255,255,0.06)] pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[var(--subtle)]">
+                <button
+                  type="button"
+                  onClick={() => alert('Sources details: Baseline Facet 04 (Reflective Expression) & Facet 12 (Pressure Containment).')}
+                  className="font-utility text-[11px] text-[var(--muted)] hover:text-[var(--cream)] transition underline cursor-pointer"
+                >
+                  See source details
+                </button>
+                <span>Correct, adjust, or reject this interpretation at any time.</span>
               </div>
             </div>
           </div>

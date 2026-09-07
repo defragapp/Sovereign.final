@@ -13,14 +13,17 @@
   --cream: #f4f0e8;
   --muted: #a3a099;
   --subtle: #686660;
-  --surface: #111110;
-  --surface-2: #161614;
-  --surface-3: #1c1c19;
+  --surface-0: #0c0c0e;
+  --surface-1: #121215;
+  --surface-2: #18181c;
+  --surface-3: #202026;
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.16);
+  --line-glow: rgba(255, 255, 255, 0.12);
   --ring: rgba(244, 240, 232, 0.7);
   --ring-soft: rgba(244, 240, 232, 0.08);
   --sage: #aebaa7;
+  --sage-muted: rgba(174, 186, 167, 0.14);
   --clay: #c4aba1;
 }
 
