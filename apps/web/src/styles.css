@@ -106,8 +106,13 @@ button, input, textarea { font: inherit; }
 }
 
 /* Typographic Hierarchy */
-h1, h2, .font-display, .font-statement, .landing-hero h1 {
+h1, h2, .font-display, .font-statement, .landing-hero h1, .text-editorial {
   font-family: var(--serif-primary) !important;
+}
+.text-editorial {
+  font-family: var(--serif-primary) !important;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
 }
 .font-display {
   font-family: var(--serif-primary) !important;
