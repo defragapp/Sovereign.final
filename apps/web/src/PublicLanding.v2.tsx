@@ -5,7 +5,6 @@ import { PublicDemoChat } from './components/PublicDemoChat';
 import { BaselineViewFragment } from './components/fragments/BaselineViewFragment';
 import { ExpressionViewFragment } from './components/fragments/ExpressionViewFragment';
 import { SystemMapViewFragment } from './components/fragments/SystemMapViewFragment';
-
 const REAL_LIFE_QUESTIONS = [
   { scope: 'Self', text: 'How do I make decisions that actually fit me?' },
   { scope: 'Relationships', text: 'Why does the same conversation feel different to each of us?' },
@@ -77,7 +76,7 @@ export function PublicLanding() {
         aria-hidden="true"
         style={{
           background:
-            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 75%), radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.06) 0px, transparent 50%), radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.05) 0px, transparent 50%), radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.05) 0px, transparent 50%), #000000',
+            'radial-gradient(ellipse 80% 50% at 50% -5%, rgba(159, 186, 161, 0.12) 0%, rgba(99, 102, 241, 0.08) 25%, rgba(168, 85, 247, 0.06) 45%, transparent 70%), radial-gradient(circle at 20% 30%, rgba(159, 186, 161, 0.08) 0px, transparent 45%), radial-gradient(circle at 80% 20%, rgba(196, 171, 161, 0.07) 0px, transparent 40%), radial-gradient(circle at 50% 80%, rgba(99, 102, 241, 0.04) 0px, transparent 50%), #000000',
         }}
       />
 
@@ -191,11 +190,11 @@ function ConceptualPillars() {
       <div className="mx-auto max-w-5xl">
         <header className="mb-14 text-center max-w-2xl mx-auto">
           <div className="inline-block rounded-full bg-white/5 border border-white/10 px-3 py-1 font-mono text-xs uppercase tracking-wider text-neutral-400 mb-3">
-            Core Architecture
+            What Makes Sovereign Different
           </div>
-          <h2 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-white">Three conceptual pillars</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-normal tracking-tight text-white">Three ways to understand your life</h2>
           <p className="mt-3 text-base sm:text-lg text-neutral-400">
-            A unified intelligence model that expands naturally from the individual outward.
+            A unified intelligence that expands naturally from the individual outward.
           </p>
         </header>
 
@@ -265,13 +264,13 @@ function ExpansionSequence() {
       <div className="mx-auto max-w-5xl">
         <header className="mb-16 text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1 text-xs font-mono uppercase tracking-wider text-neutral-400 mb-4">
-            Vertical Scroll Expansion Sequence
+            How Sovereign Works
           </div>
           <h2 className="font-display text-3xl sm:text-5xl font-normal tracking-tight text-white">
-            YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS
+            From you, outward.
           </h2>
           <p className="mt-4 text-base sm:text-lg text-neutral-300">
-            From your quiet internal reference to multi-party relationship vectors.
+            Start with yourself. Add the people around you. See the whole system.
           </p>
         </header>
 
@@ -307,7 +306,7 @@ function ExpansionSequence() {
                 <h3 className="text-2xl font-bold text-white mt-1">BASELINE · Quiet Reference</h3>
               </div>
               <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full self-start md:self-auto">
-                Grounding Layer
+                Quiet Reference
               </span>
             </div>
             <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-8">
@@ -326,7 +325,7 @@ function ExpansionSequence() {
                 <h3 className="text-2xl font-bold text-white mt-1">EXPRESSION · Grounded Synthesis</h3>
               </div>
               <span className="text-xs font-mono text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full self-start md:self-auto">
-                Contextual Breakdown
+                Grounded Answer
               </span>
             </div>
             <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-8">
@@ -345,7 +344,7 @@ function ExpansionSequence() {
                 <h3 className="text-2xl font-bold text-white mt-1">PEOPLE · Relational Intelligence</h3>
               </div>
               <span className="text-xs font-mono text-purple-400 bg-purple-500/10 border border-purple-500/20 px-3 py-1 rounded-full self-start md:self-auto">
-                Mutual Consent
+                Shared Understanding
               </span>
             </div>
             <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-6">
@@ -371,7 +370,7 @@ function ExpansionSequence() {
                 <h3 className="text-2xl font-bold text-white mt-1">SYSTEMS · Multi-Party Dynamics</h3>
               </div>
               <span className="text-xs font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full self-start md:self-auto">
-                System Equilibrium
+                Group Dynamics
               </span>
             </div>
             <p className="text-base text-neutral-300 leading-relaxed max-w-3xl mb-8">

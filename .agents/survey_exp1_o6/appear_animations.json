@@ -1,0 +1,1008 @@
+{
+  "1g7tdyi": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0.9,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": -40
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.2,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    },
+    "1qvd1f": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0.9,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": -40
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.2,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    },
+    "1jdn6b1": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0.9,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": -40
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.2,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "1mnq5vh": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 40
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.2,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "1lyxcuk": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 40
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.3,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "93qf5f": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 40
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.5,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "vg2egy": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": -20,
+        "y": 40
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 1.2,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "436ii3": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.5,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 1,
+          "duration": 2,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "1lsuuhe": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.5,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 1,
+          "duration": 2,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "l30jui": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.5,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 1,
+          "duration": 2,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    }
+  },
+  "1ykp0g5": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.6,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.9,
+          "duration": 1.8,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "1lsuuhe": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.6,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.9,
+          "duration": 1.8,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "l30jui": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.6,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.9,
+          "duration": 1.8,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    }
+  },
+  "1dbxvbt": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.7,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.8,
+          "duration": 1.6,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "1lsuuhe": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.7,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.8,
+          "duration": 1.6,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "l30jui": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.7,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.8,
+          "duration": 1.6,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    }
+  },
+  "1lyse93": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.7,
+          "duration": 1.4,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "1lsuuhe": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.7,
+          "duration": 1.4,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "l30jui": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.7,
+          "duration": 1.4,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    }
+  },
+  "1ytd2cr": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.6,
+          "duration": 1.2,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "1lsuuhe": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.6,
+          "duration": 1.2,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "l30jui": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.6,
+          "duration": 1.2,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    }
+  },
+  "1jjvits": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.5,
+          "duration": 1,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "1lsuuhe": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.5,
+          "duration": 1,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    },
+    "l30jui": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 0,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.8,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "bounce": 0.3,
+          "delay": 0.5,
+          "duration": 1,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      },
+      "transformTemplate": "translate(-50%, -50%) __Appear_Animation_Transform__"
+    }
+  },
+  "1a1ehbx": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": -20,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.3,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "b0087j": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": -20,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.4,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "9jv8xs": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 20,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.6,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "10wbp92": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 20,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 1,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "delay": 0.5,
+          "duration": 0.8,
+          "ease": [
+            0.6,
+            0,
+            0.4,
+            1
+          ],
+          "type": "tween"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  },
+  "91hf5k": {
+    "default": {
+      "initial": {
+        "opacity": 0.001,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "x": 0,
+        "y": 0
+      },
+      "animate": {
+        "opacity": 0.5,
+        "rotate": 0,
+        "rotateX": 0,
+        "rotateY": 0,
+        "scale": 1,
+        "skewX": 0,
+        "skewY": 0,
+        "transition": {
+          "damping": 50,
+          "delay": 0.2,
+          "mass": 1,
+          "stiffness": 500,
+          "type": "spring"
+        },
+        "x": 0,
+        "y": 0
+      }
+    }
+  }
+}

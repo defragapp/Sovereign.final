@@ -1,0 +1,27 @@
+# Progress — Worker M1 (Frontend Design System & UI Fragments)
+
+- Last visited: 2026-09-07T21:34:30Z
+- Status: Task completed, all gates green
+- Completed:
+  - Created presentation UI fragments in `apps/web/src/components/fragments/`:
+    - `BaselineViewFragment.tsx`: Mock context vectors with percentage weights and descriptors
+    - `ExpressionViewFragment.tsx`: Raw query input vs Sovereign contextual breakdown
+    - `SystemMapViewFragment.tsx`: Compact SVG/CSS multi-party relationship vector node diagram
+  - Updated `apps/web/src/PublicLanding.v2.tsx`:
+    - Atmospheric glass borders (`border-white/10` base, `hover:border-white/20`)
+    - Hero headline scale increased by ~25% with expanded line-height (`leading-[1.12]`), in `max-w-5xl mx-auto`
+    - Placed compact `BaselineViewFragment` preview card above the fold in the hero stage
+    - Added Three Conceptual Pillars: **SELF — Your Baseline**, **BETWEEN — Your Relationships**, **WHOLE — Your Systems**
+    - Added Vertical Scroll Expansion Sequence: `YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS` embedding all 3 UI fragments
+  - Unified static HTML pages styling in `apps/web/public/`:
+    - Created `apps/web/public/tokens.css` with authoritative variables and compatibility aliases
+    - Linked `/tokens.css` in `pricing.html`, `faq.html`, `how-it-works.html`, `consent.html`, and `404.html`
+    - Preserved all Stripe support links and text checked by `PublicSupport.test.ts`
+  - Verified full test and gate suite:
+    - `pnpm typecheck` -> 0 errors
+    - `pnpm test` -> 21 web tests passed, 399 worker tests passed
+    - `pnpm validate:ui` -> PASSED
+    - `pnpm build` -> PASSED
+    - `pnpm verify:foundation` -> PASSED
+- Next:
+  - Deliver handoff report and notify orchestrator
