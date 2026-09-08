@@ -67,3 +67,32 @@ html,body,#main{box-sizing:border-box;margin:0;padding:0}:root{-webkit-font-smoo
 /* Framer MindWave Template CSS */
 html body { background: var(--token-dfa85e1b-31ee-41ab-bfa8-b53b1e521c20, rgb(10, 10, 10)); }
 /* Framer MindWave Template CSS */
+
+
+/* Framer MindWave SSR Visibility & Display Overrides */
+.framer-mindwave-root [data-framer-appear-id],
+.framer-mindwave-root nav.framer-gDgJV .framer-1g7tdyi,
+.framer-mindwave-root .framer-1mnq5vh,
+.framer-mindwave-root .framer-1lyxcuk,
+.framer-mindwave-root .framer-93qf5f-container,
+.framer-mindwave-root .framer-vg2egy-container,
+.framer-mindwave-root .framer-1a1ehbx,
+.framer-mindwave-root .framer-b0087j,
+.framer-mindwave-root .framer-9jv8xs,
+.framer-mindwave-root .framer-10wbp92,
+.framer-mindwave-root .framer-91hf5k,
+.framer-mindwave-root .framer-hfinpz-container,
+.framer-mindwave-root .framer-1drl45k-container,
+.framer-mindwave-root [style*="opacity:0.001"],
+.framer-mindwave-root [style*="opacity: 0.001"],
+.framer-mindwave-root [style*="opacity:0;"],
+.framer-mindwave-root [style*="opacity: 0;"] {
+  opacity: 1 !important;
+  transform: none !important;
+  will-change: auto !important;
+}
+
+.framer-mindwave-root .framer-13fxv7s > div {
+  opacity: 0.6 !important;
+  transform: translate(-50%, -50%) scale(1) !important;
+}
