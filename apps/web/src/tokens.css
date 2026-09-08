@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Sovereign.OS — Design Tokens (MindWave Framer Edition)
+   Source authority: apps/web/src/tokens.css
+   ========================================================================== */
+
+:root {
+  /* ── Framer Color Tokens ── */
+  --token-cream:     #fafafa;
+  --token-surface-1: #f5f5f5;
+  --token-surface-2: #e5e5e5;
+  --token-surface-3: #d4d4d4;
+  --token-muted:     #a3a3a3;
+  --token-subtle:    #737373;
+  --token-body:      #525252;
+  --token-mid:       #404040;
+  --token-dark-2:    #262626;
+  --token-dark-3:    #171717;
+  --token-ink:       #0a0a0a;
+
+  /* Accent palette */
+  --token-red:    #eb2c50;
+  --token-amber:  #f29220;
+  --token-yellow: #fee435;
+  --token-blue:   #4788c8;
+  --token-green:  #65bf72;
+  --token-purple: #5a54a4;
+
+  /* Transparent whites */
+  --token-white-5:  rgba(250, 250, 250, 0.05);
+  --token-white-10: rgba(250, 250, 250, 0.10);
+  --token-white-15: rgba(250, 250, 250, 0.15);
+  --token-white-20: rgba(250, 250, 250, 0.20);
+  --token-white-30: rgba(250, 250, 250, 0.30);
+  --token-white-40: rgba(250, 250, 250, 0.40);
+  --token-white-50: rgba(250, 250, 250, 0.50);
+
+  /* Transparent blacks */
+  --token-black-5:  rgba(10, 10, 10, 0.05);
+  --token-black-10: rgba(10, 10, 10, 0.10);
+  --token-black-20: rgba(10, 10, 10, 0.20);
+  --token-black-40: rgba(10, 10, 10, 0.40);
+  --token-black-60: rgba(10, 10, 10, 0.60);
+  --token-black-70: rgba(10, 10, 10, 0.70);
+  --token-black-80: rgba(10, 10, 10, 0.80);
+  --token-black-90: rgba(10, 10, 10, 0.90);
+  --token-black-99: rgba(10, 10, 10, 0.99);
+
+  /* ── Product Color Map ── */
+  --stage-black:    #000000;
+  --stage-surface:  #050505;
+  --cream:          #f4f0e8;
+  --muted:          #a3a099;
+  --subtle:         #686660;
+  --line:           rgba(255, 255, 255, 0.08);
+  --line-strong:    rgba(255, 255, 255, 0.16);
+  --sage:           #9fbaa1;
+  --platform-bg:    #000000;
+
+  /* ── Typography Tokens ── */
+  --font-sans:    "Onest", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  --font-mono:    "Fragment Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-display: "Gambarino", Georgia, "Times New Roman", serif;
+  --sans-primary: var(--font-sans);
+
+  /* ── Glassmorphism Tokens ── */
+  --glass-bg:     rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur:   blur(20px);
+  --glass-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
+
+  /* ── Iridescent / Flow Gradient ── */
+  --iridescent-flow: linear-gradient(135deg, #a855f7 0%, #6366f1 25%, #3b82f6 50%, #06b6d4 75%, #10b981 100%);
+  --iridescent-conic: conic-gradient(from 0deg at 50% 50%,
+    transparent 158.4deg,
+    rgba(235,44,80,0.3) 165.6deg,
+    #f29220 172.8deg,
+    #fee435 180deg,
+    #65bf72 187.2deg,
+    #4788c8 194.4deg,
+    rgba(90,84,164,0.3) 201.6deg,
+    transparent 208.8deg
+  );
+
+  /* ── Radius Tokens ── */
+  --sov-radius-xs:        6px;
+  --sov-radius-sm:        8px;
+  --sov-radius-md:        12px;
+  --sov-radius-lg:        16px;
+  --sov-radius-xl:        24px;
+  --sov-radius-2xl:       32px;
+  --sov-radius-container: 16px;
+  --sov-radius-input:     10px;
+  --sov-radius-button:    8px;
+
+  /* ── Motion Tokens ── */
+  --motion-fast:   140ms;
+  --motion-base:   200ms;
+  --motion-slow:   240ms;
+  --motion-ease:   cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ── Workspace Tokens ── */
+  --powder-start:  #080a0d;
+  --powder-mid:    #090c10;
+  --powder-end:    #080a0d;
+  --bronze-accent: #dda273;
+  --geist-font:    "Geist", system-ui, sans-serif;
+  --sov-ink:       #f4f0e8;
+  --sov-page:      #000000;
+  --sov-clay-soft: rgba(185, 151, 114, 0.06);
+}

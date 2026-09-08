@@ -65,7 +65,7 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div className="rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-8 shadow-2xl backdrop-blur-md space-y-6">
+        <div className="rounded-3xl border border-white/10 bg-[#0a0a0a]/90 p-8 shadow-2xl space-y-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-display tracking-tight text-white">
               {isSignup ? 'Create your Sovereign account' : 'Sign in to Sovereign'}

@@ -86,3 +86,64 @@ Ensure all changes strictly satisfy existing test suites (`pnpm test`), TypeScri
 - [ ] Full test suite (`pnpm test`), TypeScript verification (`pnpm typecheck`), and `pnpm verify:cloudflare-build` pass with zero errors.
 </USER_REQUEST>
 
+## 2026-09-08T17:41:25Z
+
+<USER_REQUEST>
+Implement the full visual, functional, and deployment specification for **Sovereign.OS** at https://sovereign.defrag.app/, matching the Framer template at https://slight-use-623506.framer.app/ / https://framer.com/projects/MindWave-copy--rcpFlEAbbAmY31n6fD6g.
+
+Working directory: /Users/cjo/Sovereign.final
+Integrity mode: development
+
+## Requirements
+
+### R1. Design System & Scale Hierarchy Overhaul (Framer to Web App Sync)
+- **Palette & Atmosphere:** Pure near-black (`#0a0a0a`), warm cream typography (`#f5f5f7`), and atmospheric soft glass borders (`border border-white/10`). Remove any stark 1px white borders.
+- **Typography:** Serif editorial headers (`font-display` / `font-serif`, `tracking-tight`) with Gambarino styling paired with clean sans-serif body copy.
+- **Hero Scaling:** Increase hero section scale by 25%. Make the primary headline ("Healing isn't optional. Holding onto the pain is." / "Understand yourself. Understand your people. See the whole system.") fill a commanding vertical presence with expanded line-height and `max-w-5xl` container sizing.
+- **Section Rhythm (SELF → BETWEEN → WHOLE):** Implement conceptual architecture sections:
+  * SELF — Your Baseline
+  * BETWEEN — Your Relationships
+  * WHOLE — Your Systems
+- **Interactive Sequence ("Start with You"):** Vertical scroll sequence mapping `YOU → BASELINE → EXPRESSION → PEOPLE → SYSTEMS`.
+
+### R2. Real Product UI Fragments
+Replace any empty gradient placeholders with high-fidelity, interactive or structured visual interface fragments demonstrating contextual intelligence:
+- **Baseline View:** Render mock metadata cards showing context vectors and baseline weighting.
+- **Expression View:** Textual differentiation between raw query input and Sovereign's contextual breakdown.
+- **System Map View:** SVG/CSS node network illustrating multi-party relationship vectors.
+
+### R3. Authentication & Passkey Integration
+- Passkey-first WebAuthn registration and login handlers (`/api/auth/register`, `/api/auth/authenticate`) with fallback to magic-link email verification.
+- HTTP-only cookie session token binding compatible with Cloudflare Workers.
+
+### R4. Stripe Billing & Access Enforcement
+- Cloudflare Worker route `/api/billing/webhook` processing `checkout.session.completed`, `invoice.payment_succeeded`, `invoice.payment_failed`, and `customer.subscription.*`.
+- D1 SQL migration `0019_deprecate_manual_capacity` / subscription status tracking tiers (`free`, `sovereign_pro`).
+- 402 Payment Required enforcement for protected workspace routes.
+
+### R5. Internal AI Thread UI (Sovereign Chat Workspace)
+- Fluid Dark UI shell in `SovereignChatWorkspace.v2.tsx` / `SovereignThread.tsx` with auto-resizing input, passkey badges, message blocks separating user prompt, baseline analysis, and synthesized explanation (`/api/explain`).
+- Ensure static public HTML assets share exact CSS variables and dark-mode design system.
+
+### R6. Build & Deployment Verification
+- Execute `pnpm typecheck`, `pnpm test` (100% pass rate across all workspace tests), `pnpm verify:cloudflare-build`, and production deployment (`pnpm production:release:text`).
+- Verify live `/ready` SHA parity and inspect Playwright screenshots.
+
+## Acceptance Criteria
+
+### Visual & Layout Quality
+- [ ] Hero headline and CTA buttons scale 25% larger with `max-w-5xl` container sizing and zero vertical overlap.
+- [ ] Design system tokens (`#0a0a0a` background, soft `border-white/10` glass, Gambarino headline typography) are uniform across all routes (`/`, `/how-it-works`, `/pricing`, `/faq`, `/terms`, `/privacy`, `/login`, `/signup`, `/app`).
+- [ ] Real product UI fragments (Baseline View, Expression View, System Map SVG) render cleanly without empty placeholder boxes.
+
+### Functional & Backend Parity
+- [ ] Passkey and magic link authentication flows complete successfully.
+- [ ] Stripe webhook endpoints process subscription status events without errors.
+- [ ] Sovereign chat workspace thread renders prompt, baseline grounding, and synthesis blocks.
+
+### Build & Release Verification
+- [ ] 0 TypeScript errors (`pnpm typecheck`).
+- [ ] All Vitest tests passing (`pnpm test`).
+- [ ] Cloudflare build gate passed (`pnpm verify:cloudflare-build`).
+- [ ] Deployed live to `https://sovereign.defrag.app` with verified SHA parity on `/ready`.
+</USER_REQUEST>

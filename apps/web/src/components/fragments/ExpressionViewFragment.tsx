@@ -3,7 +3,7 @@ import React from 'react';
 export function ExpressionViewFragment() {
   return (
     <div
-      className="w-full max-w-4xl rounded-2xl border border-white/10 bg-black/50 backdrop-blur-xl p-6 sm:p-8 shadow-2xl transition-all duration-300 hover:border-white/20 hover:-translate-y-1"
+      className="w-full max-w-4xl rounded-2xl border border-white/10 bg-[#0a0a0a]/90 p-6 sm:p-8 shadow-2xl transition-all duration-300 hover:border-white/20 hover:-translate-y-1"
       aria-label="Expression View Demonstration"
     >
       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">

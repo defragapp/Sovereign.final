@@ -20,7 +20,7 @@ export function BaselineViewFragment({ compact = false }: { compact?: boolean })
 
   return (
     <div
-      className={`w-full rounded-2xl border border-white/10 bg-black/40 backdrop-blur-xl p-5 sm:p-6 shadow-2xl transition-all duration-300 hover:border-white/20 hover:-translate-y-1 ${
+      className={`w-full rounded-2xl border border-white/10 bg-[#0a0a0a]/90 p-5 sm:p-6 shadow-2xl transition-all duration-300 hover:border-white/20 hover:-translate-y-1 ${
         compact ? 'max-w-md' : 'max-w-xl'
       }`}
       aria-label="Baseline View Demonstration"
