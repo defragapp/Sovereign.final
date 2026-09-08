@@ -182,6 +182,33 @@ html body { background: var(--token-dfa85e1b-31ee-41ab-bfa8-b53b1e521c20, rgb(10
   margin-top: 12px !important;
 }
 
+/* Fix Navbar button container and vertical clipping */
+.framer-mindwave-root .framer-h2degb {
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.framer-mindwave-root .framer-150mn3j,
+.framer-mindwave-root .framer-1kqa6s8 {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+}
+
+/* Style hero image containers with obsidian glass gradient */
+.framer-mindwave-root .framer-1a1ehbx,
+.framer-mindwave-root .framer-b0087j,
+.framer-mindwave-root .framer-9jv8xs,
+.framer-mindwave-root .framer-10wbp92 {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(8px) !important;
+}
+
 /* Ensure text wrapping on bento & section cards */
 .framer-mindwave-root h1,
 .framer-mindwave-root h2,
