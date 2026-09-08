@@ -102,6 +102,7 @@ export function PublicLanding() {
             Move from one relationship to a family, household, team, or group. See who is involved, what each person is responsible for, where pressure builds, how people respond to one another, and what may change when one person responds differently.
           </p>
           <a href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02">Support Sovereign.OS</a>
+          <a href="mailto:info@sovereign.defrag.app">Contact Support</a>
         </div>
 
         {/* Live Interactive Sovereign Intelligence Demo */}

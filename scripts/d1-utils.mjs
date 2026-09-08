@@ -30,7 +30,9 @@ export function parseWranglerJson(output, label = 'Wrangler') {
   } catch {
     const starts = [text.indexOf('{'), text.indexOf('[')].filter((index) => index >= 0);
     if (!starts.length) throw new Error(`${label} returned no JSON payload`);
-    return JSON.parse(text.slice(Math.min(...starts)));
+    const ends = [text.lastIndexOf("}"), text.lastIndexOf("]")].filter((index) => index >= 0);
+    if (!starts.length || !ends.length) throw new Error("Wrangler returned no JSON payload");
+    return JSON.parse(text.slice(Math.min(...starts), Math.max(...ends) + 1));
   }
 }
 

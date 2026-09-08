@@ -8,7 +8,7 @@ const migrationsDir = 'apps/sovereign-worker/migrations';
 const databaseName = 'sovereign-openapi-db';
 
 function runWranglerCli(args, options = {}) {
-  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', ...args], {
+  const result = spawnSync('pnpm', ['--filter', './apps/worker', 'exec', 'wrangler', ...args], {
     cwd: options.cwd || root,
     env: options.env || process.env,
     encoding: 'utf8',
@@ -31,7 +31,9 @@ function parseWranglerJson(output) {
   } catch {
     const starts = [text.indexOf('{'), text.indexOf('[')].filter((index) => index >= 0);
     if (!starts.length) throw new Error('Wrangler returned no JSON payload');
-    return JSON.parse(text.slice(Math.min(...starts)));
+    const ends = [text.lastIndexOf("}"), text.lastIndexOf("]")].filter((index) => index >= 0);
+    if (!starts.length || !ends.length) throw new Error("Wrangler returned no JSON payload");
+    return JSON.parse(text.slice(Math.min(...starts), Math.max(...ends) + 1));
   }
 }
 
@@ -53,7 +55,7 @@ function wranglerRows(value) {
 function executeD1({ databaseName = 'sovereign-openapi-db', configPath, sql } = {}) {
   if (!configPath) throw new Error('A generated Wrangler config is required for D1 execution');
   if (!String(sql || '').trim()) throw new Error('A non-empty D1 SQL command is required');
-  const result = spawnSync('pnpm', ['--filter', '@sovereign/worker', 'exec', 'wrangler', 'd1', 'execute', databaseName, '--remote', '--config', configPath, '--json', '--command', String(sql)], {
+  const result = spawnSync('pnpm', ['--filter', './apps/worker', 'exec', 'wrangler', 'd1', 'execute', databaseName, '--remote', '--config', configPath, '--json', '--command', String(sql)], {
     cwd: root,
     env: process.env,
     encoding: 'utf8',

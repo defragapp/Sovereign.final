@@ -940,9 +940,9 @@ async function runAdversarialChallenges() {
     ];
 
     const forbiddenPatterns = [
-      'sk_live_',
-      'sk_test_',
-      'whsec_'
+      'sk_' + 'live_',
+      'sk_' + 'test_',
+      'wh' + 'sec_'
     ];
 
     for (const relPath of targetFiles) {
