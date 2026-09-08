@@ -69,11 +69,7 @@ export function FramerNavbar() {
           className="flex items-center gap-3 cursor-pointer group"
           aria-label="Sovereign.OS Home"
         >
-          <img
-            src="https://framerusercontent.com/images/0O5v3itGAnPaIlNYp2Dtalj5s.png"
-            alt="Sovereign Logo"
-            className="w-8 h-8 rounded-full object-cover transition-transform group-hover:scale-105"
-          />
+          <SovereignMark size={26} className="transition-transform group-hover:scale-110 text-white" />
           <span className="font-display text-xl tracking-tight text-[#fafafa]">
             Sovereign.OS
           </span>

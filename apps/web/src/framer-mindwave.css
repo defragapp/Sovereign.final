@@ -163,5 +163,32 @@ html body { background: var(--token-dfa85e1b-31ee-41ab-bfa8-b53b1e521c20, rgb(10
 /* Enable Framer SSR Navbar container */
 .framer-mindwave-root .framer-1g7tdyi {
   opacity: 1 !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
+/* Fix Hero CTA buttons layout and prevent overlap */
+.framer-mindwave-root .framer-93qf5f-container {
+  position: relative !important;
+  z-index: 20 !important;
+  display: inline-flex !important;
+  margin-top: 24px !important;
+}
+
+.framer-mindwave-root .framer-1l36rri-container {
+  position: relative !important;
+  z-index: 20 !important;
+  display: inline-flex !important;
+  margin-top: 12px !important;
+}
+
+/* Ensure text wrapping on bento & section cards */
+.framer-mindwave-root h1,
+.framer-mindwave-root h2,
+.framer-mindwave-root h3,
+.framer-mindwave-root h4,
+.framer-mindwave-root p {
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
