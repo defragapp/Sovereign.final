@@ -171,6 +171,7 @@ export async function main({
     if (deployFailure) {
       return { status: 'failed', stage: 'deploy', deploys: 1, output: deployFailure.message };
     }
+    runWrangler(['deploy', '--config', 'apps/sovereign-worker/wrangler.jsonc']);
     return {
       status: 'ok',
       deploys: 1,

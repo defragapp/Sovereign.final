@@ -586,15 +586,9 @@ function navigationAssetRequest(request: Request, pathname: string): Request {
 
 function isSpaDocumentPath(pathname: string): boolean {
   return pathname === '/'
-    || pathname === '/privacy'
-    || pathname === '/terms'
-    || pathname === '/app'
-    || pathname.startsWith('/app/')
-    || pathname === '/login'
-    || pathname === '/signup'
-    || pathname === '/onboarding'
-    || pathname === '/invitation'
-    || pathname.startsWith('/auth/');
+    || PUBLIC_PATHS.has(pathname)
+    || pathname.endsWith('.html')
+    || isApplicationPagePath(pathname);
 }
 
 function redirectTo(hostname: string, source: URL): Response {
