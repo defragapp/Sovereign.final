@@ -161,7 +161,7 @@ async function configureAiGateway(client, accountId, gatewayId) {
   } catch (error) {
     const status = Number(error?.status || 0);
     const authCode = Number(error?.payload?.errors?.[0]?.code || 0);
-    const managementUnavailable = status === 404 || status === 401 || status === 403 || authCode === 10000;
+    const managementUnavailable = status === 404 || status === 401 || status === 403 || status === 500 || authCode === 10000;
     if (!managementUnavailable) throw error;
     return {
       id: gatewayId,
