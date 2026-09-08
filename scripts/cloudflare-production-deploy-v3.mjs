@@ -165,6 +165,11 @@ export async function main({
       await configureControls({ accountId, apiToken, databaseId })
     );
 
+    const buildResult = spawnSync('pnpm', ['build'], { stdio: 'inherit', env: process.env });
+    if (buildResult.status !== 0) {
+      throw new Error('pnpm build failed prior to Cloudflare production deployment');
+    }
+
     deployInvoked = true;
     const deployResult = runWrangler(['deploy', '--config', generatedConfigPath]);
     const deployFailure = wranglerFailure(deployResult, 'wrangler deploy');
