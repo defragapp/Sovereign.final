@@ -388,207 +388,127 @@ export function App() {
    ========================================================================= */
 function PageFrame({
   title,
+  subtitle,
   onBack,
   children
 }: {
   title: string;
+  subtitle?: string;
   onBack: () => void;
   children: ReactNode;
 }) {
   return (
-    <div className="relative mx-auto max-w-4xl px-6 pb-12 pt-6 md:px-8">
+    <div className="relative mx-auto max-w-4xl px-6 pb-20 pt-8 md:px-8">
       <button 
         onClick={onBack} 
-        className="mb-8 font-mono text-[10px] text-[var(--sage,#9fbaa1)] hover:text-white transition flex items-center gap-2 uppercase tracking-widest cursor-pointer"
+        className="mb-8 font-mono text-[10px] text-[var(--sage,#9fbaa1)] hover:text-white transition inline-flex items-center gap-2 uppercase tracking-widest cursor-pointer"
       >
-        <ArrowUp className="h-3 w-3 rotate-90" /> Back to Home
+        <ArrowUp className="h-3 w-3 -rotate-90" /> Back to Home
       </button>
-      <h1 className="font-display text-4xl md:text-6xl text-white tracking-tight mb-12">
-        {title}
-      </h1>
+      <div className="text-center space-y-4 mb-16">
+        <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-[#fafafa] tracking-tight">
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="font-mono text-xs text-white/50 tracking-wide uppercase">
+            {subtitle}
+          </p>
+        )}
+      </div>
       <div className="relative z-10">{children}</div>
     </div>
   );
 }
 
-function InfoPage({ onBack }: { onBack: () => void }) {
-  return (
-    <PageFrame title="How Sovereign Works" onBack={onBack}>
-      <div className="space-y-12">
-        {[
-          { label: '01', title: 'Start with you', body: 'Sovereign begins with your Baseline: a private reference built around you that captures how you think, decide, communicate, connect, and respond under pressure.' },
-          { label: '02', title: 'Bring real situations', body: 'Ask in ordinary language about decisions, relationships, or recurring patterns. Sovereign grounds its response in your personal reference rather than delivering generic chatbot replies.' },
-          { label: '03', title: 'Understand what happens between people', body: 'Add people you choose to include to examine relational dynamics without collapsing two distinct perspectives into one.' },
-          { label: '04', title: 'See the whole system', body: 'Families, teams, and groups have patterns that no single person created alone. Sovereign illuminates the wider system while keeping individual contexts intact.' },
-        ].map((item) => (
-          <div key={item.label} className="glass-border p-8 rounded-3xl space-y-4 transition-all duration-300 hover:border-white/20">
-            <div className="font-mono text-xs text-[var(--sage,#9fbaa1)] tracking-widest">{item.label}</div>
-            <h2 className="font-display text-2xl md:text-3xl text-white leading-tight">{item.title}</h2>
-            <p className="max-w-2xl text-sm md:text-base text-white/70 leading-relaxed">{item.body}</p>
-          </div>
-        ))}
-
-        <div id="support" className="glass-border p-8 rounded-3xl mt-12 space-y-6">
-          <h3 className="font-display text-2xl text-white">Support Sovereign.OS from .</h3>
-          <p className="text-sm text-white/70 leading-relaxed">
-            Separate from subscriptions. Support is voluntary and does not change Free or Sovereign+ access. Contributions use a secure one-time amount from .
-          </p>
-          <a
-            href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block rounded-xl bg-white px-6 py-3 text-xs font-medium text-black hover:bg-neutral-200 transition cursor-pointer"
-          >
-            Make a voluntary support contribution →
-          </a>
-        </div>
-      </div>
-    </PageFrame>
-  );
-}
-
-function Pricing({ onBack }: { onBack: () => void }) {
-  return (
-    <PageFrame title="Pricing" onBack={onBack}>
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="glass-border p-8 sm:p-10 rounded-3xl space-y-8 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div>
-              <span className="font-mono text-xs text-white/50 uppercase tracking-widest">Standard</span>
-              <div className="mt-2 font-display text-4xl text-white">Free (zsh)</div>
-            </div>
-            <p className="text-sm text-white/70 leading-relaxed">
-              A private Baseline and a focused way to start using Sovereign.
-            </p>
-            <div className="space-y-3 text-xs text-white/90 pt-6 border-t border-white/10">
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> Private personal Baseline
-              </div>
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> Today thinking surface
-              </div>
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> 10 AI turns / month
-              </div>
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> Strict architectural privacy
-              </div>
-            </div>
-          </div>
-          <button onClick={() => go('/signup')} className="w-full rounded-xl border border-white/20 py-3 text-xs font-medium text-white hover:bg-white/5 transition cursor-pointer">
-            Start Free
-          </button>
-        </div>
-
-        <div className="glass-border-strong p-8 sm:p-10 rounded-3xl space-y-8 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <span className="font-mono text-xs text-[var(--sage,#9fbaa1)] uppercase tracking-widest">Sovereign+</span>
-                <div className="mt-2 font-display text-4xl text-white"> / month</div>
-              </div>
-              <Sparkles className="h-5 w-5 text-[var(--sage,#9fbaa1)]" />
-            </div>
-            <p className="text-sm text-white/70 leading-relaxed">
-              Room for deeper personal exploration, relational intelligence, and systems.
-            </p>
-            <div className="space-y-3 text-xs text-white/90 pt-6 border-t border-white/10">
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> Everything in Free
-              </div>
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> 300 AI turns / month
-              </div>
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> People & relational dynamic comparisons
-              </div>
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> Multi-participant system mapping
-              </div>
-              <div className="flex items-center gap-3">
-                <Check className="h-3.5 w-3.5 text-[var(--sage,#9fbaa1)]" /> Extended library retention
-              </div>
-            </div>
-          </div>
-          <button onClick={() => go('/signup')} className="w-full rounded-xl bg-white py-3 text-xs font-medium text-black hover:bg-neutral-200 transition cursor-pointer shadow-lg font-semibold">
-            Start Sovereign+
-          </button>
-        </div>
-      </div>
-
-      <div className="glass-border p-8 rounded-3xl mt-12 space-y-4">
-        <h4 className="font-display text-xl text-white">Support Sovereign.OS</h4>
-        <p className="text-xs text-white/70 leading-relaxed">
-          Support is separate from a subscription. Support does not unlock paid features or change your account access. One-time amount from .
-        </p>
-        <a
-          href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block rounded-xl border border-white/20 px-6 py-3 text-xs text-white hover:bg-white/5 transition cursor-pointer"
-        >
-          Voluntary Contribution Link →
-        </a>
-      </div>
-    </PageFrame>
-  );
-}
-
-function FAQ({ onBack }: { onBack: () => void }) {
-  return (
-    <PageFrame title="Frequently Asked Questions" onBack={onBack}>
-      <div className="max-w-3xl space-y-4">
-        {[
-          [
-            'What is Sovereign?',
-            'A private personal AI environment for understanding yourself, your relationships, your decisions, and the systems around you.'
-          ],
-          [
-            'What is a Baseline?',
-            'A private reference built around you that gives Sovereign consistent context when it helps answer a question, instead of starting from scratch each time.'
-          ],
-          [
-            'Does Sovereign know what another person feels or intends?',
-            'No. Sovereign can work with consented information about another person, but it does not claim access to private motives, exact emotions, or hidden intentions.'
-          ],
-          [
-            'Can I support Sovereign.OS without subscribing?',
-            'Yes. Voluntary support does not unlock paid features or change your plan. It is a separate one-time contribution and is not presented as tax-deductible.'
-          ]
-        ].map(([q, a]) => (
-          <details key={q} className="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/20 cursor-pointer">
-            <summary className="flex items-center justify-between gap-4 font-display text-lg text-white list-none">
-              {q}
-              <ChevronDown className="h-4 w-4 text-white/50 transition-transform group-open:rotate-180" />
-            </summary>
-            <div className="mt-4 pt-4 border-t border-white/10">
-              <p className="text-sm text-white/70 leading-relaxed">{a}</p>
-            </div>
-          </details>
-        ))}
-      </div>
-    </PageFrame>
-  );
-}
-
 function LegalPage({ title, onBack }: { title: string; onBack: () => void }) {
+  const isPrivacy = title.toLowerCase().includes('privacy');
+
   return (
-    <PageFrame title={title} onBack={onBack}>
-      <div className="max-w-3xl glass-border p-8 sm:p-12 rounded-3xl space-y-6">
-        <p className="font-mono text-[10px] text-[var(--sage,#9fbaa1)] uppercase tracking-widest">
-          EFFECTIVE DATE: AUGUST 17, 2026
-        </p>
-        <div className="space-y-6 text-sm leading-relaxed text-white/70">
-          <p>
-            Sovereign is built with strict data isolation: your raw birth date, exact coordinates, and private notes are stored strictly for your Baseline and never enter language-model prompt context.
-          </p>
-          <p>
-            Conversations and responses remain private to your authenticated account. Consented sharing with other accounts requires explicit approval for each participant.
-          </p>
-          <p>
-            Sovereign does not sell personal information or train public artificial intelligence models on your private data.
+    <PageFrame
+      title={title}
+      subtitle="Last Updated: August 17, 2026"
+      onBack={onBack}
+    >
+      <div className="max-w-3xl mx-auto rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-8 sm:p-12 space-y-10 shadow-2xl">
+        <div className="space-y-3 border-b border-white/10 pb-8">
+          <h2 className="font-display text-2xl text-white">Contact Us</h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            If you have questions about this policy or account preferences, contact support directly through your Sovereign account settings.
           </p>
         </div>
+
+        {isPrivacy ? (
+          <>
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">Introduction</h2>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Sovereign.OS is committed to protecting your privacy. This Privacy Policy explains how we store, process, and safeguard your personal information when you use our personal intelligence platform.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">Information We Collect</h2>
+              <p className="text-sm text-white/70 leading-relaxed mb-3">
+                Sovereign operates with strict data isolation boundaries:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-sm text-white/70 leading-relaxed pl-2">
+                <li><strong className="text-white">Account Information:</strong> Email address, optional profile name, and passkey/session identifiers.</li>
+                <li><strong className="text-white">Baseline Data:</strong> Private personal references, birth parameters, and context profiles stored strictly for your account.</li>
+                <li><strong className="text-white">Interaction Context:</strong> Conversation threads and relational comparison inputs.</li>
+                <li><strong className="text-white">Technical Metadata:</strong> Authenticated token signatures, session security timestamps, and standard audit logs.</li>
+              </ul>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">Data Protection & Architectural Isolation</h2>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Raw birth parameters, exact coordinates, and private notes remain encrypted and isolated in database storage. They are never exposed in raw prompt text to external foundation models. Conversations and responses remain strictly private to your authenticated session.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">Your Rights & Control</h2>
+              <p className="text-sm text-white/70 leading-relaxed">
+                You maintain complete ownership of your data. You may review, export, or permanently delete your account, Baseline context, and saved conversations at any time through account settings.
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">Acceptance of Terms</h2>
+              <p className="text-sm text-white/70 leading-relaxed">
+                By accessing or using Sovereign.OS, you agree to be bound by these Terms of Service. If you disagree with any part of these terms, you may not access the platform.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">Service Description</h2>
+              <p className="text-sm text-white/70 leading-relaxed">
+                Sovereign provides personal AI capabilities, relational dynamic comparisons, and system mapping. Sovereign is designed as a tool for personal inquiry, decision reflection, and self-understanding. It does not provide medical treatment, therapeutic diagnosis, or legally binding advice.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">User Accounts & Eligibility</h2>
+              <p className="text-sm text-white/70 leading-relaxed">
+                You must be 18 years of age or older to register an account independently. You are responsible for maintaining the security of your authentication credentials and passkeys.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <h2 className="font-display text-2xl text-white">Acceptable Use</h2>
+              <p className="text-sm text-white/70 leading-relaxed mb-3">
+                You agree not to:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-sm text-white/70 leading-relaxed pl-2">
+                <li>Use the service to harm, harass, or impersonate others.</li>
+                <li>Attempt to reverse-engineer or bypass data isolation security controls.</li>
+                <li>Use automated systems to extract private user data without authorization.</li>
+              </ul>
+            </div>
+          </>
+        )}
       </div>
     </PageFrame>
   );

@@ -58,34 +58,24 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 py-12 bg-[#000000] overflow-hidden text-white page-noise">
-      <div className="stage-glow" />
-      <LiquidMesh />
-
+    <div className="relative flex items-center justify-center px-4 py-12 text-white">
       <motion.div
         className="relative z-10 w-full max-w-md"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        <button
-          type="button"
-          onClick={() => navigate('/')}
-          className="mx-auto mb-8 flex items-center gap-2.5 group cursor-pointer transition-transform duration-200 hover:scale-105"
-        >
-          <BrandMark size={22} className="transition-transform group-hover:scale-110" />
-          <span className="text-sm font-semibold tracking-tight text-white">Sovereign</span>
-        </button>
-
-        <div className="glass-border p-8">
-          <h1 className="text-2xl font-display tracking-tight text-white">
-            {isSignup ? 'Create your Sovereign account' : 'Sign in to Sovereign'}
-          </h1>
-          <p className="mt-2 text-sm text-[var(--muted)] leading-relaxed">
-            {isSignup
-              ? 'Start with a private account. Your Baseline comes next.'
-              : 'Sign in with your email address.'}
-          </p>
+        <div className="rounded-3xl border border-white/10 bg-[#0a0a0a]/80 p-8 shadow-2xl backdrop-blur-md space-y-6">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-display tracking-tight text-white">
+              {isSignup ? 'Create your Sovereign account' : 'Sign in to Sovereign'}
+            </h1>
+            <p className="mt-2 text-xs sm:text-sm text-white/60 leading-relaxed">
+              {isSignup
+                ? 'Start with a private account. Your Baseline comes next.'
+                : 'Sign in with your email address.'}
+            </p>
+          </div>
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">

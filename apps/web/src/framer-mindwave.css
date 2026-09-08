@@ -167,19 +167,29 @@ html body { background: var(--token-dfa85e1b-31ee-41ab-bfa8-b53b1e521c20, rgb(10
   overflow: visible !important;
 }
 
-/* Fix Hero CTA buttons layout and prevent overlap */
-.framer-mindwave-root .framer-93qf5f-container {
-  position: relative !important;
-  z-index: 20 !important;
-  display: inline-flex !important;
-  margin-top: 24px !important;
+/* Unblur Framer SSR text reveal spans */
+.framer-mindwave-root [style*="filter:blur"],
+.framer-mindwave-root [style*="filter: blur"] {
+  filter: none !important;
+  color: var(--token-35958b5f-fcd4-4988-a517-708c39eda844, rgb(250, 250, 250)) !important;
+  opacity: 1 !important;
 }
 
+/* Fix Hero content layout and CTA button flow */
+.framer-mindwave-root .framer-1gffwn7 {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.framer-mindwave-root .framer-93qf5f-container,
 .framer-mindwave-root .framer-1l36rri-container {
-  position: relative !important;
-  z-index: 20 !important;
-  display: inline-flex !important;
-  margin-top: 12px !important;
+  position: static !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 16px auto 0 auto !important;
+  z-index: 30 !important;
 }
 
 /* Fix Navbar button container and vertical clipping */

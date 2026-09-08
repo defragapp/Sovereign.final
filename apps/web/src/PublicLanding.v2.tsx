@@ -11,14 +11,23 @@ export function PublicLanding({ targetSection }: { targetSection?: string }) {
 
   useEffect(() => {
     if (!targetSection) return;
-    const timer = setTimeout(() => {
-      const el = document.getElementById(targetSection) ||
-                 document.querySelector(`[data-framer-name*="${targetSection}"]`);
+    const findAndScroll = () => {
+      const targetId = targetSection === 'how-it-works' ? 'process' : targetSection;
+      const el = document.getElementById(targetId) ||
+                 document.getElementById(targetSection) ||
+                 document.querySelector(`[data-framer-name*="${targetId}" i]`);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
+        const top = el.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
       }
-    }, 150);
-    return () => clearTimeout(timer);
+    };
+
+    const timer1 = setTimeout(findAndScroll, 100);
+    const timer2 = setTimeout(findAndScroll, 400);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
   }, [targetSection]);
 
   useEffect(() => {
@@ -46,19 +55,31 @@ export function PublicLanding({ targetSection }: { targetSection?: string }) {
         go('/signup');
       } else if (text.includes('how it works') || href.includes('process') || href.includes('how-it-works')) {
         e.preventDefault();
-        const el = document.getElementById('how-it-works');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        else go('/how-it-works');
+        const el = document.getElementById('process') || document.getElementById('how-it-works');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        } else {
+          go('/how-it-works');
+        }
       } else if (text.includes('pricing') || href.includes('pricing')) {
         e.preventDefault();
         const el = document.getElementById('pricing');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        else go('/pricing');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        } else {
+          go('/pricing');
+        }
       } else if (text.includes('faq') || href.includes('faq')) {
         e.preventDefault();
         const el = document.getElementById('faq');
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        else go('/faq');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        } else {
+          go('/faq');
+        }
       } else if (text.includes('privacy') || href.includes('privacy')) {
         e.preventDefault();
         go('/privacy');
