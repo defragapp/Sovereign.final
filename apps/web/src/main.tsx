@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './tokens.css';
+import './framer-mindwave.css';
 import './design-system.css';
 import './public.css';
 import './workspace.css';
