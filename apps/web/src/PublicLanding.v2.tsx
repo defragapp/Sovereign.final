@@ -6,8 +6,20 @@ import { ExpressionMockPanel } from '@/components/mocks/ExpressionMockPanel';
 import { SystemMapMockSVG } from '@/components/mocks/SystemMapMockSVG';
 import { go, type Route } from './lib/router';
 
-export function PublicLanding() {
+export function PublicLanding({ targetSection }: { targetSection?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!targetSection) return;
+    const timer = setTimeout(() => {
+      const el = document.getElementById(targetSection) ||
+                 document.querySelector(`[data-framer-name*="${targetSection}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [targetSection]);
 
   useEffect(() => {
     const root = containerRef.current;

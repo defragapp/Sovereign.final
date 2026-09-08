@@ -283,7 +283,7 @@ export function FramerFooter() {
    ========================================================================= */
 export function FramerLayoutShell({ children, showFooter = true }: { children: ReactNode; showFooter?: boolean }) {
   return (
-    <div className="relative min-h-screen bg-[#000000] text-[#f4f0e8] overflow-x-hidden page-noise">
+    <div className="framer-mindwave-root relative min-h-screen bg-[#000000] text-[#f4f0e8] overflow-x-hidden page-noise">
       <div className="stage-glow" />
       <FramerNavbar />
       <main className="relative z-10 pt-6">{children}</main>
@@ -349,27 +349,15 @@ export function App() {
   }
 
   if (route === '/how-it-works') {
-    return (
-      <FramerLayoutShell>
-        <InfoPage onBack={() => go('/')} />
-      </FramerLayoutShell>
-    );
+    return <PublicLanding targetSection="process" />;
   }
 
   if (route === '/pricing') {
-    return (
-      <FramerLayoutShell>
-        <Pricing onBack={() => go('/')} />
-      </FramerLayoutShell>
-    );
+    return <PublicLanding targetSection="pricing" />;
   }
 
   if (route === '/faq') {
-    return (
-      <FramerLayoutShell>
-        <FAQ onBack={() => go('/')} />
-      </FramerLayoutShell>
-    );
+    return <PublicLanding targetSection="faq" />;
   }
 
   if (route === '/terms') {
