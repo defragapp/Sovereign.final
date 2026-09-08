@@ -58,19 +58,9 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 py-12 bg-black overflow-hidden text-white">
-      {/* Global animated iridescent liquid mesh */}
+    <div className="relative min-h-screen flex items-center justify-center px-4 py-12 bg-[#000000] overflow-hidden text-white page-noise">
+      <div className="stage-glow" />
       <LiquidMesh />
-
-      {/* Global CSS mesh gradient fallback & dark stage spotlight */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 75%), radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.18) 0px, transparent 50%), radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.16) 0px, transparent 50%), radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.14) 0px, transparent 50%), #000000',
-        }}
-      />
 
       <motion.div
         className="relative z-10 w-full max-w-md"
@@ -87,12 +77,11 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
           <span className="text-sm font-semibold tracking-tight text-white">Sovereign</span>
         </button>
 
-        {/* 1. Glassmorphic container with Tailwind classes */}
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-8">
-          <h1 className="text-2xl font-bold tracking-tight text-white">
+        <div className="glass-border p-8">
+          <h1 className="text-2xl font-display tracking-tight text-white">
             {isSignup ? 'Create your Sovereign account' : 'Sign in to Sovereign'}
           </h1>
-          <p className="mt-2 text-sm text-neutral-400">
+          <p className="mt-2 text-sm text-[var(--muted)] leading-relaxed">
             {isSignup
               ? 'Start with a private account. Your Baseline comes next.'
               : 'Sign in with your email address.'}
@@ -107,11 +96,10 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
           {!sent ? (
             <form className="mt-6 space-y-4" onSubmit={handleRequest}>
               {isSignup && (
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-neutral-400">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-widest text-[var(--muted)]">
                     Your Name
                   </label>
-                  {/* 2. Styled inputs with Tailwind classes */}
                   <input
                     placeholder="First and last name"
                     type="text"
@@ -119,16 +107,15 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-neutral-500 focus:border-white/40 focus:ring-1 focus:ring-white/20 outline-none transition-colors"
+                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-neutral-600 focus:border-white/30 outline-none transition-colors"
                   />
                 </div>
               )}
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-neutral-400">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-mono uppercase tracking-widest text-[var(--muted)]">
                   Email Address
                 </label>
-                {/* 2. Styled inputs with Tailwind classes */}
                 <input
                   placeholder="you@domain.com"
                   type="email"
@@ -136,19 +123,19 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-neutral-500 focus:border-white/40 focus:ring-1 focus:ring-white/20 outline-none transition-colors"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-neutral-600 focus:border-white/30 outline-none transition-colors"
                 />
               </div>
 
               {isSignup && (
-                <div className="space-y-2.5 pt-2 text-xs text-neutral-400">
+                <div className="space-y-2.5 pt-2 text-xs text-[var(--muted)]">
                   <label className="flex items-start gap-2.5 cursor-pointer">
                     <input
                       type="checkbox"
                       required
                       className="mt-0.5 rounded border border-white/20 bg-black/50 text-white focus:ring-0 cursor-pointer"
                     />
-                    <span>I confirm I am 18 years of age or older.</span>
+                    <span className="leading-relaxed">I confirm I am 18 years of age or older.</span>
                   </label>
                   <label className="flex items-start gap-2.5 cursor-pointer">
                     <input
@@ -156,7 +143,7 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
                       required
                       className="mt-0.5 rounded border border-white/20 bg-black/50 text-white focus:ring-0 cursor-pointer"
                     />
-                    <span>
+                    <span className="leading-relaxed">
                       I agree to the{' '}
                       <button
                         type="button"
@@ -179,11 +166,10 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
                 </div>
               )}
 
-              {/* 3. Styled submit buttons using direct classes */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 bg-white/10 hover:bg-white/20 transition-all duration-300 rounded-lg py-3 text-sm font-semibold text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 hover:border-white/20"
+                className="w-full mt-2 bg-white/10 hover:bg-white/20 transition-all duration-300 rounded-xl py-3 text-sm font-semibold text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 hover:border-white/20"
               >
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -206,27 +192,25 @@ export function PasskeyAuthentication({ mode }: AuthProps) {
               </div>
 
               <form className="space-y-4" onSubmit={handleVerifyCode}>
-                <div>
-                  <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-neutral-400">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-mono uppercase tracking-widest text-[var(--muted)]">
                     6-digit verification code
                   </label>
-                  {/* 2. Styled inputs with Tailwind classes */}
                   <input
                     type="text"
                     placeholder="123456"
                     maxLength={6}
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    className="w-full text-center font-mono text-xl tracking-[0.3em] bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-white placeholder:text-neutral-600 focus:border-white/40 focus:ring-1 focus:ring-white/20 outline-none"
+                    className="w-full text-center font-mono text-xl tracking-[0.3em] bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-neutral-600 focus:border-white/30 outline-none transition-colors"
                     required
                   />
                 </div>
 
-                {/* 3. Styled submit buttons using direct classes */}
                 <button
                   type="submit"
                   disabled={loading || code.trim().length < 6}
-                  className="w-full bg-white/10 hover:bg-white/20 transition-all duration-300 rounded-lg py-3 text-sm font-semibold text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 hover:border-white/20"
+                  className="w-full bg-white/10 hover:bg-white/20 transition-all duration-300 rounded-xl py-3 text-sm font-semibold text-white flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border border-white/10 hover:border-white/20"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Confirm & Open'}
                 </button>
@@ -305,17 +289,10 @@ export function Redeem() {
   }, []);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 bg-black overflow-hidden text-white">
+    <div className="relative min-h-screen flex items-center justify-center p-4 bg-[#000000] overflow-hidden text-white page-noise">
+      <div className="stage-glow" />
       <LiquidMesh />
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.12) 40%, transparent 75%), radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.18) 0px, transparent 50%), radial-gradient(at 90% 15%, rgba(168, 85, 247, 0.16) 0px, transparent 50%), radial-gradient(at 50% 85%, rgba(6, 182, 212, 0.14) 0px, transparent 50%), #000000',
-        }}
-      />
-      <div className="relative z-10 w-full max-w-sm rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl p-8 text-center space-y-4">
+      <div className="relative z-10 w-full max-w-sm glass-border p-8 text-center space-y-4">
         {status === 'loading' && (
           <>
             <IridescentLoader />

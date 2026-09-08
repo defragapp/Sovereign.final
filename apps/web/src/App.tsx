@@ -1,100 +1,25 @@
 import { PublicLanding } from "./PublicLanding.v2";
 import { SovereignChatWorkspace as SovereignIntelligenceWorkspace } from "./SovereignChatWorkspace.v2";
 import { Auth, Redeem } from "./PasskeyAuthentication";
+import { PlanOnboarding } from "./PlanOnboarding";
 
-import { useEffect, useState, type ReactNode, type FormEvent } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   ArrowUp,
   Check,
   ChevronDown,
-  ChevronRight,
-  Compass,
-  Layers,
-  Loader2,
-  LogOut,
-  Menu,
-  Plus,
-  Sliders,
   Sparkles,
-  User,
-  Users,
-  BookOpen,
+  Menu,
   X
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { motion } from 'framer-motion';
-import { useInView } from '@/hooks/useInView';
-import { Accordion, type AccordionItem } from '@/components/Accordion';
-import { IridescentLoader } from '@/components/IridescentLoader';
+import { useInView } from './hooks/useInView';
+import { Accordion, type AccordionItem } from './components/Accordion';
 import {
-  checkSession,
-  requestSignup,
-  requestLogin,
-  redeemAuth,
-  logout,
-  getBaselineStatus,
-  submitBaseline,
-  getAccountOnboarding,
-  completeAccountOnboarding,
-  getEntitlements,
-  sendThreadMessage,
-  submitCorrection,
-  type AuthSession,
-  type BaselineStatus,
-  type Entitlements,
-  type SovereignAnswerV2,
-  type BasisRegistryItem
-} from '@/lib/api';
-
-type Route =
-  | '/'
-  | '/how-it-works'
-  | '/pricing'
-  | '/faq'
-  | '/terms'
-  | '/privacy'
-  | '/login'
-  | '/signup'
-  | '/auth/redeem'
-  | '/onboarding'
-  | '/app';
-
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  text: string;
-  answer?: SovereignAnswerV2;
-  basis?: BasisRegistryItem[];
-  feedbackGiven?: 'yes' | 'partly' | 'not_today';
-}
-
-function currentRoute(): Route {
-  const raw = window.location.pathname;
-  // Normalize trailing slashes (e.g. /pricing/ → /pricing), preserving root /
-  const path = raw.replace(/\/+$/, '') || '/';
-  if (path.startsWith('/auth/redeem')) return '/auth/redeem';
-  const known: Route[] = [
-    '/',
-    '/how-it-works',
-    '/pricing',
-    '/faq',
-    '/terms',
-    '/privacy',
-    '/login',
-    '/signup',
-    '/auth/redeem',
-    '/onboarding',
-    '/app'
-  ];
-  return known.includes(path as Route) ? (path as Route) : '/';
-}
-
-function go(path: Route) {
-  window.history.pushState({}, '', path);
-  window.dispatchEvent(new PopStateEvent('popstate'));
-}
+  go,
+  currentRoute,
+  type Route
+} from './lib/router';
 
 /* =========================================================================
    SOVEREIGN MARK / SEAL
@@ -116,30 +41,6 @@ export function SovereignMark({ size = 20, className = '' }: { size?: number; cl
 }
 
 /* =========================================================================
-   THE REFERENCE FIELD (Spatial Motif)
-   ========================================================================= */
-export function ReferenceField({ className = '' }: { className?: string }) {
-  return (
-    <div className={`overflow-hidden pointer-events-none select-none ${className}`} aria-hidden="true">
-      <svg className="w-full h-full text-[var(--line-strong)] opacity-40" viewBox="0 0 400 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <line x1="200" y1="20" x2="200" y2="220" stroke="currentColor" strokeDasharray="3 3" strokeWidth="1" />
-        <line x1="60" y1="120" x2="340" y2="120" stroke="currentColor" strokeDasharray="3 3" strokeWidth="1" />
-        <line x1="200" y1="50" x2="110" y2="120" stroke="currentColor" strokeWidth="1" strokeOpacity="0.7" />
-        <line x1="200" y1="50" x2="290" y2="120" stroke="currentColor" strokeWidth="1" strokeOpacity="0.7" />
-        <line x1="110" y1="120" x2="200" y2="190" stroke="currentColor" strokeWidth="1" strokeOpacity="0.7" />
-        <line x1="290" y1="120" x2="200" y2="190" stroke="currentColor" strokeWidth="1" strokeOpacity="0.7" />
-        
-        <circle cx="200" cy="50" r="3" fill="var(--cream)" />
-        <circle cx="110" cy="120" r="3" fill="var(--cream)" />
-        <circle cx="290" cy="120" r="3" fill="var(--cream)" />
-        <circle cx="200" cy="190" r="3" fill="var(--cream)" />
-        <circle cx="200" cy="120" r="4.5" stroke="var(--cream)" strokeWidth="1" fill="var(--ink)" />
-      </svg>
-    </div>
-  );
-}
-
-/* =========================================================================
    ROUTER & APP ROOT
    ========================================================================= */
 export function App() {
@@ -153,13 +54,14 @@ export function App() {
 
   const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
   const isAppDomain = hostname.includes('app.defrag.app');
+  {/* Choose what this connection may use. */}
 
   if (isAppDomain && route === '/') {
     return <Auth mode="login" />;
   }
 
   if (route === '/app') return <SovereignIntelligenceWorkspace />;
-  if (route === '/onboarding') return <Onboarding />;
+  if (route === '/onboarding') return <PlanOnboarding />;
   if (route === '/auth/redeem') return <Redeem />;
   if (route === '/login' || route === '/signup') return <Auth mode={route.slice(1) as 'login' | 'signup'} />;
   if (route === '/how-it-works') return <InfoPage onBack={() => go('/')} />;
@@ -196,8 +98,8 @@ function Header() {
   const nav = (path: Route) => { setMobileOpen(false); go(path); };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[rgba(255,255,255,0.08)] bg-[#000000]">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-[var(--line)] bg-[#000000]/90 transition-all duration-300">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-8">
         <button aria-label="Sovereign home" onClick={() => nav('/')} className="flex items-center gap-2.5 group shrink-0 cursor-pointer">
           <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
           <span className="text-sm font-medium tracking-tight text-[var(--cream)]">Sovereign.OS</span>
@@ -217,7 +119,7 @@ function Header() {
           </button>
           <button
             onClick={() => nav('/signup')}
-            className="rounded-full bg-[var(--cream)] px-4 py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors whitespace-nowrap shadow-sm cursor-pointer"
+            className="rounded-full bg-[var(--cream)] px-4 py-2 text-xs font-medium text-[var(--ink)] hover:bg-white transition colors whitespace-nowrap shadow-sm cursor-pointer"
           >
             Get started
           </button>
@@ -235,7 +137,7 @@ function Header() {
 
       {/* Mobile navigation drawer */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-[rgba(255,255,255,0.08)] bg-[#050505] px-6 py-4 space-y-1">
+        <div className="md:hidden border-t border-[var(--line)] bg-[#050505] px-6 py-4 space-y-1">
           {[
             { label: 'How it works', action: () => nav('/how-it-works') },
             { label: '01 · You', action: () => scrollToLayer('layer-01') },
@@ -262,1512 +164,64 @@ function Header() {
   );
 }
 
-
-/* =========================================================================
-   PUBLIC LANDING PAGE — SOVEREIGN.OS NARRATIVE PROGRESSION
-   ========================================================================= */
-function Landing() {
-  const heroView = useInView({ threshold: 0.1 });
-  const previewView = useInView({ threshold: 0.1 });
-  const engineView = useInView({ threshold: 0.1 });
-  const pricingView = useInView({ threshold: 0.1 });
-  const finalView = useInView({ threshold: 0.1 });
-
-  // Terminal intake preview state
-  const [demoQuestion, setDemoQuestion] = useState('Why does the same conversation feel urgent to me and pressuring to them?');
-  const [isAsking, setIsAsking] = useState(false);
-  const [showSources, setShowSources] = useState(false);
-
-  const handleAskSovereign = () => {
-    setIsAsking(true);
-    setTimeout(() => {
-      setIsAsking(false);
-    }, 350);
-  };
-
-  const baselineAccordionItems: AccordionItem[] = [
-    {
-      id: 'overthinking',
-      question: 'Why do I keep overthinking what to say when I feel misunderstood?',
-      observation: 'Your Baseline requires reflective processing before articulation. When you feel misunderstood, you instinctively draft multiple speech variants in real time to prevent incorrect perceptions.',
-      pattern: 'Over-refinement is an attempt to manage the other party\'s internal reaction before they have finished processing.',
-      shift: 'Separate the observation from the resolution. Name the disconnect cleanly, pause the conversation, and return only when your internal clarity stabilizes.'
-    },
-    {
-      id: 'boundaries',
-      question: 'How can I set a clear boundary without causing avoidable tension?',
-      observation: 'Your communication tendency defaults to softening statements under relational pressure, which can obscure the boundary line.',
-      pattern: 'Conflating clarity with aggression leads you to overexplain your reasons, inviting debate on the condition rather than securing the boundary.',
-      shift: 'State the boundary in one declarative sentence. Allow the silence after the statement without rushing to reassure.'
-    },
-    {
-      id: 'pressure',
-      question: 'Why do I take on full responsibility when group expectations collapse?',
-      observation: 'Under group stress, your Baseline activates early overfunctioning as an internal stabilizer.',
-      pattern: 'Absorbing unassigned responsibility protects the team pace short-term but creates structural resentment long-term.',
-      shift: 'Pause before stepping into vacant execution roles. Distinguish between your commitment and the group\'s system mechanics.'
-    }
-  ];
-
+function PageFrame({
+  title,
+  onBack,
+  children
+}: {
+  title: string;
+  onBack: () => void;
+  children: ReactNode;
+}) {
   return (
-    <div className="page-noise relative min-h-screen bg-[var(--platform-bg)] text-[var(--cream)] overflow-x-hidden">
-      {/* Ambient background glow */}
-      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[450px] bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(159,186,161,0.06),transparent_70%)]" />
-
+    <div className="page-noise relative min-h-screen bg-[#000000] text-[var(--cream)] overflow-x-hidden">
+      <div className="stage-glow" />
       <Header />
-
-      <main className="relative z-10 mx-auto max-w-5xl px-6 sm:px-8 pb-32 space-y-24 sm:space-y-32">
-        {/* 1. HERO SECTION */}
-        <section className="pt-20 sm:pt-28 text-center">
-          <motion.div
-            className="max-w-3xl mx-auto flex flex-col items-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.09 } }
-            }}
-          >
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } } }}
-              className="inline-flex items-center gap-2.5 rounded-full border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.025)] px-4 py-1.5 text-[11px] font-mono font-medium text-[var(--muted)] mb-8 tracking-wider uppercase"
-            >
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)]" />
-              <span>PERSONAL AI FOR REAL LIFE</span>
-            </motion.div>
-
-            <motion.h1
-              variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } } }}
-              className="text-3xl sm:text-6xl md:text-7xl text-[var(--cream)] font-normal tracking-tight leading-[1.06]"
-            >
-              Healing isn’t optional.<br />
-              Holding onto the pain is.
-            </motion.h1>
-
-            <motion.p
-              variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } } }}
-              className="max-w-2xl mx-auto text-[var(--muted)] text-base sm:text-lg leading-relaxed mt-6"
-            >
-              <strong className="block text-white font-medium mb-2">Sovereign is a Baseline-first private AI for understanding yourself, your relationships, and the human systems around you.</strong>
-              Sovereign.OS is a private personal AI for understanding yourself, your relationships, your decisions, and the systems around you. Build your Baseline once, then explore how you think, decide, communicate, create, connect, respond under pressure, and change.
-            </motion.p>
-
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
-            >
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => go('/signup')}
-                className="rounded-xl bg-[var(--cream)] px-8 py-3.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer shadow-sm w-full sm:w-auto"
-              >
-                Build your Baseline
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => {
-                  const demoEl = document.getElementById('demo');
-                  if (demoEl) {
-                    demoEl.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    go('/how-it-works');
-                  }
-                }}
-                className="rounded-xl border border-[rgba(255,255,255,0.12)] bg-transparent px-8 py-3.5 text-sm font-medium text-[var(--cream)] hover:bg-[rgba(255,255,255,0.04)] transition cursor-pointer w-full sm:w-auto"
-              >
-                See a Sovereign answer
-              </motion.button>
-            </motion.div>
-
-            <motion.p
-              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.5, delay: 0.1 } } }}
-              className="mt-4 text-xs text-[var(--subtle)]"
-            >
-              Start free · No card required · Review, correct, or reject any interpretation
-            </motion.p>
-          </motion.div>
-        </section>
-
-        {/* 2. THREE-LAYER SCOPE SECTION */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 space-y-16"
+      <main className="relative z-10 mx-auto max-w-4xl px-6 pb-24 pt-10 md:px-8 md:pt-16">
+        <button 
+          onClick={onBack} 
+          className="mb-8 font-mono text-[10px] text-[var(--muted)] hover:text-[var(--cream)] transition flex items-center gap-2 uppercase tracking-widest cursor-pointer"
         >
-          <div className="max-w-2xl mx-auto text-center space-y-4">
-            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
-              HOW IT WORKS
-            </span>
-            <h2 className="text-3xl sm:text-5xl text-[var(--cream)] font-normal leading-tight">
-              Understanding moves outward in three clear layers.
-            </h2>
-            <p className="text-base sm:text-lg text-[var(--muted)] leading-relaxed">
-              Start with yourself. Add people with consent. See the whole picture when it matters.
-            </p>
-          </div>
-
-          <motion.div
-            className="grid gap-8 md:grid-cols-3"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.12 } }
-            }}
-          >
-            {/* Card 1: 01 · YOU */}
-            <motion.div
-              id="layer-01"
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/10 bg-[#0c0c0e] p-6 sm:p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">01 · YOU</span>
-                  <span className="text-xs text-[var(--subtle)] font-mono">Explore yourself</span>
-                </div>
-                <h3 className="text-xl text-[var(--cream)] font-medium leading-snug">
-                  Explore how you think, decide, communicate, create, connect, and grow.
-                </h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
-                  Use Sovereign to explore your own patterns, expression, creativity, decisions, relationships, pressure, change, Shadow, Gift, and Alignment—without reducing yourself to a type or score.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)] font-mono">
-                Individual Baseline · Today Workspace
-              </div>
-            </motion.div>
-
-            {/* Card 2: 02 · YOU + YOUR PEOPLE */}
-            <motion.div
-              id="layer-02"
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 sm:p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">02 · YOU + YOUR PEOPLE</span>
-                  <span className="text-xs text-[var(--subtle)] font-mono">Relational intelligence</span>
-                </div>
-                <h3 className="text-xl text-[var(--cream)] font-medium leading-snug">
-                  See why the same moment lands differently—and how to bridge the gap.
-                </h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
-                  With permission, Sovereign can use both people’s Baselines while keeping each person distinct. See where timing, communication, pressure, or decision styles differ, what happens when they meet, and what each person can do differently.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)] font-mono">
-                Mutual Consent · Distinct Perspectives
-              </div>
-            </motion.div>
-
-            {/* Card 3: 03 · FROM 1:1 TO THE WHOLE SYSTEM */}
-            <motion.div
-              id="layer-03"
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } } }}
-              whileHover={{ y: -4, transition: { duration: 0.2 } }}
-              className="rounded-2xl border border-white/[0.08] bg-[#0c0c0e] p-6 sm:p-8 space-y-5 flex flex-col justify-between shadow-xl transition-colors hover:border-white/[0.16]"
-            >
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-wider">03 · FROM 1:1 TO THE WHOLE SYSTEM</span>
-                  <span className="text-xs text-[var(--subtle)] font-mono">System dynamics</span>
-                </div>
-                <h3 className="text-xl text-[var(--cream)] font-medium leading-snug">
-                  See the whole system.
-                </h3>
-                <p className="text-sm text-[var(--muted)] leading-relaxed font-normal">
-                  Move from one relationship to a family, household, team, or group. See who is involved, what each person is responsible for, where pressure builds, how people respond to one another, and what may change when one person responds differently.
-                </p>
-              </div>
-              <div className="pt-4 border-t border-white/[0.06] text-xs text-[var(--subtle)] font-mono">
-                Groups &amp; Teams · Pressure Flow
-              </div>
-            </motion.div>
-          </motion.div>
-        </motion.section>
-
-        {/* 3. SOVEREIGN ANSWER DEMONSTRATION WINDOW */}
-        <section
-          id="demo"
-          ref={previewView.ref}
-          data-visible={previewView.isInView}
-          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 animate-fade-up"
-        >
-          <div className="max-w-2xl mx-auto text-center space-y-4 mb-10">
-            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
-              SEE IT IN ACTION
-            </span>
-            <h2 className="text-3xl sm:text-4xl text-[var(--cream)] font-normal">
-              A real answer, grounded in two people's context.
-            </h2>
-            <p className="text-sm sm:text-base text-[var(--muted)]">
-              This is how Sovereign works when two people share context. Each perspective stays private and distinct.
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-white/[0.08] bg-[#050505] p-6 sm:p-10 space-y-6 shadow-2xl relative overflow-hidden">
-            {/* Ambient terminal glow */}
-            <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[radial-gradient(ellipse_at_center,rgba(159,186,161,0.06),transparent_70%)]" />
-
-            {/* Terminal Window Header Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-4">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="h-2.5 w-2.5 rounded-full bg-white/10 shrink-0" />
-                <span className="h-2.5 w-2.5 rounded-full bg-white/10 shrink-0" />
-                <span className="h-2.5 w-2.5 rounded-full bg-white/10 shrink-0" />
-                <span className="ml-2 font-mono text-[11px] text-[var(--subtle)] truncate">sovereign.workspace</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.02] px-3 py-1 shrink-0">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--sage)] animate-pulse" />
-                <span className="text-[10px] font-utility text-[var(--sage)] tracking-wider">LIVE PREVIEW</span>
-              </div>
-            </div>
-
-            {/* Question Intake Input / Prompt Box */}
-            <div className="rounded-xl border border-white/[0.08] bg-[#0c0c0e] p-4 sm:p-5 space-y-3">
-              <div className="flex items-center justify-between">
-                <label className="font-utility text-[10px] text-[var(--muted)] tracking-wider uppercase">
-                  Your question:
-                </label>
-                <span className="text-[11px] text-[var(--subtle)] font-mono">Relational context active</span>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  value={demoQuestion}
-                  onChange={(e) => setDemoQuestion(e.target.value)}
-                  placeholder="Enter a relational inquiry..."
-                  className="flex-1 rounded-lg border border-white/[0.1] bg-[#050505] px-4 py-2.5 text-sm text-[var(--cream)] placeholder-[var(--subtle)] focus:outline-none focus:border-[var(--sage)] transition-colors"
-                />
-                <button
-                  type="button"
-                  onClick={handleAskSovereign}
-                  disabled={isAsking}
-                  className="rounded-lg bg-[var(--cream)] px-6 py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white transition-colors cursor-pointer shrink-0 flex items-center justify-center gap-2 shadow-sm"
-                >
-                  {isAsking ? (
-                    <>
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      <span>Synthesizing...</span>
-                    </>
-                  ) : (
-                    <span>Ask Sovereign</span>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Answer Display Surface */}
-            <div className="space-y-6 pt-2">
-              <div className="border-b border-white/[0.06] pb-3 flex items-center justify-between">
-                <span className="font-utility text-[11px] text-[var(--muted)] tracking-wider uppercase">
-                  WHAT SOVEREIGN FOUND
-                </span>
-                <span className="font-mono text-[10px] text-[var(--subtle)]">Three perspectives</span>
-              </div>
-
-              {/* Triad Item 1: WHAT YOU MAY BE BRINGING */}
-              <div className="rounded-xl border border-white/[0.06] bg-[#0c0c0e]/60 p-5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
-                    WHAT YOU MAY BE BRINGING
-                  </span>
-                  <span className="text-[10px] text-[var(--subtle)] font-mono">Your Baseline</span>
-                </div>
-                <p className="text-sm sm:text-base text-[var(--cream)]/95 leading-relaxed font-normal">
-                  Your Baseline relies on fast processing and immediate verbal resolution to regulate tension when ambiguity arises. In hard conversations, you seek a concrete next step in order to feel settled, which can accelerate your pacing.
-                </p>
-              </div>
-
-              {/* Triad Item 2: WHAT THEY MAY BE BRINGING */}
-              <div className="rounded-xl border border-white/[0.06] bg-[#0c0c0e]/60 p-5 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">
-                    WHAT THEY MAY BE BRINGING
-                  </span>
-                  <span className="text-[10px] text-[var(--subtle)] font-mono">Shared Baseline</span>
-                </div>
-                <p className="text-sm sm:text-base text-[var(--cream)]/85 leading-relaxed font-normal">
-                  Their shared Baseline requires internal reflection time before responding, experiencing rapid questioning as an intrusion. Under pressure, their instinct is to pause and regulate rather than offer an immediate commitment.
-                </p>
-              </div>
-
-              {/* Triad Item 3: WHAT HAPPENS BETWEEN YOU */}
-              <div className="rounded-xl border border-[rgba(159,186,161,0.2)] bg-[#0c0c0e] p-5 space-y-2 shadow-inner">
-                <div className="flex items-center justify-between">
-                  <span className="font-utility text-[10px] text-[var(--cream)] tracking-widest uppercase">
-                    WHAT HAPPENS BETWEEN YOU
-                  </span>
-                  <span className="text-[10px] text-[var(--sage)] font-mono">Interaction Dynamic</span>
-                </div>
-                <p className="text-sm sm:text-base text-[var(--cream)] font-medium leading-relaxed">
-                  Your pursuit of immediate clarity accelerates their need for space, turning a simple timing difference into mutual defense. Urgency invites withdrawal, and withdrawal amplifies urgency. Naming a clear return time allows space without leaving the issue abandoned.
-                </p>
-              </div>
-
-              {/* Footer Controls: Sources Toggle & Guidance Note */}
-              <div className="border-t border-white/[0.06] pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[var(--subtle)]">
-                <button
-                  type="button"
-                  onClick={() => setShowSources(!showSources)}
-                  className="font-utility text-[11px] text-[var(--muted)] hover:text-[var(--cream)] transition-colors underline cursor-pointer flex items-center gap-1.5"
-                >
-                  <span>{showSources ? 'Hide source details' : 'See source details'}</span>
-                  <ChevronDown className={`h-3 w-3 transition-transform ${showSources ? 'rotate-180' : ''}`} />
-                </button>
-                <span>Correct, adjust, or reject this interpretation at any time.</span>
-              </div>
-
-              {/* Clean Inline Sources Disclosure Drawer */}
-              {showSources && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="rounded-xl border border-white/[0.08] bg-[#0c0c0e] p-5 space-y-4"
-                >
-                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                    <span className="font-utility text-[10px] text-[var(--cream)] tracking-wider uppercase">
-                      Source details
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowSources(false)}
-                      className="text-xs text-[var(--subtle)] hover:text-[var(--cream)] cursor-pointer"
-                    >
-                      Close
-                    </button>
-                  </div>
-                  <p className="text-xs text-[var(--muted)] leading-relaxed">
-                    These are the source values Sovereign used for this answer. They can inform reflection; they do not prove personality or current state.
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
-                      <div className="font-mono text-xs text-[var(--cream)] font-medium">HD G13.1</div>
-                      <div className="text-[10px] text-[var(--subtle)] mt-1">Listening & Direction</div>
-                    </div>
-                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
-                      <div className="font-mono text-xs text-[var(--cream)] font-medium">GK ACT13</div>
-                      <div className="text-[10px] text-[var(--subtle)] mt-1">Discernment</div>
-                    </div>
-                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
-                      <div className="font-mono text-xs text-[var(--cream)] font-medium">☉ CAN 04.2°</div>
-                      <div className="text-[10px] text-[var(--subtle)] mt-1">Relational Sensitivity</div>
-                    </div>
-                    <div className="rounded-lg border border-white/[0.06] bg-[#050505] p-3 text-center">
-                      <div className="font-mono text-xs text-[var(--cream)] font-medium">N LP1</div>
-                      <div className="text-[10px] text-[var(--subtle)] mt-1">Pacing & Autonomy</div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-          </div>
-
-          {/* Interactive Accordion Demo */}
-          <div className="mt-12 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#0c0c0e] p-6 sm:p-8 space-y-4">
-            <span className="font-utility text-[10px] text-[var(--subtle)] tracking-wider uppercase block">
-              EXPLORE CANONICAL INQUIRIES
-            </span>
-            <Accordion items={baselineAccordionItems} />
-          </div>
-        </section>
-
-        {/* 5. COMPARISON / WHY THIS AI IS DIFFERENT */}
-        <section className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 animate-fade-up">
-          <div className="max-w-2xl mx-auto text-center space-y-4 mb-12">
-            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">THE DIFFERENCE</span>
-            <h2 className="text-3xl sm:text-4xl text-[var(--cream)] font-normal">
-              Most AI starts with the prompt.<br />
-              Sovereign starts with you.
-            </h2>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[rgba(255,255,255,0.02)] p-7 space-y-4">
-              <span className="font-utility text-xs text-[var(--muted)]">GENERIC AI CHATBOTS</span>
-              <ul className="space-y-3 text-sm text-[var(--muted)]">
-                <li className="flex items-start gap-2">
-                  <span className="text-[var(--subtle)]">—</span>
-                  <span>Requires pasting full context into every prompt.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[var(--subtle)]">—</span>
-                  <span>Provides surface-level, agreeable advice.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[var(--subtle)]">—</span>
-                  <span>Has no structural memory of your operating mechanics.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.04)] p-7 space-y-4">
-              <span className="font-utility text-xs text-[var(--sage)]">SOVEREIGN.OS</span>
-              <ul className="space-y-3 text-sm text-[var(--cream)]">
-                <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-[var(--sage)] shrink-0 mt-0.5" />
-                  <span>Grounds every turn in your permanent private Baseline.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-[var(--sage)] shrink-0 mt-0.5" />
-                  <span>Delivers structured, grounded relational observations.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-4 w-4 text-[var(--sage)] shrink-0 mt-0.5" />
-                  <span>Exposes underlying patterns without forcing outcomes.</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* 6. QUIET SURFACE PRICING */}
-        <section
-          ref={pricingView.ref}
-          data-visible={pricingView.isInView}
-          className="border-t border-[rgba(255,255,255,0.08)] pt-20 sm:pt-24 animate-fade-up"
-        >
-          <div className="max-w-xl mb-10">
-            <span className="font-utility text-[10px] text-[var(--sage)] tracking-widest uppercase">ACCESS & PRICING</span>
-            <h2 className="text-3xl sm:text-4xl text-[var(--cream)] font-normal mt-2">
-              Simple, transparent access.
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-[var(--muted)]">
-              Start with your private Baseline at no cost. Add depth when you are ready to examine relationships and whole systems.
-            </p>
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/[0.08] bg-[#121215] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xl">
-              <div className="space-y-4">
-                <div>
-                  <span className="font-utility text-xs text-[var(--muted)]">STANDARD</span>
-                  <div className="mt-2 text-3xl text-[var(--cream)] font-normal">Free ($0)</div>
-                </div>
-                <p className="text-xs sm:text-sm text-[var(--muted)]">
-                  A private Baseline and a quiet way to begin asking questions.
-                </p>
-                <div className="space-y-2 text-xs text-[var(--cream)]/90 pt-4 border-t border-white/[0.06]">
-                  <div>— Private personal Baseline</div>
-                  <div>— Today thinking environment</div>
-                  <div>— 10 AI turns per month</div>
-                </div>
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                onClick={() => go('/signup')}
-                className="w-full rounded-xl border border-white/[0.12] py-3 text-xs font-medium text-[var(--cream)] hover:bg-white/[0.05] transition cursor-pointer"
-              >
-                Start Free
-              </motion.button>
-            </div>
-
-            <div className="rounded-2xl border border-white/[0.14] bg-[#16161a] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-xl">
-              <div className="space-y-4">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <span className="font-utility text-xs text-[var(--sage)]">SOVEREIGN+</span>
-                    <div className="mt-2 text-3xl text-[var(--cream)] font-normal">$20 / mo</div>
-                  </div>
-                  <Sparkles className="h-5 w-5 text-[var(--sage)]" />
-                </div>
-                <p className="text-xs sm:text-sm text-[var(--muted)]">
-                  Room for deeper personal exploration, relational intelligence, and systems.
-                </p>
-                <div className="space-y-2 text-xs text-[var(--cream)]/90 pt-4 border-t border-white/[0.06]">
-                  <div>— Everything in Free</div>
-                  <div>— 300 AI turns per month</div>
-                  <div>— Relational inquiry & system dynamics</div>
-                </div>
-              </div>
-              <motion.button
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.99 }}
-                onClick={() => go('/signup')}
-                className="w-full rounded-xl bg-[var(--cream)] py-3 text-xs font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer"
-              >
-                Start Sovereign+
-              </motion.button>
-            </div>
-          </div>
-        </section>
-
-        {/* 7. FINAL CALL TO ACTION */}
-        <section
-          ref={finalView.ref}
-          data-visible={finalView.isInView}
-          className="border-t border-[rgba(255,255,255,0.08)] pt-24 text-center animate-fade-up"
-        >
-          <div className="max-w-xl mx-auto space-y-6">
-            <SovereignMark size={32} className="mx-auto text-[var(--cream)]" />
-            <h2 className="text-3xl sm:text-5xl text-[var(--cream)] font-normal leading-tight">
-              Know yourself.<br />
-              Understand your people.<br />
-              See the whole system.
-            </h2>
-            <p className="text-base text-[var(--muted)] max-w-md mx-auto">
-              Establish your private reference in under two minutes.
-            </p>
-            <div className="pt-2">
-              <button
-                onClick={() => go('/signup')}
-                className="rounded-xl bg-[var(--cream)] px-8 py-3.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer shadow-sm"
-              >
-                Build your Baseline
-              </button>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      {/* FOOTER */}
-      <footer className="relative z-10 border-t border-[rgba(255,255,255,0.08)] py-10 text-xs text-[var(--subtle)]">
-        <div className="mx-auto max-w-5xl px-6 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <SovereignMark size={14} />
-            <span className="font-medium text-[var(--muted)]">Sovereign.OS</span>
-          </div>
-          <div className="flex gap-6 font-utility text-[10px]">
-            <button onClick={() => go('/how-it-works')} className="hover:text-[var(--cream)] transition cursor-pointer">How it works</button>
-            <button onClick={() => go('/terms')} className="hover:text-[var(--cream)] transition cursor-pointer">Terms</button>
-            <button onClick={() => go('/privacy')} className="hover:text-[var(--cream)] transition cursor-pointer">Privacy</button>
-            <button onClick={() => go('/pricing')} className="hover:text-[var(--cream)] transition cursor-pointer">Pricing</button>
-            <button onClick={() => go('/faq')} className="hover:text-[var(--cream)] transition cursor-pointer">FAQ</button>
-          </div>
-          <div>© {new Date().getFullYear()} Sovereign.OS. Private personal AI.</div>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-/* =========================================================================
-   AUTHENTICATION — SIGNUP / LOGIN (Delegated to PasskeyAuthentication)
-   ========================================================================= */
-
-
-/* =========================================================================
-   ONBOARDING — BASELINE INTAKE & TIER SELECTION
-   ========================================================================= */
-function Onboarding() {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [baselineStatus, setBaselineStatus] = useState<BaselineStatus | null>(null);
-  const [step, setStep] = useState<'loading' | 'intake' | 'computing' | 'plan' | 'done'>('loading');
-  const [birthDate, setBirthDate] = useState('1990-01-01');
-  const [birthplace, setBirthplace] = useState('San Francisco, CA, US');
-  const [birthTimezone, setBirthTimezone] = useState(
-    typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles' : 'America/Los_Angeles'
-  );
-  const [birthTimeCertainty, setBirthTimeCertainty] = useState<'exact' | 'approximate' | 'unknown'>('approximate');
-  const [birthTime, setBirthTime] = useState('12:00');
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'sovereign_plus'>('free');
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    checkSession().then(async (user) => {
-      if (!user) {
-        go('/login');
-        return;
-      }
-      setSession(user);
-      try {
-        const bl = await getBaselineStatus();
-        setBaselineStatus(bl);
-        if (bl.ready) {
-          const acct = await getAccountOnboarding();
-          if (acct.completed) {
-            go('/app');
-          } else {
-            setStep('plan');
-          }
-        } else {
-          setStep('intake');
-        }
-      } catch {
-        setStep('intake');
-      }
-    });
-  }, []);
-
-  const handleBaselineSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    try {
-      await submitBaseline({
-        birthDate,
-        birthplace,
-        birthTimezone,
-        birthTimeCertainty,
-        birthTime: birthTimeCertainty !== 'unknown' ? birthTime : undefined
-      });
-      setStep('computing');
-      let attempts = 0;
-      const interval = setInterval(async () => {
-        attempts += 1;
-        try {
-          const status = await getBaselineStatus();
-          setBaselineStatus(status);
-          if (status.ready || attempts > 15) {
-            clearInterval(interval);
-            setLoading(false);
-            setStep('plan');
-          }
-        } catch {
-          if (attempts > 10) {
-            clearInterval(interval);
-            setLoading(false);
-            setStep('plan');
-          }
-        }
-      }, 1500);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Baseline establishment failed');
-      setLoading(false);
-    }
-  };
-
-  const handlePlanSubmit = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      await completeAccountOnboarding(selectedPlan);
-      go('/app');
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Plan onboarding failed');
-      setLoading(false);
-    }
-  };
-
-  if (step === 'loading') {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--ink)]">
-        <Loader2 className="h-6 w-6 animate-spin text-[var(--sage)]" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="page-noise min-h-screen bg-[var(--ink)] text-[var(--cream)] px-6 py-12">
-      <div className="mx-auto max-w-lg">
-        <div className="mb-8 flex items-center justify-between border-b border-[var(--line)] pb-4">
-          <div className="flex items-center gap-2.5">
-            <SovereignMark size={18} />
-            <span className="text-sm font-medium tracking-tight">Sovereign</span>
-          </div>
-          {session && (
-            <span className="font-utility text-[10px] text-[var(--subtle)]">Account: {session.accountId.slice(0, 8)}</span>
-          )}
-        </div>
-
-        {error && (
-          <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">
-            {error}
-          </div>
-        )}
-
-        {step === 'intake' && (
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-7 md:p-9 shadow-xl">
-            <p className="font-utility text-[var(--sage)]">STEP 1 OF 2</p>
-            <h1 className="mt-2 font-statement text-2xl md:text-3xl text-[var(--cream)]">
-              Let&apos;s build your Baseline.
-            </h1>
-            <p className="mt-2 font-explanation text-sm">
-              This becomes the private reference Sovereign uses to understand your context. Your birth details stay private to you and are never shared with AI model providers or used to train models.
-            </p>
-
-            <form onSubmit={handleBaselineSubmit} className="mt-6 space-y-4">
-              <div>
-                <label className="mb-1.5 block font-utility text-[11px] text-[var(--subtle)]">Birth Date</label>
-                <Input
-                  type="date"
-                  required
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  className="border-[var(--line)] bg-[var(--surface-2)] text-sm rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block font-utility text-[11px] text-[var(--subtle)]">Birthplace (City, State/Country)</label>
-                <Input
-                  placeholder="e.g. San Francisco, California, US"
-                  required
-                  value={birthplace}
-                  onChange={(e) => setBirthplace(e.target.value)}
-                  className="border-[var(--line)] bg-[var(--surface-2)] text-sm rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block font-utility text-[11px] text-[var(--subtle)]">Birthplace Timezone</label>
-                <Input
-                  placeholder="e.g. America/Los_Angeles"
-                  required
-                  value={birthTimezone}
-                  onChange={(e) => setBirthTimezone(e.target.value)}
-                  className="border-[var(--line)] bg-[var(--surface-2)] text-sm rounded-lg"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1.5 block font-utility text-[11px] text-[var(--subtle)]">Time Certainty</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['exact', 'approximate', 'unknown'] as const).map((cert) => (
-                    <button
-                      key={cert}
-                      type="button"
-                      onClick={() => setBirthTimeCertainty(cert)}
-                      className={`rounded-lg border py-2 text-xs capitalize transition ${
-                        birthTimeCertainty === cert
-                          ? 'border-[var(--cream)] bg-[var(--surface-2)] text-[var(--cream)]'
-                          : 'border-[var(--line)] text-[var(--muted)] hover:border-[var(--line-strong)]'
-                      }`}
-                    >
-                      {cert}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {birthTimeCertainty !== 'unknown' && (
-                <div>
-                  <label className="mb-1.5 block font-utility text-[11px] text-[var(--subtle)]">Birth Time (24h)</label>
-                  <Input
-                    type="time"
-                    required
-                    value={birthTime}
-                    onChange={(e) => setBirthTime(e.target.value)}
-                    className="border-[var(--line)] bg-[var(--surface-2)] text-sm rounded-lg"
-                  />
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full mt-4 rounded-lg bg-[var(--cream)] py-2.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition flex items-center justify-center gap-2"
-              >
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Establish Baseline'}
-              </button>
-            </form>
-          </div>
-        )}
-
-        {step === 'computing' && (
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-10 text-center space-y-4">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-[var(--sage)]" />
-            <h2 className="font-statement text-xl text-[var(--cream)]">Computing your private Baseline</h2>
-            <p className="font-explanation text-xs max-w-sm mx-auto">
-              {baselineStatus?.message || 'Reducing astronomical coordinates into grounded personal themes...'}
-            </p>
-          </div>
-        )}
-
-        {step === 'plan' && (
-          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-7 md:p-9 shadow-xl">
-            <div className="flex items-center gap-2 font-utility text-[11px] text-[var(--sage)]">
-              <Check className="h-4 w-4" />
-              <span>BASELINE ESTABLISHED</span>
-            </div>
-            <h1 className="mt-2 font-statement text-2xl md:text-3xl text-[var(--cream)]">
-              Choose your launch tier
-            </h1>
-            <p className="mt-2 font-explanation text-sm">
-              Both tiers include your private Baseline and authenticated personal workspace.
-            </p>
-
-            <div className="mt-6 space-y-3">
-              <div
-                onClick={() => setSelectedPlan('free')}
-                className={`cursor-pointer rounded-xl border p-4 transition ${
-                  selectedPlan === 'free'
-                    ? 'border-[var(--cream)] bg-[var(--surface-2)]'
-                    : 'border-[var(--line)] hover:border-[var(--line-strong)]'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-utility text-[10px] text-[var(--muted)]">STANDARD</span>
-                    <h3 className="font-statement text-base text-[var(--cream)]">Free Tier ($0)</h3>
-                  </div>
-                  <span className="font-utility text-xs text-[var(--cream)]">10 turns / mo</span>
-                </div>
-                <p className="mt-1 font-explanation text-xs">Private Baseline, Today surface, grounded Sovereign answers.</p>
-              </div>
-
-              <div
-                onClick={() => setSelectedPlan('sovereign_plus')}
-                className={`cursor-pointer rounded-xl border p-4 transition ${
-                  selectedPlan === 'sovereign_plus'
-                    ? 'border-[var(--cream)] bg-[var(--surface-2)]'
-                    : 'border-[var(--line)] hover:border-[var(--line-strong)]'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-utility text-[10px] text-[var(--sage)]">UNLIMITED DEPTH</span>
-                    <h3 className="font-statement text-base text-[var(--cream)]">Sovereign+ ($20 / mo)</h3>
-                  </div>
-                  <span className="font-utility text-xs text-[var(--cream)]">300 turns / mo</span>
-                </div>
-                <p className="mt-1 font-explanation text-xs">People comparisons, multi-participant systems, and extended library retention.</p>
-              </div>
-            </div>
-
-            <button
-              onClick={handlePlanSubmit}
-              disabled={loading}
-              className="mt-6 w-full rounded-lg bg-[var(--cream)] py-2.5 text-sm font-medium text-[var(--ink)] hover:bg-white transition flex items-center justify-center gap-2"
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enter Sovereign Workspace'}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* =========================================================================
-   AUTHENTICATED WORKSPACE — WRITING & THINKING ENVIRONMENT
-   ========================================================================= */
-type WorkspaceTab = 'today' | 'explore' | 'people' | 'systems' | 'library' | 'you';
-// Choose what this connection may use.
-function Workspace() {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [entitlements, setEntitlements] = useState<Entitlements | null>(null);
-  const [baseline, setBaseline] = useState<BaselineStatus | null>(null);
-  const [activeTab, setActiveTab] = useState<WorkspaceTab>('today');
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [sending, setSending] = useState(false);
-  const [threadId] = useState(() => `t_${crypto.randomUUID().slice(0, 12)}`);
-  const [errorBanner, setErrorBanner] = useState<string | null>(null);
-
-  // People view state
-  const [people, setPeople] = useState<{ id: string; name: string; relation: string; note: string }[]>([
-    { id: 'p1', name: 'Partner', relation: 'Spouse / Partner', note: 'Opposing coping style under pressure; seeks connection when I need space.' }
-  ]);
-  const [newPersonName, setNewPersonName] = useState('');
-  const [newPersonRelation, setNewPersonRelation] = useState('');
-  const [showAddPerson, setShowAddPerson] = useState(false);
-
-  useEffect(() => {
-    checkSession().then(async (user) => {
-      if (!user) {
-        go('/login');
-        return;
-      }
-      setSession(user);
-      try {
-        const [bl, ent] = await Promise.all([getBaselineStatus(), getEntitlements()]);
-        setBaseline(bl);
-        setEntitlements(ent);
-        if (!bl.ready) {
-          go('/onboarding');
-        }
-      } catch {
-        // Fallback for fresh sessions
-      }
-    });
-  }, []);
-
-  const send = async () => {
-    const text = input.trim();
-    if (!text || sending) return;
-
-    setErrorBanner(null);
-    const userMsgId = `m_${crypto.randomUUID()}`;
-    const assistantPlaceholderId = `m_${crypto.randomUUID()}`;
-    const userMsg: ChatMessage = { id: userMsgId, role: 'user', text };
-
-    setMessages((prev) => [...prev, userMsg]);
-    setInput('');
-    setSending(true);
-
-    const idempotencyKey = `turn_${crypto.randomUUID()}`;
-
-    try {
-      const response = await sendThreadMessage(threadId, text, idempotencyKey);
-      const assistantMsg: ChatMessage = {
-        id: assistantPlaceholderId,
-        role: 'assistant',
-        text: response.text,
-        answer: response.answer,
-        basis: response.basis
-      };
-      setMessages((prev) => [...prev, assistantMsg]);
-      getEntitlements().then(setEntitlements).catch(() => {});
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Turn request failed';
-      setErrorBanner(msg);
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleFeedback = async (messageId: string, choice: 'yes' | 'partly' | 'not_today') => {
-    setMessages((prev) =>
-      prev.map((m) => (m.id === messageId ? { ...m, feedbackGiven: choice } : m))
-    );
-    try {
-      await submitCorrection(threadId, choice);
-    } catch {
-      // Ignored non-fatal feedback error
-    }
-  };
-
-  const handleAddPerson = (e: FormEvent) => {
-    e.preventDefault();
-    if (!newPersonName.trim()) return;
-    setPeople((prev) => [
-      ...prev,
-      {
-        id: `p_${Date.now()}`,
-        name: newPersonName.trim(),
-        relation: newPersonRelation.trim() || 'Collaborator',
-        note: 'Added for distinct relational examination without collapsing perspectives.'
-      }
-    ]);
-    setNewPersonName('');
-    setNewPersonRelation('');
-    setShowAddPerson(false);
-  };
-
-  return (
-    <div className="min-h-screen bg-[var(--ink)] text-[var(--cream)] flex flex-col md:flex-row overflow-x-hidden">
-      {/* NAVIGATION RAIL */}
-      <aside className="w-full md:w-60 shrink-0 border-b md:border-b-0 md:border-r border-[var(--line)] bg-[var(--surface)] flex flex-row md:flex-col justify-between p-4 md:p-6 z-20">
-        <div className="space-y-6 w-full">
-          <div className="flex items-center justify-between">
-            <button onClick={() => go('/')} className="flex items-center gap-2.5 group">
-              <SovereignMark size={20} className="transition-transform group-hover:scale-105" />
-              <span className="text-[15px] font-medium tracking-tight">Sovereign</span>
-            </button>
-            <span className="font-utility text-[9px] text-[var(--sage)] md:hidden">
-              {entitlements?.plan === 'free' ? 'Free' : 'Sovereign+'}
-            </span>
-          </div>
-
-          <nav className="flex md:flex-col gap-1 overflow-x-auto scrollbar-hide">
-            {[
-              { id: 'today', label: 'Today', icon: Compass },
-              { id: 'explore', label: 'Explore', icon: Sliders },
-              { id: 'people', label: 'People', icon: Users },
-              { id: 'systems', label: 'Systems', icon: Layers },
-              { id: 'library', label: 'Library', icon: BookOpen },
-              { id: 'you', label: 'You', icon: User }
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as WorkspaceTab)}
-                  className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs transition shrink-0 ${
-                    isActive
-                      ? 'bg-[var(--surface-2)] text-[var(--cream)] font-medium border border-[var(--line)]'
-                      : 'text-[var(--muted)] hover:text-[var(--cream)] hover:bg-[var(--surface-2)]/50'
-                  }`}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Mobile sign-out (visible only on small screens) */}
-          <button
-            className="md:hidden ml-auto flex items-center gap-1.5 text-[var(--subtle)] hover:text-[var(--cream)] transition shrink-0 px-2 py-1"
-            onClick={async () => { await logout(); go('/'); }}
-            title="Sign out"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            <span className="text-[10px] font-utility">Sign out</span>
-          </button>
-        </div>
-
-        <div className="hidden md:block pt-6 border-t border-[var(--line)] space-y-3">
-          {entitlements && (
-            <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-2.5 text-[11px] text-[var(--muted)]">
-              <div className="flex justify-between font-utility text-[9px]">
-                <span className="text-[var(--sage)]">{entitlements.plan === 'free' ? 'FREE PLAN' : 'SOVEREIGN+'}</span>
-                <span>{entitlements.aiTurnsRemaining !== undefined ? `${entitlements.aiTurnsRemaining} left` : 'Active'}</span>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between pt-1">
-            <span className="font-utility text-[10px] text-[var(--subtle)]">PRIVATE SESSION</span>
-            <button
-              onClick={async () => {
-                await logout();
-                go('/');
-              }}
-              className="text-[var(--subtle)] hover:text-[var(--cream)] transition p-1"
-              title="Sign out"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* MAIN WORKSPACE CONTENT AREA */}
-      <main className="flex-1 flex flex-col min-h-[calc(100svh-60px)] md:min-h-screen bg-[var(--ink)] overflow-x-hidden">
-        {errorBanner && (
-          <div className="mx-6 mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300">
-            {errorBanner}
-          </div>
-        )}
-
-        {/* TODAY VIEW (Primary conversation & thinking surface) */}
-        {activeTab === 'today' && (
-          <div className="sov-tab-content flex-1 flex flex-col max-w-3xl mx-auto w-full px-6 py-8">
-            <div className="flex-1">
-              {messages.length === 0 ? (
-                <div className="flex min-h-[55vh] flex-col justify-center relative overflow-hidden">
-                  <ReferenceField className="absolute -right-20 -top-10 w-96 h-64 opacity-20" />
-                  <div className="relative z-10 space-y-3">
-                    <p className="font-utility text-[var(--sage)]">TODAY</p>
-                    <h1 className="font-statement text-3xl md:text-5xl text-[var(--cream)] max-w-lg">
-                      What is active for you now?
-                    </h1>
-                    <p className="font-explanation text-sm max-w-lg">
-                      Ask in ordinary language. Sovereign answers from your private Baseline, surfaces active dynamics, and keeps unknowns explicit.
-                    </p>
-
-                    <div className="mt-8 space-y-2 pt-2">
-                      <span className="font-utility text-[10px] text-[var(--subtle)]">OR START WITH A SITUATION:</span>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          'Why do I keep overthinking what to say?',
-                          'Why does this conversation keep going the same way?',
-                          'What am I missing about what is happening between us?',
-                          'How should I approach this decision?'
-                        ].map((q) => (
-                          <button
-                            key={q}
-                            type="button"
-                            onClick={() => setInput(q)}
-                            className="rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3.5 py-2 text-left text-xs text-[var(--muted)] hover:border-[var(--line-strong)] hover:text-[var(--cream)] transition"
-                          >
-                            {q}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-6 pb-36">
-                  {messages.map((message) =>
-                    message.role === 'user' ? (
-                      <motion.div
-                        key={message.id}
-                        initial={{ opacity: 0, x: 8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        className="ml-auto max-w-[85%] rounded-xl bg-[var(--surface-2)] border border-[var(--line)] px-4 py-3 text-sm leading-relaxed text-[var(--cream)]"
-                      >
-                        {message.text}
-                      </motion.div>
-                    ) : (
-                      <motion.article
-                        key={message.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                        className="space-y-4"
-                      >
-                        {message.answer ? (
-                          <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8 space-y-5">
-                            <div className="flex items-center justify-between font-utility text-[10px] text-[var(--subtle)]">
-                              <span className="text-[var(--sage)] flex items-center gap-1.5">
-                                <SovereignMark size={12} />
-                                <span>GROUNDED REFERENCE</span>
-                              </span>
-                              <span className="text-[var(--subtle)]">PRIVATE</span>
-                            </div>
-
-                            <h2 className="font-statement text-xl md:text-2xl text-[var(--cream)]">
-                              {message.answer.headline}
-                            </h2>
-
-                            <div className="answer-direct answer-prose">
-                              <p>{message.answer.direct_answer}</p>
-                            </div>
-
-                            {message.answer.sections && message.answer.sections.length > 0 && (
-                              <div className="space-y-2.5 border-t border-[var(--line)] pt-4">
-                                {message.answer.sections.map((sec) => (
-                                  <motion.div
-                                    key={sec.id}
-                                    initial={{ opacity: 0, y: 6 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                                    className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-4 space-y-1"
-                                  >
-                                    <div className="font-utility text-[9px] text-[var(--subtle)] uppercase tracking-wider">{sec.label}</div>
-                                    <div className="font-explanation text-xs leading-relaxed text-[var(--cream)]">{sec.body}</div>
-                                  </motion.div>
-                                ))}
-                              </div>
-                            )}
-
-                            {message.basis && message.basis.length > 0 && (
-                              <div className="border-t border-[var(--line)] pt-3 flex flex-wrap items-center gap-1.5">
-                                <span className="font-utility text-[9px] text-[var(--subtle)] mr-1">Sources:</span>
-                                {message.basis.map((b) => (
-                                  <span key={b.id} className="font-utility text-[10px] rounded-md border border-[var(--line)] bg-[#0c0c0b] px-2 py-0.5 text-[var(--muted)]">
-                                    {b.display}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-                            <div className="border-t border-[var(--line)] pt-4 flex items-center justify-between text-xs text-[var(--subtle)]">
-                              <span>{message.answer.correction_prompt || 'Does this match today?'}</span>
-                              {!message.feedbackGiven ? (
-                                <div className="flex gap-2">
-                                  {(['yes', 'partly', 'not_today'] as const).map((choice) => (
-                                    <button
-                                      key={choice}
-                                      onClick={() => handleFeedback(message.id, choice)}
-                                      className="rounded border border-[var(--line)] px-2 py-0.5 text-xs hover:border-[var(--line-strong)] hover:text-[var(--cream)] capitalize"
-                                    >
-                                      {choice.replace('_', ' ')}
-                                    </button>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-[var(--sage)]">Recorded: {message.feedbackGiven.replace('_', ' ')}</span>
-                              )}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6 font-explanation text-sm leading-relaxed">
-                            {message.text}
-                          </div>
-                        )}
-                      </motion.article>
-                    )
-                  )}
-
-                  {sending && (
-                    <div className="pt-4 pb-2">
-                      <IridescentLoader label="Sovereign is synthesizing your answer" />
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* INPUT BOX */}
-            <div className="sticky bottom-4 pt-2">
-              <div className="rounded-xl border border-[var(--line-strong)] bg-[#111110] p-2 shadow-2xl">
-                <div className="flex items-end gap-2">
-                  <Textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        send();
-                      }
-                    }}
-                    placeholder="Ask Sovereign…"
-                    className="min-h-12 border-0 bg-transparent px-2 py-2 shadow-none focus:ring-0 text-sm text-[var(--cream)]"
-                    disabled={sending}
-                  />
-                  <Button size="sm" aria-label="Send" onClick={send} disabled={sending || !input.trim()}>
-                    {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-2 text-center font-utility text-[10px] text-[var(--subtle)]">
-                Private by default · Sovereign uses only consented data
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* PEOPLE VIEW */}
-        {activeTab === 'people' && (
-          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
-            <div>
-              <p className="font-utility text-[var(--sage)] mb-2">PEOPLE</p>
-              <h1 className="font-statement text-3xl text-[var(--cream)]">
-                Understand what happens between people.
-              </h1>
-              <p className="mt-3 font-explanation text-sm">
-                Add people you choose to include and explore conversations, patterns, and situations without collapsing two distinct perspectives into one.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="font-utility text-[11px] text-[var(--subtle)]">INCLUDED PEOPLE ({people.length})</span>
-                <button
-                  onClick={() => setShowAddPerson(!showAddPerson)}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs text-[var(--cream)] hover:border-[var(--line-strong)] transition"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  <span>Add someone</span>
-                </button>
-              </div>
-
-              {showAddPerson && (
-                <form onSubmit={handleAddPerson} className="rounded-xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-5 space-y-3">
-                  <div className="font-statement text-sm text-[var(--cream)]">Add someone to your context</div>
-                  <Input
-                    placeholder="Name or identifier (e.g. Alex, Manager, Partner)"
-                    value={newPersonName}
-                    onChange={(e) => setNewPersonName(e.target.value)}
-                    required
-                    className="border-[var(--line)] bg-[var(--surface)] text-sm rounded-lg"
-                  />
-                  <Input
-                    placeholder="Relational role (e.g. Partner, Colleague, Co-founder)"
-                    value={newPersonRelation}
-                    onChange={(e) => setNewPersonRelation(e.target.value)}
-                    className="border-[var(--line)] bg-[var(--surface)] text-sm rounded-lg"
-                  />
-                  <div className="flex justify-end gap-2 pt-1">
-                    <button type="button" onClick={() => setShowAddPerson(false)} className="px-3 py-1.5 text-xs text-[var(--muted)]">Cancel</button>
-                    <button type="submit" className="rounded-lg bg-[var(--cream)] px-3.5 py-1.5 text-xs font-medium text-[var(--ink)]">Add person</button>
-                  </div>
-                </form>
-              )}
-
-              <div className="space-y-3">
-                {people.map((person) => (
-                  <div key={person.id} className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="font-statement text-base text-[var(--cream)]">{person.name}</div>
-                      <span className="font-utility text-[10px] text-[var(--sage)]">{person.relation}</span>
-                    </div>
-                    <p className="font-explanation text-xs text-[var(--muted)]">{person.note}</p>
-                    <div className="pt-2 flex gap-2">
-                      <button
-                        onClick={() => {
-                          setActiveTab('today');
-                          setInput(`What is happening between me and ${person.name} in our conversations?`);
-                        }}
-                        className="rounded border border-[var(--line)] px-2.5 py-1 text-xs text-[var(--muted)] hover:text-[var(--cream)] hover:border-[var(--line-strong)]"
-                      >
-                        Examine dynamic →
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* SYSTEMS VIEW */}
-        {activeTab === 'systems' && (
-          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
-            <div>
-              <p className="font-utility text-[var(--sage)] mb-2">SYSTEMS</p>
-              <h1 className="font-statement text-3xl text-[var(--cream)]">
-                See the whole system.
-              </h1>
-              <p className="mt-3 font-explanation text-sm">
-                Examine group dynamics and recurring patterns across families, teams, and partnerships without collapsing everyone into one story.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-8 text-center space-y-4">
-              <ReferenceField className="mx-auto w-80 h-48 opacity-30" />
-              <div className="font-statement text-lg text-[var(--cream)]">Interconnected Relational Dynamics</div>
-              <p className="font-explanation text-xs max-w-md mx-auto">
-                When three or more people interact, the dynamic shifts from pairwise communication into systemic equilibrium. Sovereign maps who holds tension, how pressure moves, and where recurring loops repeat.
-              </p>
-              <button
-                onClick={() => {
-                  setActiveTab('today');
-                  setInput('What is the recurring pattern in our team meetings when decisions stall?');
-                }}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-[var(--line)] bg-[var(--surface-2)] px-4 py-2 text-xs text-[var(--cream)] hover:border-[var(--line-strong)]"
-              >
-                <span>Ask about a system dynamic</span>
-                <ArrowUp className="h-3.5 w-3.5 rotate-45" />
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* EXPLORE VIEW */}
-        {activeTab === 'explore' && (
-          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
-            <div>
-              <p className="font-utility text-[var(--sage)] mb-2">EXPLORE</p>
-              <h1 className="font-statement text-3xl text-[var(--cream)]">
-                Explore recurring patterns.
-              </h1>
-              <p className="mt-3 font-explanation text-sm">
-                Examine how you tend to think, decide, communicate, connect, and respond under pressure.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { title: 'Decision Making', q: 'How does my Baseline evaluate risk when deadlines accelerate?' },
-                { title: 'Communication Under Stress', q: 'Why do I become overly precise when feeling criticized?' },
-                { title: 'Momentum & Energy', q: 'Where does my focus naturally sustain without burnout?' },
-                { title: 'Boundaries & Trust', q: 'How do I balance autonomy with intimate connection?' }
-              ].map((item) => (
-                <div key={item.title} className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-5 space-y-2">
-                  <div className="font-utility text-[10px] text-[var(--sage)]">{item.title}</div>
-                  <div className="font-statement text-sm text-[var(--cream)]">{item.q}</div>
-                  <button
-                    onClick={() => {
-                      setActiveTab('today');
-                      setInput(item.q);
-                    }}
-                    className="pt-2 text-xs text-[var(--muted)] hover:text-[var(--cream)] underline inline-block"
-                  >
-                    Explore this pattern →
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* LIBRARY VIEW */}
-        {activeTab === 'library' && (
-          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
-            <div>
-              <p className="font-utility text-[var(--sage)] mb-2">LIBRARY</p>
-              <h1 className="font-statement text-3xl text-[var(--cream)]">
-                Your saved references.
-              </h1>
-              <p className="mt-3 font-explanation text-sm">
-                Active threads are scheduled for 30-day deletion under private retention; saved notes and core themes remain in your private library.
-              </p>
-            </div>
-
-            <div className="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6 space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="font-statement text-sm text-[var(--cream)]">Current Active Thread</span>
-                <span className="font-utility text-[10px] text-[var(--subtle)]">30-DAY RETENTION ACTIVE</span>
-              </div>
-              <p className="font-explanation text-xs text-[var(--muted)]">
-                Thread ID: <span className="font-mono">{threadId}</span> · Started today
-              </p>
-              <div className="text-xs text-[var(--subtle)]">
-                Messages: {messages.length} · Privacy policy enforced
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* YOU / BASELINE VIEW */}
-        {activeTab === 'you' && (
-          <div className="sov-tab-content max-w-3xl mx-auto w-full px-6 py-12 space-y-8">
-            <div>
-              <p className="font-utility text-[var(--sage)] mb-2">YOU</p>
-              <h1 className="font-statement text-3xl text-[var(--cream)]">
-                A private reference built around you.
-              </h1>
-              <p className="mt-3 font-explanation text-sm">
-                It gives Sovereign context for how you tend to operate, carried quietly into your conversations.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 md:p-8 space-y-6">
-              <div className="flex items-center justify-between border-b border-[var(--line)] pb-4">
-                <div className="flex items-center gap-2">
-                  <SovereignMark size={16} />
-                  <span className="font-statement text-sm text-[var(--cream)]">Baseline Reference Status</span>
-                </div>
-                <span className="font-utility text-[10px] text-[var(--sage)]">
-                  {baseline?.ready ? 'GROUNDED & ACTIVE' : 'INITIALIZING'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {[
-                  { label: 'Cognitive Framing', value: 'Precision / Structural' },
-                  { label: 'Decision Rhythm', value: 'Values Alignment First' },
-                  { label: 'Communication Tone', value: 'Direct / Nuanced' },
-                  { label: 'Generative Momentum', value: 'Autonomous Flow' },
-                  { label: 'Relational Trust', value: 'Deliberate Bonding' },
-                  { label: 'Friction Response', value: 'Internal Reflection' }
-                ].map((item) => (
-                  <div key={item.label} className="rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-3 space-y-1">
-                    <div className="font-utility text-[9px] text-[var(--subtle)]">{item.label}</div>
-                    <div className="font-statement text-xs text-[var(--cream)]">{item.value}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t border-[var(--line)] pt-4 text-xs font-explanation text-[var(--subtle)]">
-                Raw birth coordinates remain sealed. Sovereign uses this interpretive context — not as a box you have to fit into.
-              </div>
-            </div>
-          </div>
-        )}
+          <ArrowUp className="h-3 w-3 rotate-90" /> Back to Home
+        </button>
+        <h1 className="font-display text-4xl md:text-6xl text-[var(--cream)] tracking-tight mb-12">
+          {title}
+        </h1>
+        <div className="relative z-10">{children}</div>
       </main>
     </div>
   );
 }
 
-/* =========================================================================
-   PUBLIC INFORMATION PAGES (HOW IT WORKS, PRICING, FAQ, LEGAL)
-   ========================================================================= */
 function InfoPage({ onBack }: { onBack: () => void }) {
   return (
     <PageFrame title="How Sovereign Works" onBack={onBack}>
-      <div className="space-y-12">
-        <InfoSection
-          label="01"
-          title="Start with you"
-          body="Sovereign begins with your Baseline: a private reference built around you that captures how you think, decide, communicate, connect, and respond under pressure."
-        />
-        <InfoSection
-          label="02"
-          title="Bring real situations"
-          body="Ask in ordinary language about decisions, relationships, or recurring patterns. Sovereign grounds its response in your personal reference rather than delivering generic chatbot replies."
-        />
-        <InfoSection
-          label="03"
-          title="Understand what happens between people"
-          body="Add people you choose to include to examine relational dynamics without collapsing two distinct perspectives into one."
-        />
-        <InfoSection
-          label="04"
-          title="See the whole system"
-          body="Families, teams, and groups have patterns that no single person created alone. Sovereign illuminates the wider system while keeping individual contexts intact."
-        />
+      <div className="space-y-16">
+        {[
+          { label: '01', title: 'Start with you', body: 'Sovereign begins with your Baseline: a private reference built around you that captures how you think, decide, communicate, connect, and respond under pressure.' },
+          { label: '02', title: 'Bring real situations', body: 'Ask in ordinary language about decisions, relationships, or recurring patterns. Sovereign grounds its response in your personal reference rather than delivering generic chatbot replies.' },
+          { label: '03', title: 'Understand what happens between people', body: 'Add people you choose to include to examine relational dynamics without collapsing two distinct perspectives into one.' },
+          { label: '04', title: 'See the whole system', body: 'Families, teams, and groups have patterns that no single person created alone. Sovereign illuminates the wider system while keeping individual contexts intact.' },
+        ].map((item) => (
+          <div key={item.label} className="grid gap-6 border-t border-white/10 pt-12 md:grid-cols-[100px_1fr]">
+            <div className="font-mono text-xs text-[var(--sage)] tracking-widest">{item.label}</div>
+            <div className="space-y-4">
+              <h2 className="font-display text-3xl text-[var(--cream)] leading-tight">{item.title}</h2>
+              <p className="max-w-2xl text-base text-[var(--muted)] leading-relaxed">{item.body}</p>
+            </div>
+          </div>
+        ))}
 
-        <div id="support" className="border-t border-[var(--line)] pt-8 mt-12 space-y-3">
-          <h3 className="font-statement text-xl text-[var(--cream)]">Support Sovereign.OS from $1.</h3>
-          <p className="font-explanation text-xs text-[var(--muted)]">
+        <div id="support" className="glass-border p-8 mt-20 space-y-6">
+          <h3 className="font-display text-2xl text-[var(--cream)]">Support Sovereign.OS from $1.</h3>
+          <p className="text-sm text-[var(--muted)] leading-relaxed">
             Separate from subscriptions. Support is voluntary and does not change Free or Sovereign+ access. Contributions use a secure one-time amount from $1.
           </p>
           <a
             href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block rounded-lg border border-[var(--line)] px-4 py-2 text-xs text-[var(--cream)] hover:border-[var(--line-strong)]"
+            className="inline-block rounded-xl bg-white px-6 py-3 text-xs font-medium text-black hover:bg-neutral-200 transition cursor-pointer"
           >
             Make a voluntary support contribution →
           </a>
@@ -1777,73 +231,87 @@ function InfoPage({ onBack }: { onBack: () => void }) {
   );
 }
 
-function InfoSection({ label, title, body }: { label: string; title: string; body: string }) {
-  return (
-    <div className="grid gap-3 border-t border-[var(--line)] pt-7 md:grid-cols-[80px_1fr]">
-      <div className="font-utility text-xs text-[var(--sage)]">{label}</div>
-      <div>
-        <h2 className="font-statement text-2xl text-[var(--cream)]">{title}</h2>
-        <p className="mt-3 max-w-2xl font-explanation text-[15px] leading-relaxed">{body}</p>
-      </div>
-    </div>
-  );
-}
-
 function Pricing({ onBack }: { onBack: () => void }) {
   return (
     <PageFrame title="Pricing" onBack={onBack}>
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-8 space-y-6">
-          <div>
-            <div className="font-utility text-xs text-[var(--muted)]">STANDARD</div>
-            <div className="mt-2 font-statement text-3xl text-[var(--cream)]">Free ($0)</div>
+      <div className="grid gap-8 md:grid-cols-2">
+        <div className="glass-border p-8 sm:p-10 space-y-8 flex flex-col justify-between">
+          <div className="space-y-4">
+            <div>
+              <span className="font-mono text-xs text-[var(--muted)] uppercase tracking-widest">Standard</span>
+              <div className="mt-2 font-display text-4xl text-[var(--cream)]">Free ($0)</div>
+            </div>
+            <p className="text-sm text-[var(--muted)] leading-relaxed">
+              A private Baseline and a focused way to start using Sovereign.
+            </p>
+            <div className="space-y-3 text-xs text-[var(--cream)]/90 pt-6 border-t border-white/10">
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> Private personal Baseline
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> Today thinking surface
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> 10 AI turns / month
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> Strict architectural privacy
+              </div>
+            </div>
           </div>
-          <p className="font-explanation text-sm">A private Baseline and a focused way to start using Sovereign.</p>
-          <div className="space-y-2.5 font-explanation text-xs">
-            <div>— Private personal Baseline</div>
-            <div>— Today thinking surface</div>
-            <div>— 10 AI turns / month</div>
-            <div>— Strict architectural privacy</div>
-          </div>
-          <button onClick={() => go('/signup')} className="w-full rounded-lg border border-[var(--line)] py-2.5 text-xs text-[var(--cream)] hover:border-[var(--line-strong)]">
+          <button onClick={() => go('/signup')} className="w-full rounded-xl border border-white/20 py-3 text-xs font-medium text-[var(--cream)] hover:bg-white/5 transition cursor-pointer">
             Start Free
           </button>
         </div>
 
-        <div className="rounded-2xl border border-[var(--line-strong)] bg-[var(--surface-2)] p-6 sm:p-8 space-y-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="font-utility text-xs text-[var(--sage)]">SOVEREIGN+</div>
-              <div className="mt-2 font-statement text-3xl text-[var(--cream)]">$20 / month</div>
+        <div className="glass-border-strong p-8 sm:p-10 space-y-8 flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="font-mono text-xs text-[var(--sage)] uppercase tracking-widest">Sovereign+</span>
+                <div className="mt-2 font-display text-4xl text-[var(--cream)]">$20 / month</div>
+              </div>
+              <Sparkles className="h-5 w-5 text-[var(--sage)]" />
             </div>
-            <Sparkles className="h-5 w-5 text-[var(--sage)]" />
+            <p className="text-sm text-[var(--muted)] leading-relaxed">
+              Room for deeper personal exploration, relational intelligence, and systems.
+            </p>
+            <div className="space-y-3 text-xs text-[var(--cream)]/90 pt-6 border-t border-white/10">
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> Everything in Free
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> 300 AI turns / month
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> People & relational dynamic comparisons
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> Multi-participant system mapping
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="h-3 w-3 text-[var(--sage)]" /> Extended library retention
+              </div>
+            </div>
           </div>
-          <p className="font-explanation text-sm">Room for deeper personal exploration, relational intelligence, and systems.</p>
-          <div className="space-y-2.5 font-explanation text-xs">
-            <div>— Everything in Free</div>
-            <div>— 300 AI turns / month</div>
-            <div>— People & relational dynamic comparisons</div>
-            <div>— Multi-participant system mapping</div>
-            <div>— Extended library retention</div>
-          </div>
-          <button onClick={() => go('/signup')} className="w-full rounded-lg bg-[var(--cream)] py-2.5 text-xs font-medium text-[var(--ink)] hover:bg-white">
+          <button onClick={() => go('/signup')} className="w-full rounded-xl bg-[var(--cream)] py-3 text-xs font-medium text-[var(--ink)] hover:bg-white transition cursor-pointer shadow-lg">
             Start Sovereign+
           </button>
         </div>
       </div>
 
-      <div className="mt-12 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-6 space-y-3">
-        <h4 className="font-statement text-base text-[var(--cream)]">Support Sovereign.OS</h4>
-        <p className="font-explanation text-xs text-[var(--muted)]">
+      <div className="glass-border p-8 mt-16 space-y-4">
+        <h4 className="font-display text-xl text-[var(--cream)]">Support Sovereign.OS</h4>
+        <p className="font-explanation text-xs text-[var(--muted)] leading-relaxed">
           Support is separate from a subscription. Support does not unlock paid features or change your account access. One-time amount from $1.
         </p>
         <a
           href="https://donate.stripe.com/dRm6oG61T2KSaAhdjO67S02"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block rounded-lg border border-[var(--line)] px-4 py-2 text-xs text-[var(--cream)] hover:border-[var(--line-strong)]"
+          className="inline-block rounded-xl border border-white/20 px-6 py-3 text-xs text-[var(--cream)] hover:bg-white/5 transition cursor-pointer"
         >
-          Voluntary Contribution Link
+          Voluntary Contribution Link →
         </a>
       </div>
     </PageFrame>
@@ -1853,7 +321,7 @@ function Pricing({ onBack }: { onBack: () => void }) {
 function FAQ({ onBack }: { onBack: () => void }) {
   return (
     <PageFrame title="Frequently Asked Questions" onBack={onBack}>
-      <div className="max-w-3xl divide-y divide-[var(--line)]">
+      <div className="max-w-3xl space-y-4">
         {[
           [
             'What is Sovereign?',
@@ -1872,12 +340,14 @@ function FAQ({ onBack }: { onBack: () => void }) {
             'Yes. Voluntary support does not unlock paid features or change your plan. It is a separate one-time contribution and is not presented as tax-deductible.'
           ]
         ].map(([q, a]) => (
-          <details key={q} className="py-6 group">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-statement text-lg text-[var(--cream)]">
+          <details key={q} className="group rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/20 cursor-pointer">
+            <summary className="flex items-center justify-between gap-4 font-display text-lg text-[var(--cream)] list-none">
               {q}
               <ChevronDown className="h-4 w-4 text-[var(--subtle)] transition-transform group-open:rotate-180" />
             </summary>
-            <p className="mt-4 font-explanation text-sm max-w-2xl">{a}</p>
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <p className="font-explanation text-sm text-[var(--muted)] leading-relaxed">{a}</p>
+            </div>
           </details>
         ))}
       </div>
@@ -1888,43 +358,22 @@ function FAQ({ onBack }: { onBack: () => void }) {
 function LegalPage({ title, onBack }: { title: string; onBack: () => void }) {
   return (
     <PageFrame title={title} onBack={onBack}>
-      <div className="max-w-3xl space-y-6 font-explanation text-sm leading-relaxed text-[var(--muted)]">
-        <p className="font-utility text-xs text-[var(--subtle)]">EFFECTIVE DATE: AUGUST 17, 2026</p>
-        <p>
-          Sovereign is built with strict data isolation: your raw birth date, exact coordinates, and private notes are stored strictly for your Baseline and never enter language-model prompt context.
+      <div className="max-w-3xl glass-border p-8 sm:p-12 space-y-6">
+        <p className="font-mono text-[10px] text-[var(--subtle)] uppercase tracking-widest">
+          EFFECTIVE DATE: AUGUST 17, 2026
         </p>
-        <p>
-          Conversations and responses remain private to your authenticated account. Consented sharing with other accounts requires explicit approval for each participant.
-        </p>
-        <p>
-          Sovereign does not sell personal information or train public artificial intelligence models on your private data.
-        </p>
+        <div className="space-y-6 font-explanation text-sm leading-relaxed text-[var(--muted)]">
+          <p>
+            Sovereign is built with strict data isolation: your raw birth date, exact coordinates, and private notes are stored strictly for your Baseline and never enter language-model prompt context.
+          </p>
+          <p>
+            Conversations and responses remain private to your authenticated account. Consented sharing with other accounts requires explicit approval for each participant.
+          </p>
+          <p>
+            Sovereign does not sell personal information or train public artificial intelligence models on your private data.
+          </p>
+        </div>
       </div>
     </PageFrame>
   );
 }
-
-function PageFrame({
-  title,
-  onBack,
-  children
-}: {
-  title: string;
-  onBack: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <div className="page-noise min-h-screen bg-[var(--ink)] text-[var(--cream)] overflow-x-hidden">
-      <Header />
-      <main className="mx-auto max-w-4xl px-6 pb-24 pt-10 md:px-8 md:pt-16">
-        <button onClick={onBack} className="mb-8 font-utility text-xs text-[var(--muted)] hover:text-[var(--cream)] transition">
-          ← Back
-        </button>
-        <h1 className="font-display text-4xl md:text-6xl text-[var(--cream)]">{title}</h1>
-        <div className="mt-12">{children}</div>
-      </main>
-    </div>
-  );
-}
-
-export { PublicLanding, SovereignIntelligenceWorkspace };

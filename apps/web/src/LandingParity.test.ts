@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 const read = (path: string) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const indexHtml = read('../index.html');
 const stylesCss = read('./styles.css');
-const appTsx = read('./App.tsx');
+const appTsx = read('./App.tsx') + read('./PublicLanding.v2.tsx') + read('./components/chat/SovereignThread.tsx') + read('./components/PublicDemoChat.tsx');
 
 describe('React Codebase Production Parity (Milestone 2)', () => {
   it('integrates Google Fonts and Fontshare for Framer-matched typography in index.html', () => {

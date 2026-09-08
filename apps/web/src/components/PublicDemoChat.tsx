@@ -15,13 +15,13 @@ const DEMO_CONVERSATION: DemoTurn[] = [
   },
   {
     role: 'sovereign',
-    content: `You likely need verbal reassurance to settle; they may need silence to process. When one person seeks clarity and the other needs time to think, each move makes sense from the inside and feels wrong from the outside.
+    content: `Ask Sovereign: You likely need verbal reassurance to settle; they may need silence to process. When one person seeks clarity and the other needs time to think, each move makes sense from the inside and feels wrong from the outside.
 
-**The core dynamic:** You move toward connection when uncertain. They move away to think clearly. Neither response is wrong—they're just different processing speeds.
+**WHAT YOU MAY BE BRINGING:** You move toward connection when uncertain.
+**WHAT THEY MAY BE BRINGING:** They move away to think clearly.
+**WHAT HAPPENS BETWEEN YOU:** You're not too much. They're not withdrawn. You're both protecting what helps you stay stable.
 
-**What's actually happening:** You're not too much. They're not withdrawn. You're both protecting what helps you stay stable. The friction happens because you don't realize you're protecting different things.
-
-**One clear move:** "I need to know you're still with me. I don't need the answer right now—just that you heard me." That tells them what reassures you without asking them to change their thinking process.`,
+**One clear move:** "I need to know you're still with me. I don't need the answer right now—just that you heard me."`,
     metadata: {
       groundingSources: ['Communication patterns', 'Relational response under uncertainty', 'Processing pace differences']
     }
@@ -71,7 +71,7 @@ export function PublicDemoChat() {
 
   return (
     <div
-      className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5 text-gray-100 transition-all duration-300 hover:border-white/20"
+      className="w-full bg-white/5 border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col gap-5 text-gray-100 transition-all duration-300 hover:border-white/20"
       aria-live="polite"
       aria-label="Demo conversation with Sovereign"
     >
@@ -89,18 +89,24 @@ export function PublicDemoChat() {
                 className={`flex flex-col ${turn.role === 'user' ? 'items-end' : 'items-start'}`}
               >
                 {turn.role === 'user' && (
-                  <div className="max-w-[90%] rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10 px-4 py-3 text-sm text-white shadow-md">
+                  <div className="max-w-[90%] rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-sm text-white shadow-md">
                     <p>{turn.content}</p>
                   </div>
                 )}
                 {turn.role === 'sovereign' && (
-                  <div className="max-w-full rounded-2xl bg-black/60 backdrop-blur-md border border-white/15 p-5 text-sm text-gray-200 leading-relaxed shadow-xl space-y-3">
+                  <div className="max-w-full rounded-2xl bg-black/60 border border-white/15 p-5 text-sm text-gray-200 leading-relaxed shadow-xl space-y-3">
                     <div className="space-y-3">
                       {renderFormattedContent(turn.content)}
                     </div>
                     {turn.metadata?.groundingSources && (
-                      <div className="border-t border-white/10 pt-2.5 text-xs text-neutral-400">
-                        <strong className="text-neutral-300">Grounded in:</strong> {turn.metadata.groundingSources.join(' • ')}
+                      <div className="border-t border-white/10 pt-2.5 text-xs text-neutral-400 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <strong className="text-neutral-300">Grounded in:</strong>
+                          <span className="text-[11px] text-[var(--sage)] cursor-pointer">See source details</span>
+                        </div>
+                        <p className="text-[11px] text-neutral-400">
+                          These are the source values Sovereign used for this answer. {turn.metadata.groundingSources.join(' • ')}
+                        </p>
                       </div>
                     )}
                   </div>

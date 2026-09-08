@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type FormEvent } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowUp, ChevronDown, ChevronUp, Check, RotateCcw } from 'lucide-react';
 import { BrandMark } from '../ui/BrandMark';
@@ -34,21 +34,13 @@ export interface ChatMessage {
 }
 
 export interface SovereignThreadProps {
-  /** Unique thread identifier for conversation persistence */
   threadId?: string;
-  /** Active user auth session with optional passkey indicator */
   session?: (AuthSession & { hasPasskey?: boolean; passkeyVerified?: boolean }) | null;
-  /** Explicit override or prop for verified passkey badge */
   hasVerifiedPasskey?: boolean;
-  /** Surface context passed to worker API (defaults to 'Today') */
   surface?: 'Today' | 'Explore' | 'People' | 'Systems' | string;
-  /** Optional initial messages list */
   initialMessages?: ChatMessage[];
-  /** Callback triggered when a turn completes */
   onTurnComplete?: (message: ChatMessage) => void;
-  /** Custom class name for the wrapper container */
   className?: string;
-  /** Optional input placeholder */
   placeholder?: string;
 }
 
@@ -81,19 +73,16 @@ export function SovereignThread({
   const scrollEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Conditional passkey badge check
   const isPasskeyVerified = Boolean(
     session?.hasPasskey || session?.passkeyVerified || hasVerifiedPasskey
   );
 
-  // Auto-scroll to latest turn
   useEffect(() => {
     if (scrollEndRef.current) {
       scrollEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   }, [messages, isStreaming]);
 
-  // Auto-resize textarea composer using scrollHeight clamping (44px to 200px)
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -120,8 +109,8 @@ export function SovereignThread({
     );
     try {
       await submitCorrection(currentThreadId, choice);
-    } catch {
-      // Feedback submission is non-blocking
+    } catch (e) {
+      // Silent fail
     }
   };
 
@@ -138,7 +127,7 @@ export function SovereignThread({
     }
   };
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     const inquiry = draft.trim();
     if (!inquiry || isStreaming) return;
@@ -231,7 +220,6 @@ export function SovereignThread({
         isStreaming: false
       };
 
-      // Enrich completed turn with structured metadata from thread messages if available
       try {
         const threadMessages = await getThreadMessages(currentThreadId);
         const lastMsg = threadMessages[threadMessages.length - 1];
@@ -244,8 +232,8 @@ export function SovereignThread({
             sources: lastMsg.basis
           };
         }
-      } catch {
-        // Retain streamed text if thread enrichment is unavailable
+      } catch (e) {
+        // Ignore enrichment error
       }
 
       setMessages((prev) =>
@@ -263,7 +251,6 @@ export function SovereignThread({
     }
   }
 
-  // Normalize sources list helper (strictly avoiding Basis in presentation)
   const getNormalizedSources = (message: ChatMessage): ChatMessageSource[] => {
     const rawList = message.sources || message.basis || [];
     return rawList.map((item) => {
@@ -283,11 +270,11 @@ export function SovereignThread({
 
   return (
     <div
-      className={`flex flex-col h-full min-h-[500px] w-full bg-[#000000] text-[#f5f5f7] ${className}`}
+      className={`relative flex flex-col h-full min-h-[500px] w-full bg-[#000000] text-[#f5f5f7] ${className} page-noise`}
       data-testid="sovereign-thread"
     >
-      {/* Thread Header */}
-      <header className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08] bg-[#000000]/90 sticky top-0 z-20">
+      <div className="stage-glow" />
+      <header className="relative z-10 flex items-center justify-between px-5 py-3.5 border-b border-white/[0.08] bg-[#000000]/90 sticky top-0">
         <div className="flex items-center gap-3">
           <BrandMark size={20} className="text-[#f5f5f7]" />
           <span className="text-sm font-semibold tracking-tight text-[#f5f5f7]">
@@ -299,7 +286,6 @@ export function SovereignThread({
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Sage Passkey Verification Badge */}
           {isPasskeyVerified && (
             <div
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-[#9fbaa1]/30 bg-[#9fbaa1]/10 text-[#9fbaa1]"
@@ -324,19 +310,18 @@ export function SovereignThread({
         </div>
       </header>
 
-      {/* Main Message Stream */}
       <div className="flex-1 overflow-y-auto px-4 py-6 md:px-6 max-w-4xl w-full mx-auto space-y-6">
         {messages.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center max-w-xl mx-auto text-center px-4 py-16 space-y-6">
-            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-widest border border-white/10 text-[#8e8e93] bg-white/[0.03]">
-              {surface}
+          <div className="flex flex-col items-center justify-center min-h-[350px] text-center max-w-md mx-auto space-y-6 my-auto">
+            <div className="h-12 w-12 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#9fbaa1]">
+              <BrandMark size={24} />
             </div>
-            <h1 className="text-2xl md:text-3xl font-medium tracking-tight text-[#f5f5f7]">
-              What is happening in your life right now?
+            <h1 className="font-display text-2xl md:text-3xl text-[#f5f5f7]">
+              What is active for you now?
             </h1>
             <p className="text-sm leading-relaxed text-[#8e8e93]">
               Ask in ordinary language. Sovereign answers from your private Baseline,
-              surfaces active dynamics, and keeps unknowns explicit.
+              surfaces how pressure moves, active dynamics, and keeps unknowns explicit.
             </p>
             <div className="pt-2 w-full space-y-2.5">
               <div className="text-[10px] font-mono uppercase tracking-widest text-[#636366]">
@@ -365,8 +350,8 @@ export function SovereignThread({
               const sources = getNormalizedSources(message);
               const isSourcesOpen = Boolean(expandedSources[message.id]);
 
+              {/* Block 1: User prompt block */}
               if (message.role === 'user') {
-                {/* Block 1: User prompt block */}
                 return (
                   <motion.div
                     key={message.id}
@@ -389,7 +374,7 @@ export function SovereignThread({
                   transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                   className="w-full space-y-4"
                 >
-                  <div className="rounded-2xl border border-white/10 bg-[#0d0d0c] p-6 md:p-8 space-y-5 shadow-xl">
+                  <div className="glass-border p-6 md:p-8 space-y-5 shadow-xl">
                     <div className="flex items-center justify-between font-mono text-[10px] text-[#8e8e93]">
                       <span className="text-[#9fbaa1] flex items-center gap-1.5 font-medium">
                         <BrandMark size={14} className="text-[#9fbaa1]" />
@@ -398,20 +383,18 @@ export function SovereignThread({
                       <span className="tracking-wider uppercase text-[#636366]">PRIVATE</span>
                     </div>
 
-                    {/* Headline */}
                     {message.answer?.headline && (
-                      <h2 className="text-xl md:text-2xl font-medium tracking-tight text-[#f5f5f7]">
+                      <h2 className="text-xl md:text-2xl font-medium tracking-tight text-[#f5f5f7] font-display">
                         {message.answer.headline}
                       </h2>
                     )}
 
-                    {/* Direct answer prose */}
                     {message.isStreaming && !message.content && !message.text ? (
                       <div className="pt-2 pb-1">
                         <IridescentLoader label="Sovereign is synthesizing your answer" />
                       </div>
                     ) : (
-                      <div className="answer-direct text-[15px] leading-[1.72] text-[#e5e5ea]">
+                      <div className="text-[15px] leading-[1.72] text-[#e5e5ea] answer-direct">
                         <p className="whitespace-pre-wrap">
                           {message.answer?.direct_answer || message.content || message.text}
                           {message.isStreaming && (
@@ -424,7 +407,6 @@ export function SovereignThread({
                       </div>
                     )}
 
-                    {/* Exploration section cards */}
                     {message.answer?.sections && message.answer.sections.length > 0 && (
                       <div className="space-y-3 border-t border-white/[0.08] pt-4">
                         {message.answer.sections.map((sec) => (
@@ -516,7 +498,6 @@ export function SovereignThread({
                       </div>
                     )}
 
-                    {/* Feedback prompt */}
                     <div className="border-t border-white/[0.08] pt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-[#8e8e93]">
                       <span>{message.answer?.correction_prompt || 'Does this match today?'}</span>
                       {!message.feedbackGiven ? (
@@ -543,31 +524,13 @@ export function SovereignThread({
                 </motion.article>
               );
             })}
-
-            {error && (
-              <div
-                className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-xs text-red-400 flex items-center justify-between"
-                role="alert"
-              >
-                <span>{error}</span>
-                <button
-                  type="button"
-                  onClick={() => setError(null)}
-                  className="text-red-300 underline ml-3 cursor-pointer"
-                >
-                  Dismiss
-                </button>
-              </div>
-            )}
-            <div ref={scrollEndRef} />
           </div>
         )}
       </div>
 
-      {/* Sticky Composer */}
-      <div className="px-4 pb-4 md:px-6 max-w-4xl w-full mx-auto">
+      <div className="relative z-10 px-4 pb-4 md:px-6 max-w-4xl w-full mx-auto">
         <form onSubmit={handleSubmit} className="relative">
-          <div className="rounded-xl border border-white/15 bg-[#111110] p-2 shadow-2xl focus-within:border-white/30 transition-colors">
+          <div className="glass-border p-2 shadow-2xl focus-within:border-white/30 transition-colors">
             <div className="flex items-end gap-2">
               <textarea
                 ref={textareaRef}
@@ -579,7 +542,7 @@ export function SovereignThread({
                     handleSubmit(e);
                   }
                 }}
-                placeholder={placeholder || 'Ask Sovereign anything... (Shift+Enter for new line)'}
+                placeholder="Ask Sovereign…"
                 disabled={isStreaming}
                 aria-label="Send inquiry to Sovereign"
                 className="w-full min-h-[44px] max-h-[200px] border-0 bg-transparent px-2 py-2 text-sm text-[#f5f5f7] placeholder-[#636366] focus:outline-none resize-none leading-relaxed"
