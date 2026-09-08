@@ -73,7 +73,10 @@ const PUBLIC_PATHS = new Set([
   '/how-it-works.html'
 ]);
 const PUBLIC_ROUTE_ALIASES = new Map([
-  ['/questions', '/faq']
+  ['/questions', '/faq'],
+  ['/pricing.html', '/pricing'],
+  ['/faq.html', '/faq'],
+  ['/how-it-works.html', '/how-it-works']
 ]);
 const THREAD_MESSAGE_PATH = /^\/api\/v1\/threads\/[^/]+\/messages$/;
 const PASSKEY_DELETE_PATH = /^\/api\/v1\/auth\/passkeys\/([^/]+)$/;

@@ -99,8 +99,11 @@ h1, h2, .font-display, .font-statement {
 /* ── Font-Face declarations ── */
 @font-face {
   font-family: "Gambarino";
-  src: url("/fonts/gambarino.woff2") format("woff2");
+  src: url("/fonts/gambarino.woff2") format("woff2"),
+       url("https://framerusercontent.com/third-party-assets/fontshare/wf/ZINX7PW4XMYISLZAZKYY4QHYYHYNPKAV/Z54IGKTR4PBLA5KTYL3IDQZHFQPJJVNZ/6KBHT5NXCZVM6GHTPKGIR6DXZLQAYIFK.woff2") format("woff2");
   font-display: swap;
+  font-style: normal;
+  font-weight: 400;
 }
 @font-face {
   font-family: "Onest";

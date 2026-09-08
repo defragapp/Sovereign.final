@@ -69,6 +69,54 @@ html body { background: var(--token-dfa85e1b-31ee-41ab-bfa8-b53b1e521c20, rgb(10
 /* Framer MindWave Template CSS */
 
 
+/* Framer MindWave Text Style Presets */
+.framer-mindwave-root .framer-styles-preset-104xs3o,
+.framer-mindwave-root [data-styles-preset="X_D2p2NQW"] {
+  --framer-font-family: "Gambarino", serif !important;
+  --framer-font-size: 56px !important;
+  --framer-line-height: 1.1em !important;
+  --framer-letter-spacing: -0.02em !important;
+  --framer-text-color: var(--token-35958b5f-fcd4-4988-a517-708c39eda844, rgb(250, 250, 250)) !important;
+  --framer-text-alignment: center !important;
+}
+
+.framer-mindwave-root .framer-styles-preset-p11uu0,
+.framer-mindwave-root [data-styles-preset="ic733n7x0"] {
+  --framer-font-family: "Onest", sans-serif !important;
+  --framer-font-size: 16px !important;
+  --framer-line-height: 1.5em !important;
+  --framer-letter-spacing: 0em !important;
+  --framer-text-color: var(--token-b60aeb72-65cc-4c6e-8812-1af0df1f280f, rgb(212, 212, 212)) !important;
+}
+
+.framer-mindwave-root .framer-styles-preset-12z0g6x,
+.framer-mindwave-root [data-styles-preset="g8C93ur7F"] {
+  --framer-font-family: "Fragment Mono", monospace !important;
+  --framer-font-size: 12px !important;
+  --framer-line-height: 1em !important;
+  --framer-letter-spacing: 0.1em !important;
+  --framer-text-transform: uppercase !important;
+  --framer-text-color: var(--token-35958b5f-fcd4-4988-a517-708c39eda844, rgb(250, 250, 250)) !important;
+}
+
+.framer-mindwave-root .framer-styles-preset-1dgusyl,
+.framer-mindwave-root [data-styles-preset="e06RPT7qs"] {
+  --framer-font-family: "Onest", sans-serif !important;
+  --framer-font-size: 14px !important;
+  --framer-font-weight: 600 !important;
+  --framer-line-height: 1.2em !important;
+  --framer-text-color: var(--token-35958b5f-fcd4-4988-a517-708c39eda844, rgb(250, 250, 250)) !important;
+}
+
+.framer-mindwave-root .framer-styles-preset-gv2o4p,
+.framer-mindwave-root [data-styles-preset="hQQzlC7Yp"] {
+  --framer-font-family: "Onest", sans-serif !important;
+  --framer-font-size: 14px !important;
+  --framer-font-weight: 500 !important;
+  --framer-line-height: 1.4em !important;
+  --framer-text-color: var(--token-879b0e1d-5621-4d40-b220-d8aae467daad, rgb(163, 163, 163)) !important;
+}
+
 /* Framer MindWave SSR Visibility & Display Overrides */
 .framer-mindwave-root [data-framer-appear-id],
 .framer-mindwave-root nav.framer-gDgJV .framer-1g7tdyi,
@@ -83,16 +131,37 @@ html body { background: var(--token-dfa85e1b-31ee-41ab-bfa8-b53b1e521c20, rgb(10
 .framer-mindwave-root .framer-91hf5k,
 .framer-mindwave-root .framer-hfinpz-container,
 .framer-mindwave-root .framer-1drl45k-container,
-.framer-mindwave-root [style*="opacity:0.001"],
-.framer-mindwave-root [style*="opacity: 0.001"],
-.framer-mindwave-root [style*="opacity:0;"],
-.framer-mindwave-root [style*="opacity: 0;"] {
+.framer-mindwave-root [style*="opacity:0"],
+.framer-mindwave-root [style*="opacity: 0"] {
   opacity: 1 !important;
-  transform: none !important;
-  will-change: auto !important;
 }
 
+/* Preserve translate(-50%, -50%) on centered background glows */
+.framer-mindwave-root .framer-1lx1254,
+.framer-mindwave-root .framer-436ii3,
+.framer-mindwave-root .framer-1ykp0g5,
+.framer-mindwave-root .framer-1dbxvbt,
+.framer-mindwave-root .framer-1lyse93,
+.framer-mindwave-root .framer-1ytd2cr,
+.framer-mindwave-root .framer-1jjvits,
 .framer-mindwave-root .framer-13fxv7s > div {
   opacity: 0.6 !important;
   transform: translate(-50%, -50%) scale(1) !important;
 }
+
+/* Enable button glow overlays */
+.framer-mindwave-root .framer-592rjz {
+  opacity: 1 !important;
+  transform: translateX(-50%) !important;
+}
+
+/* Enable slideshow logo list */
+.framer-mindwave-root .framer-18y0c2x-container section {
+  opacity: 1 !important;
+}
+
+/* Enable Framer SSR Navbar container */
+.framer-mindwave-root .framer-1g7tdyi {
+  opacity: 1 !important;
+}
+
